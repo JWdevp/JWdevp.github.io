@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontakt — Jason Wiersum</title>
+<meta name="description" content="Kontaktformular und Profile von Jason Wiersum — Entwicklung und Gestaltung aus Nürnberg.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;800&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<div class="wrap">
+
+  <nav class="island" aria-label="Hauptnavigation">
+    <a href="index.html">Start</a>
+    <a href="portfolio.html">Projekte</a>
+    <a href="kontakt.html" aria-current="page">Kontakt</a>
+  </nav>
+
+  <main id="main">
+
+    <section class="page-head">
+      <span class="label">Schreiben Sie mir</span>
+      <h1 class="page-head__title">Kontakt</h1>
+      <p class="page-head__lead">
+        Ob Projektanfrage, Stellenangebot oder einfach eine Frage — schreiben Sie
+        mir kurz, ich melde mich zeitnah zurück.
+      </p>
+    </section>
+
+    <section class="contact-grid">
+
+      <!-- Formular: wird über Web3Forms als E-Mail zugestellt -->
+      <form class="form" action="https://api.web3forms.com/submit" method="POST">
+
+        <!-- Zugriffsschlüssel von web3forms.com eintragen -->
+        <input type="hidden" name="access_key" value="HIER-DEINEN-ACCESS-KEY-EINTRAGEN">
+        <input type="hidden" name="subject" value="Neue Nachricht über jasonwiersum.de">
+        <input type="hidden" name="from_name" value="Portfolio-Kontaktformular">
+
+        <!-- Spam-Falle: für Menschen unsichtbar, Bots füllen sie aus -->
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+
+        <div class="field">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required autocomplete="name">
+        </div>
+
+        <div class="field">
+          <label for="email">E-Mail</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+
+        <div class="field">
+          <label for="betreff">Betreff</label>
+          <input type="text" id="betreff" name="betreff">
+        </div>
+
+        <div class="field">
+          <label for="nachricht">Nachricht</label>
+          <textarea id="nachricht" name="nachricht" rows="7" required></textarea>
+        </div>
+
+        <button class="btn" type="submit">Nachricht senden</button>
+
+        <p class="form__note">
+          Ihre Angaben werden ausschließlich zur Beantwortung Ihrer Anfrage verwendet.
+        </p>
+      </form>
+
+      <aside class="contact-side">
+        <span class="label contact__head">Direkt erreichbar</span>
+        <ul class="linklist">
+          <li>
+            <a href="mailto:wiersumjason@gmail.com">
+              E-Mail
+              <span class="linklist__meta">Direkt</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/in/jason-wiersum/" target="_blank" rel="noopener">
+              LinkedIn
+              <span class="linklist__meta">Profil</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/JWdevp" target="_blank" rel="noopener">
+              GitHub
+              <span class="linklist__meta">Code</span>
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <span class="label">Jason Wiersum · Nürnberg</span>
+    <span class="label">Gestaltet und gebaut in HTML &amp; CSS</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
