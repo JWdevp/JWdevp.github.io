@@ -1,0 +1,469 @@
+/* ============================================
+   Jason Wiersum — Portfolio
+   Sistema de tokens de diseño
+   ============================================ */
+
+:root {
+  /* Colores */
+  --ink:      #10162b;
+  --ink-soft: #232b47;
+  --paper:    #edeef0;
+  --paper-hi: #f7f8f9;
+  --slate:    #5c6478;
+  --line:     #c9cdd6;
+  --signal:   #2b4bff;
+
+  /* Tipografía */
+  --display: "Bricolage Grotesque", "Arial Black", sans-serif;
+  --title:   "Barlow", "Arial Black", sans-serif;
+  --body:    "Instrument Sans", -apple-system, "Segoe UI", sans-serif;
+  --mono:    "JetBrains Mono", ui-monospace, "Courier New", monospace;
+
+  /* Medidas */
+  --gutter:  clamp(1.5rem, 5vw, 5rem);
+  --measure: 62ch;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+/* ============================================
+   Clases auxiliares
+   ============================================ */
+
+.label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.wrap {
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  padding-top: clamp(4.5rem, 9vw, 6rem);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 99;
+  background: var(--ink);
+  color: var(--paper-hi);
+  padding: 0.6rem 1rem;
+}
+
+/* ============================================
+   Cabecera
+   ============================================ */
+
+.island {
+  position: fixed;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34));
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 1px 1px rgba(16, 22, 43, 0.04),
+    0 8px 24px rgba(16, 22, 43, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+.island a {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-soft);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.island a:hover,
+.island a:focus-visible {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.island a[aria-current="page"] {
+  color: var(--paper-hi);
+  background: var(--ink);
+  box-shadow: 0 1px 2px rgba(16, 22, 43, 0.25);
+}
+
+/* Feste Insel schwebt oberhalb des Inhalts — Platz ist bereits im .wrap-Padding oben eingerechnet */
+
+/* ============================================
+   Hero — Elemento distintivo: cota de medida
+   ============================================ */
+
+.hero {
+  padding-block: clamp(3.5rem, 9vw, 7rem) clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.hero__eyebrow {
+  display: block;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.hero__name {
+  font-family: var(--title);
+  font-weight: 800;
+  font-size: clamp(3.2rem, 13vw, 10.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.hero__name span {
+  display: block;
+}
+
+.hero__name span:last-child {
+  color: var(--ink-soft);
+  padding-left: 0.08em;
+}
+
+/* La cota de medida: Diseño <-> Desarrollo */
+.gauge {
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+  max-width: 44rem;
+}
+
+.gauge__cap {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.gauge__bar {
+  position: relative;
+  height: 1px;
+  background: var(--line);
+}
+
+.gauge__bar::before,
+.gauge__bar::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  width: 1px;
+  height: 11px;
+  background: var(--signal);
+}
+
+.gauge__bar::before {
+  left: 0;
+}
+
+.gauge__bar::after {
+  right: 0;
+}
+
+.hero__lead {
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  max-width: var(--measure);
+  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* ============================================
+   Datos clave
+   ============================================ */
+
+.facts {
+  border-top: 1px solid var(--line);
+  padding-block: clamp(2.5rem, 6vw, 4rem);
+}
+
+.facts__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: clamp(1.75rem, 4vw, 3rem);
+}
+
+.fact__label {
+  display: block;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.fact__body {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.fact__body strong {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.25rem;
+}
+
+/* ============================================
+   Contacto / Enlaces
+   ============================================ */
+
+.contact {
+  border-top: 1px solid var(--line);
+  padding-block: clamp(2.5rem, 6vw, 4rem) clamp(3rem, 8vw, 5rem);
+}
+
+.contact__head {
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.linklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.linklist li {
+  border-bottom: 1px solid var(--line);
+}
+
+.linklist a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 0;
+  text-decoration: none;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1.3rem, 3.5vw, 2rem);
+  letter-spacing: -0.02em;
+  transition: color 0.18s ease, padding-left 0.18s ease;
+}
+
+.linklist a:hover,
+.linklist a:focus-visible {
+  color: var(--signal);
+  padding-left: 0.65rem;
+}
+
+.linklist .linklist__meta {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--slate);
+  white-space: nowrap;
+}
+
+.linklist a:hover .linklist__meta,
+.linklist a:focus-visible .linklist__meta {
+  color: var(--signal);
+}
+
+/* ============================================
+   Proyectos (portfolio.html)
+   ============================================ */
+
+.page-head {
+  padding-block: clamp(3rem, 8vw, 5.5rem) clamp(2rem, 5vw, 3rem);
+}
+
+.page-head__title {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin: 0.75rem 0 0;
+}
+
+.page-head__lead {
+  margin: 1.5rem 0 0;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+
+.projects {
+  padding-bottom: clamp(3rem, 8vw, 5.5rem);
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+}
+
+.project {
+  border-top: 1px solid var(--line);
+  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 52rem) {
+  .project {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+}
+
+.project__meta {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.project__title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin: 0 0 1rem;
+}
+
+.project__title a {
+  text-decoration: none;
+}
+
+.project__title a:hover,
+.project__title a:focus-visible {
+  color: var(--signal);
+}
+
+.project__text {
+  margin: 0 0 1.5rem;
+  max-width: 46ch;
+  color: var(--ink-soft);
+}
+
+.project__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 3px;
+}
+
+.project__cta:hover,
+.project__cta:focus-visible {
+  color: var(--signal);
+  border-bottom-color: var(--signal);
+}
+
+/* Vista previa provisional, hasta tener capturas reales */
+.thumb {
+  aspect-ratio: 4 / 3;
+  background: var(--paper-hi);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.thumb span {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+/* ============================================
+   Pie de página
+   ============================================ */
+
+.foot {
+  border-top: 1px solid var(--line);
+  padding-block: 2rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   Foco y animación
+   ============================================ */
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+
+  .reveal--2 { animation-delay: 0.08s; }
+  .reveal--3 { animation-delay: 0.16s; }
+  .reveal--4 { animation-delay: 0.24s; }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.9rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
