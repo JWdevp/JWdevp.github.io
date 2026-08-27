@@ -8,26 +8,61 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;800&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+(function () {
+  var theme = null;
+  try { theme = localStorage.getItem("theme"); } catch (e) {}
+  if (!theme) {
+    theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.style.colorScheme = theme;
+})();
+</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<a class="skip" href="#main">Zum Inhalt springen</a>
+<a class="skip" href="#main" data-i18n="a11y.skip">Zum Inhalt springen</a>
+
+<nav class="island glass" aria-label="Hauptnavigation">
+  <span class="island__pill" aria-hidden="true"></span>
+  <a href="index.html" data-i18n="nav.start">Start</a>
+  <a href="about.html" data-i18n="nav.about">Über mich</a>
+  <a href="portfolio.html" class="is-active" data-i18n="nav.projects">Projekte</a>
+  <a href="kontakt.html" data-i18n="nav.contact">Kontakt</a>
+</nav>
+
+<div class="controls">
+  <div class="ctrl ctrl--theme glass">
+    <button type="button" data-theme-toggle
+            data-i18n-attr="aria-label:a11y.theme"
+            aria-label="Zwischen hellem und dunklem Modus wechseln">
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="ctrl ctrl--lang glass" role="group" aria-label="Sprache">
+    <button type="button" data-lang="de" aria-pressed="true">DE</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    <button type="button" data-lang="es" aria-pressed="false">ES</button>
+  </div>
+</div>
 
 <div class="wrap">
-
-  <nav class="island" aria-label="Hauptnavigation">
-    <a href="index.html">Start</a>
-    <a href="portfolio.html" aria-current="page">Projekte</a>
-    <a href="kontakt.html">Kontakt</a>
-  </nav>
 
   <main id="main">
 
     <section class="page-head">
-      <span class="label">Zwei Arbeiten</span>
-      <h1 class="page-head__title">Projekte</h1>
-      <p class="page-head__lead">
+      <span class="label" data-i18n="projects.eyebrow">Zwei Arbeiten</span>
+      <h1 class="page-head__title" data-i18n="projects.title">Projekte</h1>
+      <p class="page-head__lead" data-i18n="projects.lead">
         Konzeptarbeiten, in denen ich Gestaltung und Umsetzung selbst verantwortet
         habe — vom ersten Wireframe bis zum fertigen HTML und CSS.
       </p>
@@ -38,47 +73,47 @@
       <article class="project">
         <div class="project__body">
           <div class="project__meta">
-            <span class="label">Relaunch-Konzept</span>
-            <span class="label">Steuerkanzlei</span>
+            <span class="label" data-i18n="proj1.meta1">Relaunch-Konzept</span>
+            <span class="label" data-i18n="proj1.meta2">Steuerkanzlei</span>
           </div>
           <h2 class="project__title">
-            <a href="projekt-steuerkanzlei.html">Kanzlei-Website, neu gedacht</a>
+            <a href="projekt-steuerkanzlei.html" data-i18n="proj1.title">Kanzlei-Website, neu gedacht</a>
           </h2>
-          <p class="project__text">
+          <p class="project__text" data-i18n="proj1.text">
             Viele Kanzlei-Websites erklären, was eine Steuerberatung ist — aber nicht,
             warum man genau diese anrufen sollte. Das Konzept räumt die Startseite auf,
             stellt Leistungen und Ansprechpartner nach vorn und macht die Kontaktaufnahme
             zum sichtbaren Ziel der Seite.
           </p>
-          <a class="project__cta" href="projekt-steuerkanzlei.html">
+          <a class="project__cta" href="projekt-steuerkanzlei.html" data-i18n="proj.cta">
             Projekt ansehen
           </a>
         </div>
         <div class="thumb">
-          <span>Vorschau folgt</span>
+          <span data-i18n="proj.thumb">Vorschau folgt</span>
         </div>
       </article>
 
       <article class="project">
         <div class="project__body">
           <div class="project__meta">
-            <span class="label">Konzept &amp; Umsetzung</span>
-            <span class="label">E-Commerce</span>
+            <span class="label" data-i18n="proj2.meta1">Konzept &amp; Umsetzung</span>
+            <span class="label" data-i18n="proj2.meta2">E-Commerce</span>
           </div>
           <h2 class="project__title">
-            <a href="projekt-ecommerce.html">Onlineshop mit klarem Weg zur Kasse</a>
+            <a href="projekt-ecommerce.html" data-i18n="proj2.title">Onlineshop mit klarem Weg zur Kasse</a>
           </h2>
-          <p class="project__text">
+          <p class="project__text" data-i18n="proj2.text">
             Ein Shop-Konzept, das die Produktseite als Entscheidungshilfe behandelt:
             Bild, Preis und Verfügbarkeit ohne Umwege, ein durchgehendes Raster über
             Übersicht, Detailseite und Warenkorb.
           </p>
-          <a class="project__cta" href="projekt-ecommerce.html">
+          <a class="project__cta" href="projekt-ecommerce.html" data-i18n="proj.cta">
             Projekt ansehen
           </a>
         </div>
         <div class="thumb">
-          <span>Vorschau folgt</span>
+          <span data-i18n="proj.thumb">Vorschau folgt</span>
         </div>
       </article>
 
@@ -87,11 +122,12 @@
   </main>
 
   <footer class="foot">
-    <span class="label">Jason Wiersum · Nürnberg</span>
-    <span class="label">Gestaltet und gebaut in HTML &amp; CSS</span>
+    <span class="label" data-i18n="foot.left">Jason Wiersum · Nürnberg</span>
+    <span class="label" data-i18n="foot.right">Gestaltet und gebaut in HTML &amp; CSS</span>
   </footer>
 
 </div>
 
+<script src="script.js"></script>
 </body>
 </html>

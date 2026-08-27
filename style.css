@@ -4,7 +4,7 @@
    ============================================ */
 
 :root {
-  /* Colores */
+  /* Colores — modo día */
   --ink:      #10162b;
   --ink-soft: #232b47;
   --paper:    #edeef0;
@@ -12,6 +12,14 @@
   --slate:    #5c6478;
   --line:     #c9cdd6;
   --signal:   #2b4bff;
+
+  /* Cristal de la isla y los controles */
+  --glass-a:  rgba(255, 255, 255, 0.62);
+  --glass-b:  rgba(255, 255, 255, 0.34);
+  --glass-br: rgba(255, 255, 255, 0.55);
+  --glass-in: rgba(255, 255, 255, 0.70);
+  --glass-hi: rgba(255, 255, 255, 0.65);
+  --glass-sh: rgba(16, 22, 43, 0.10);
 
   /* Tipografía */
   --display: "Bricolage Grotesque", "Arial Black", sans-serif;
@@ -22,6 +30,24 @@
   /* Medidas */
   --gutter:  clamp(1.5rem, 5vw, 5rem);
   --measure: 62ch;
+}
+
+/* Colores — modo noche */
+[data-theme="dark"] {
+  --ink:      #e9ebf0;
+  --ink-soft: #b9c0d0;
+  --paper:    #0d1120;
+  --paper-hi: #161c2e;
+  --slate:    #8b93a7;
+  --line:     #2a3247;
+  --signal:   #5b74ff;
+
+  --glass-a:  rgba(255, 255, 255, 0.10);
+  --glass-b:  rgba(255, 255, 255, 0.04);
+  --glass-br: rgba(255, 255, 255, 0.14);
+  --glass-in: rgba(255, 255, 255, 0.10);
+  --glass-hi: rgba(255, 255, 255, 0.10);
+  --glass-sh: rgba(0, 0, 0, 0.45);
 }
 
 *,
@@ -42,6 +68,7 @@ body {
   font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -64,7 +91,7 @@ a {
   max-width: 78rem;
   margin-inline: auto;
   padding-inline: var(--gutter);
-  padding-top: clamp(4.5rem, 9vw, 6rem);
+  padding-top: clamp(5.5rem, 11vw, 7.5rem);
 }
 
 .skip {
@@ -77,12 +104,28 @@ a {
   top: 1rem;
   z-index: 99;
   background: var(--ink);
-  color: var(--paper-hi);
+  color: var(--paper);
   padding: 0.6rem 1rem;
 }
 
 /* ============================================
-   Cabecera
+   Cristal compartido (isla + controles)
+   ============================================ */
+
+.glass {
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--glass-a), var(--glass-b));
+  border: 1px solid var(--glass-br);
+  box-shadow:
+    0 1px 1px var(--glass-sh),
+    0 8px 24px var(--glass-sh),
+    inset 0 1px 0 var(--glass-in);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+/* ============================================
+   Isla de navegación central
    ============================================ */
 
 .island {
@@ -93,51 +136,144 @@ a {
   z-index: 50;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.6rem;
+  gap: 0.15rem;
+  padding: 0.45rem;
+}
+
+/* Píldora deslizante que marca la página activa */
+.island__pill {
+  position: absolute;
+  top: 0.45rem;
+  bottom: 0.45rem;
+  left: 0;
+  width: 0;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34));
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow:
-    0 1px 1px rgba(16, 22, 43, 0.04),
-    0 8px 24px rgba(16, 22, 43, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  background: var(--ink);
+  box-shadow: 0 1px 3px var(--glass-sh);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.island__pill.is-ready {
+  opacity: 1;
 }
 
 .island a {
+  position: relative;
+  z-index: 1;
   font-family: var(--mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  line-height: 1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--ink-soft);
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  transition: background 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
+  transition: color 0.22s ease;
 }
 
 .island a:hover,
 .island a:focus-visible {
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.65);
 }
 
-.island a[aria-current="page"] {
-  color: var(--paper-hi);
-  background: var(--ink);
-  box-shadow: 0 1px 2px rgba(16, 22, 43, 0.25);
+.island a.is-active {
+  color: var(--paper);
 }
-
-/* Feste Insel schwebt oberhalb des Inhalts — Platz ist bereits im .wrap-Padding oben eingerechnet */
 
 /* ============================================
-   Hero — Elemento distintivo: cota de medida
+   Controles: tema e idioma
+   ============================================ */
+
+.controls {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ctrl {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.45rem;
+}
+
+.ctrl button {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+  line-height: 1;
+  transition: background 0.18s ease, color 0.18s ease;
+  height: 1.72rem;
+  box-sizing: border-box;
+}
+
+.ctrl button:hover,
+.ctrl button:focus-visible {
+  color: var(--ink);
+  background: var(--glass-hi);
+}
+
+.ctrl button[aria-pressed="true"] {
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.ctrl--theme button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.72rem;          /* Mismo ancho que su alto para ser un círculo perfecto */
+  height: 1.72rem;         /* Misma altura exacta que el resto de botones de texto */
+  padding: 0;              /* Resetea padding interno para evitar desbordamiento por SVG */
+  flex-shrink: 0;
+}
+
+.ctrl--theme svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Icono según el tema activo */
+.icon-moon { display: none; }
+[data-theme="dark"] .icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: block; }
+
+@media (max-width: 46rem) {
+  .controls {
+    top: auto;
+    bottom: 1rem;
+    right: 50%;
+    transform: translateX(50%);
+  }
+}
+
+/* ============================================
+   Hero
    ============================================ */
 
 .hero {
-  padding-block: clamp(3.5rem, 9vw, 7rem) clamp(2.5rem, 6vw, 4.5rem);
+  padding-block: clamp(3rem, 8vw, 6rem) clamp(2.5rem, 6vw, 4.5rem);
 }
 
 .hero__eyebrow {
@@ -148,66 +284,14 @@ a {
 .hero__name {
   font-family: var(--title);
   font-weight: 800;
-  font-size: clamp(3.2rem, 13vw, 10.5rem);
-  line-height: 0.86;
+  font-size: clamp(2.4rem, 8.5vw, 6.5rem);
+  line-height: 1;
   letter-spacing: -0.03em;
   margin: 0;
 }
 
-.hero__name span {
-  display: block;
-}
-
-.hero__name span:last-child {
-  color: var(--ink-soft);
-  padding-left: 0.08em;
-}
-
-/* La cota de medida: Diseño <-> Desarrollo */
-.gauge {
-  margin-top: clamp(1.75rem, 4vw, 2.75rem);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.9rem;
-  max-width: 44rem;
-}
-
-.gauge__cap {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink);
-  white-space: nowrap;
-}
-
-.gauge__bar {
-  position: relative;
-  height: 1px;
-  background: var(--line);
-}
-
-.gauge__bar::before,
-.gauge__bar::after {
-  content: "";
-  position: absolute;
-  top: -5px;
-  width: 1px;
-  height: 11px;
-  background: var(--signal);
-}
-
-.gauge__bar::before {
-  left: 0;
-}
-
-.gauge__bar::after {
-  right: 0;
-}
-
 .hero__lead {
-  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  margin: clamp(1.75rem, 4vw, 2.75rem) 0 0;
   max-width: var(--measure);
   font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
   line-height: 1.55;
@@ -290,12 +374,6 @@ a {
   transition: color 0.18s ease, padding-left 0.18s ease;
 }
 
-.linklist a:hover,
-.linklist a:focus-visible {
-  color: var(--signal);
-  padding-left: 0.65rem;
-}
-
 .linklist .linklist__meta {
   font-family: var(--mono);
   font-weight: 400;
@@ -306,24 +384,30 @@ a {
   white-space: nowrap;
 }
 
+.linklist a:hover,
+.linklist a:focus-visible {
+  color: var(--ink-soft);
+  padding-left: 0.65rem;
+}
+
 .linklist a:hover .linklist__meta,
 .linklist a:focus-visible .linklist__meta {
-  color: var(--signal);
+  color: var(--ink-soft);
 }
 
 /* ============================================
-   Proyectos (portfolio.html)
+   Cabecera de página interior
    ============================================ */
 
 .page-head {
-  padding-block: clamp(3rem, 8vw, 5.5rem) clamp(2rem, 5vw, 3rem);
+  padding-block: clamp(2.5rem, 7vw, 4.5rem) clamp(2rem, 5vw, 3rem);
 }
 
 .page-head__title {
-  font-family: var(--display);
+  font-family: var(--title);
   font-weight: 800;
   font-size: clamp(2.4rem, 8vw, 5rem);
-  line-height: 0.95;
+  line-height: 1;
   letter-spacing: -0.03em;
   margin: 0.75rem 0 0;
 }
@@ -333,6 +417,10 @@ a {
   max-width: var(--measure);
   color: var(--ink-soft);
 }
+
+/* ============================================
+   Proyectos (portfolio.html)
+   ============================================ */
 
 .projects {
   padding-bottom: clamp(3rem, 8vw, 5.5rem);
@@ -378,7 +466,7 @@ a {
 
 .project__title a:hover,
 .project__title a:focus-visible {
-  color: var(--signal);
+  color: var(--ink-soft);
 }
 
 .project__text {
@@ -402,8 +490,8 @@ a {
 
 .project__cta:hover,
 .project__cta:focus-visible {
-  color: var(--signal);
-  border-bottom-color: var(--signal);
+  color: var(--ink-soft);
+  border-bottom-color: var(--ink-soft);
 }
 
 /* Vista previa provisional, hasta tener capturas reales */
@@ -426,46 +514,70 @@ a {
 }
 
 /* ============================================
-   Pie de página
+   Sobre mí (about.html)
    ============================================ */
 
-.foot {
+.about {
   border-top: 1px solid var(--line);
-  padding-block: 2rem 3rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+  padding-block: clamp(2rem, 5vw, 3rem) clamp(3rem, 8vw, 5.5rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 3.5rem);
 }
 
-/* ============================================
-   Foco y animación
-   ============================================ */
-
-:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: 3px;
+@media (min-width: 52rem) {
+  .about {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: start;
+  }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    animation: rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  }
+.about__text p {
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
 
-  .reveal--2 { animation-delay: 0.08s; }
-  .reveal--3 { animation-delay: 0.16s; }
-  .reveal--4 { animation-delay: 0.24s; }
+.about__text h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  letter-spacing: -0.02em;
+  margin: 2.5rem 0 0.75rem;
+  color: var(--ink);
+}
 
-  @keyframes rise {
-    from {
-      opacity: 0;
-      transform: translateY(0.9rem);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
+.about__text h2:first-child {
+  margin-top: 0;
+}
+
+.about__aside {
+  background: var(--paper-hi);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.about__aside .label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.about__aside ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.about__aside li {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.about__aside li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 /* ============================================
@@ -525,8 +637,8 @@ a {
 .field input:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--signal);
-  box-shadow: 0 0 0 3px rgba(43, 75, 255, 0.14);
+  border-color: var(--ink-soft);
+  box-shadow: 0 0 0 3px var(--glass-sh);
 }
 
 /* Trampa antispam: oculta para personas, visible para bots */
@@ -541,7 +653,7 @@ a {
   font-size: 0.78rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--paper-hi);
+  color: var(--paper);
   background: var(--ink);
   border: none;
   border-radius: 999px;
@@ -552,7 +664,7 @@ a {
 
 .btn:hover,
 .btn:focus-visible {
-  background: var(--signal);
+  background: var(--ink-soft);
   transform: translateY(-1px);
 }
 
@@ -565,4 +677,59 @@ a {
 
 .contact-side .linklist {
   margin-top: 0;
+}
+
+/* ============================================
+   Pie de página
+   ============================================ */
+
+.foot {
+  border-top: 1px solid var(--line);
+  padding-block: 2rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 46rem) {
+  .foot {
+    padding-bottom: 5.5rem;
+  }
+}
+
+/* ============================================
+   Foco y animación
+   ============================================ */
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+
+  .reveal--2 { animation-delay: 0.08s; }
+  .reveal--3 { animation-delay: 0.16s; }
+  .reveal--4 { animation-delay: 0.24s; }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.9rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .island__pill {
+    transition: none;
+  }
 }

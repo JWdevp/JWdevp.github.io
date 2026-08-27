@@ -8,40 +8,65 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;800&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+(function () {
+  var theme = null;
+  try { theme = localStorage.getItem("theme"); } catch (e) {}
+  if (!theme) {
+    theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  document.documentElement.setAttribute("data-theme", theme);
+  document.documentElement.style.colorScheme = theme;
+})();
+</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<a class="skip" href="#main">Zum Inhalt springen</a>
+<a class="skip" href="#main" data-i18n="a11y.skip">Zum Inhalt springen</a>
+
+<nav class="island glass" aria-label="Hauptnavigation">
+  <span class="island__pill" aria-hidden="true"></span>
+  <a href="index.html" class="is-active" data-i18n="nav.start">Start</a>
+  <a href="about.html" data-i18n="nav.about">Über mich</a>
+  <a href="portfolio.html" data-i18n="nav.projects">Projekte</a>
+  <a href="kontakt.html" data-i18n="nav.contact">Kontakt</a>
+</nav>
+
+<div class="controls">
+  <div class="ctrl ctrl--theme glass">
+    <button type="button" data-theme-toggle
+            data-i18n-attr="aria-label:a11y.theme"
+            aria-label="Zwischen hellem und dunklem Modus wechseln">
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="ctrl ctrl--lang glass" role="group" aria-label="Sprache">
+    <button type="button" data-lang="de" aria-pressed="true">DE</button>
+    <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    <button type="button" data-lang="es" aria-pressed="false">ES</button>
+  </div>
+</div>
 
 <div class="wrap">
-
-  <nav class="island" aria-label="Hauptnavigation">
-    <a href="index.html" aria-current="page">Start</a>
-    <a href="portfolio.html">Projekte</a>
-    <a href="kontakt.html">Kontakt</a>
-  </nav>
 
   <main id="main">
 
     <section class="hero">
-      <span class="label hero__eyebrow reveal">Webdesign &amp; Frontend-Entwicklung</span>
+      <span class="label hero__eyebrow reveal" data-i18n="hero.eyebrow">Webdesign &amp; Frontend-Entwicklung</span>
 
-      <h1 class="hero__name reveal reveal--2">
-        <span>Jason</span>
-        <span>Wiersum</span>
-      </h1>
+      <h1 class="hero__name reveal reveal--2" data-i18n="hero.name">Hey, ich bin Jason!</h1>
 
-      <!-- Cota de medida: la distancia entre ambas disciplinas -->
-      <div class="gauge reveal reveal--3">
-        <span class="gauge__cap">Gestaltung</span>
-        <span class="gauge__bar" aria-hidden="true"></span>
-        <span class="gauge__cap">Entwicklung</span>
-      </div>
-
-      <p class="hero__lead reveal reveal--4">
+      <p class="hero__lead reveal reveal--3" data-i18n="hero.lead">
         Ich gestalte Websites und setze sie selbst um. Aus dem Designstudium bringe
-        ich das Auge mit, aus der Ausbildung zum Fachinformatiker den Code — beides
+        ich das Auge mit, aus der Ausbildung zum Fachinformatiker den Code, beides
         landet im selben Projekt statt in zwei getrennten Übergaben.
       </p>
     </section>
@@ -50,34 +75,34 @@
       <div class="facts__grid">
 
         <div class="fact">
-          <span class="label fact__label">Ausbildung</span>
+          <span class="label fact__label" data-i18n="facts.education.label">Ausbildung</span>
           <p class="fact__body">
-            <strong>Fachinformatiker (IHK)</strong>
-            Anwendungsentwicklung, abgeschlossen im Juli 2026.
+            <strong data-i18n="facts.education.title">Fachinformatiker (IHK)</strong>
+            <span data-i18n="facts.education.text">Anwendungsentwicklung, abgeschlossen im Juli 2026.</span>
           </p>
         </div>
 
         <div class="fact">
-          <span class="label fact__label">Gestaltung</span>
+          <span class="label fact__label" data-i18n="facts.design.label">Gestaltung</span>
           <p class="fact__body">
-            <strong>Über 15 Jahre Photoshop</strong>
-            Designstudium, Adobe Creative Cloud, Layout und Bildbearbeitung.
+            <strong data-i18n="facts.design.title">Über 15 Jahre Photoshop</strong>
+            <span data-i18n="facts.design.text">Designstudium, Adobe Creative Cloud, Layout und Bildbearbeitung.</span>
           </p>
         </div>
 
         <div class="fact">
-          <span class="label fact__label">Technik</span>
+          <span class="label fact__label" data-i18n="facts.tech.label">Technik</span>
           <p class="fact__body">
-            <strong>HTML, CSS, JavaScript</strong>
-            Dazu Java-basierte Frameworks, SQL und Git.
+            <strong data-i18n="facts.tech.title">HTML, CSS, JavaScript</strong>
+            <span data-i18n="facts.tech.text">Dazu Java-basierte Frameworks, SQL und Git.</span>
           </p>
         </div>
 
         <div class="fact">
-          <span class="label fact__label">Sprachen</span>
+          <span class="label fact__label" data-i18n="facts.lang.label">Sprachen</span>
           <p class="fact__body">
-            <strong>DE · EN · ES</strong>
-            Deutsch verhandlungssicher, Englisch und Spanisch als Muttersprachen.
+            <strong data-i18n="facts.lang.title">DE · EN · ES</strong>
+            <span data-i18n="facts.lang.text">Deutsch verhandlungssicher, Englisch und Spanisch als Muttersprachen.</span>
           </p>
         </div>
 
@@ -85,31 +110,31 @@
     </section>
 
     <section class="contact" id="kontakt">
-      <span class="label contact__head">Kontakt &amp; Profile</span>
+      <span class="label contact__head" data-i18n="contact.head">Kontakt &amp; Profile</span>
 
       <ul class="linklist">
         <li>
-          <a href="portfolio.html">
-            Projekte ansehen
-            <span class="linklist__meta">Portfolio</span>
+          <a href="kontakt.html">
+            <span data-i18n="link.write">Schreib mich an</span>
+            <span class="linklist__meta" data-i18n="link.write.meta">Kontakt</span>
           </a>
         </li>
         <li>
           <a href="mailto:wiersumjason@gmail.com">
             wiersumjason@gmail.com
-            <span class="linklist__meta">E-Mail</span>
+            <span class="linklist__meta" data-i18n="link.email.meta">E-Mail</span>
           </a>
         </li>
         <li>
           <a href="https://www.linkedin.com/in/jason-wiersum/" target="_blank" rel="noopener">
             LinkedIn
-            <span class="linklist__meta">Profil</span>
+            <span class="linklist__meta" data-i18n="link.linkedin.meta">Profil</span>
           </a>
         </li>
         <li>
           <a href="https://github.com/JWdevp" target="_blank" rel="noopener">
             GitHub
-            <span class="linklist__meta">Code</span>
+            <span class="linklist__meta" data-i18n="link.github.meta">Code</span>
           </a>
         </li>
       </ul>
@@ -118,11 +143,12 @@
   </main>
 
   <footer class="foot">
-    <span class="label">Jason Wiersum · Nürnberg</span>
-    <span class="label">Gestaltet und gebaut in HTML &amp; CSS</span>
+    <span class="label" data-i18n="foot.left">Jason Wiersum · Nürnberg</span>
+    <span class="label" data-i18n="foot.right">Gestaltet und gebaut in HTML &amp; CSS</span>
   </footer>
 
 </div>
 
+<script src="script.js"></script>
 </body>
 </html>
