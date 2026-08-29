@@ -10,7 +10,7 @@
 export const LANGUAGES = ['es', 'en', 'de'] as const
 export type Language = (typeof LANGUAGES)[number]
 
-export const DEFAULT_LANGUAGE: Language = 'es'
+export const DEFAULT_LANGUAGE: Language = 'de'
 
 /** BCP-47 codes used for the <html lang> attribute. */
 export const HTML_LANG: Record<Language, string> = {

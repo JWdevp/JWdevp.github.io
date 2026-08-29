@@ -8,7 +8,7 @@ import './projects.css'
 export function Projects() {
   const { t } = useLanguage()
   const root = useRef<HTMLElement>(null)
-  useReveal(root, { stagger: 0.09, y: 28 })
+  useReveal(root, { y: 28 })
 
   return (
     <section id="projects" className="section projects" ref={root}>

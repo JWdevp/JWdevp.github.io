@@ -7,7 +7,7 @@ import './skills.css'
 export function Skills() {
   const { t } = useLanguage()
   const root = useRef<HTMLDivElement>(null)
-  useReveal(root, { stagger: 0.05 })
+  useReveal(root)
 
   return (
     <div className="skills" ref={root}>

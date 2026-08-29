@@ -1,8 +1,8 @@
 import { useAnimations, useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useEffect, useRef } from 'react'
-import { LoopOnce } from 'three'
-import type { AnimationAction, Group } from 'three'
+import { useEffect, useMemo, useRef } from 'react'
+import { Box3, LoopOnce, Vector3 } from 'three'
+import type { AnimationAction, Group, Object3D } from 'three'
 import { applyTracking, createTrackedParts, type TrackedPart } from './applyTracking'
 import {
   collectAnimatedNodes,
@@ -11,16 +11,56 @@ import {
   IDLE_PATTERN,
   resolveBones,
 } from './bones'
+import { FRAMING } from './characterConfig'
 import { TRACKING_RAMP, type CharacterState } from './characterState'
 import { useMouseTracking } from './useMouseTracking'
 
 interface CharacterProps {
   url: string
+  /** Multiplies the automatically computed scale. 1 = leave the framing alone. */
   scale?: number
+  /** Nudge applied after automatic framing, in world units. */
   position?: [number, number, number]
   /** When true the greeting and pointer tracking are skipped entirely. */
   reducedMotion?: boolean
   onStateChange?: (state: CharacterState) => void
+}
+
+/**
+ * Measures the model and fits it to the hero's framing.
+ *
+ * Avatars arrive at every imaginable scale, so hardcoding one would make
+ * "drop your GLB in" a lie. When the rig has a head bone the model is cropped to
+ * a head-and-shoulders bust around it; otherwise the whole bounding box is
+ * fitted. Targets live in `characterConfig.ts`.
+ */
+function computeFraming(scene: Object3D, head: Object3D | null) {
+  scene.updateWorldMatrix(true, true)
+  const box = new Box3().setFromObject(scene)
+  if (box.isEmpty()) return { scale: 1, offset: [0, 0, 0] as const }
+
+  if (head) {
+    const headPos = head.getWorldPosition(new Vector3())
+    // Everything above the head bone is roughly the top half of the skull.
+    const headSpan = Math.max(0.02, (box.max.y - headPos.y) * 2)
+    const scale = FRAMING.headDiameter / headSpan
+    return {
+      scale,
+      offset: [
+        -headPos.x * scale,
+        FRAMING.headY - headPos.y * scale,
+        -headPos.z * scale,
+      ] as const,
+    }
+  }
+
+  const size = box.getSize(new Vector3())
+  const center = box.getCenter(new Vector3())
+  const scale = FRAMING.fullHeight / Math.max(0.02, size.y)
+  return {
+    scale,
+    offset: [-center.x * scale, -center.y * scale, -center.z * scale] as const,
+  }
 }
 
 /**
@@ -37,6 +77,9 @@ export function Character({
   const group = useRef<Group>(null)
   const { scene, animations } = useGLTF(url)
   const { actions, mixer } = useAnimations(animations, group)
+
+  const bones = useMemo(() => resolveBones(scene), [scene])
+  const framing = useMemo(() => computeFraming(scene, bones.head), [scene, bones])
 
   const tracking = useMouseTracking({ initiallyEnabled: false })
   const parts = useRef<TrackedPart[]>([])
@@ -55,11 +98,24 @@ export function Character({
       node.frustumCulled = false
       if ('castShadow' in node) node.castShadow = true
     })
-    parts.current = createTrackedParts(
-      resolveBones(scene),
-      collectAnimatedNodes(animations),
-    )
-  }, [scene, animations])
+    parts.current = createTrackedParts(bones, collectAnimatedNodes(animations))
+
+    if (import.meta.env.DEV) {
+      const found = Object.entries({
+        head: bones.head?.name,
+        neck: bones.neck?.name,
+        torso: bones.torso?.name,
+        eyes: bones.eyes.map((eye) => eye.name).join(', ') || undefined,
+      })
+        .filter(([, value]) => value)
+        .map(([key, value]) => `${key}=${value}`)
+      console.info(
+        `[character] clips: ${animations.map((clip) => clip.name).join(', ') || 'none'}`,
+        `\n[character] bones: ${found.join('  ') || 'none matched — see bones.ts'}`,
+        `\n[character] auto-scale: ${framing.scale.toFixed(3)}`,
+      )
+    }
+  }, [scene, animations, bones, framing])
 
   // --- State machine -------------------------------------------------------
   useEffect(() => {
@@ -132,9 +188,13 @@ export function Character({
     applyTracking(parts.current, pointer, weight.current)
   })
 
+  // Outer group carries the manual nudge, inner group the measured framing, so
+  // the two never have to be reconciled by hand.
   return (
-    <group ref={group} position={position} scale={scale} dispose={null}>
-      <primitive object={scene} />
+    <group position={position} scale={scale} dispose={null}>
+      <group ref={group} position={framing.offset} scale={framing.scale}>
+        <primitive object={scene} />
+      </group>
     </group>
   )
 }

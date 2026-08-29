@@ -22,7 +22,7 @@ export function useReveal(
   scope: RefObject<HTMLElement | null>,
   options: { stagger?: number; y?: number; start?: string } = {},
 ) {
-  const { stagger = 0.07, y = 22, start = 'top 82%' } = options
+  const { stagger = 0.2, y = 22, start = 'top 82%' } = options
 
   useGSAP(
     () => {
@@ -40,8 +40,8 @@ export function useReveal(
           gsap.to(batch, {
             opacity: 1,
             y: 0,
-            duration: 0.62,
-            ease: 'power3.out',
+            duration: 0.3,
+            ease: 'power2.inOut',
             stagger,
             overwrite: true,
           }),

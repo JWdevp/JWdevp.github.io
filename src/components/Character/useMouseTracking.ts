@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
+import { TRACKING_LIMITS } from './characterConfig'
 
 /**
  * Pointer tracking for the 3D character.
@@ -7,30 +8,6 @@ import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
  * loop never triggers a React render. The hook only normalises the pointer and
  * damps it; how much each bone rotates is decided by the character component.
  */
-
-export interface TrackingLimits {
-  /** Radians. Eyes move most — they are what sells "it is looking at me". */
-  MAX_EYE_ROTATION: number
-  /** Radians. The head carries the bulk of the visible motion. */
-  MAX_HEAD_ROTATION: number
-  /** Radians. The neck follows a little. */
-  MAX_NECK_ROTATION: number
-  /** Radians. The torso barely moves — just enough to avoid a floating head. */
-  MAX_TORSO_ROTATION: number
-  /** Higher = snappier. Frame-rate independent (exponential smoothing). */
-  DAMPING: number
-}
-
-export const TRACKING_LIMITS: TrackingLimits = {
-  MAX_EYE_ROTATION: 0.26,
-  MAX_HEAD_ROTATION: 0.42,
-  MAX_NECK_ROTATION: 0.16,
-  MAX_TORSO_ROTATION: 0.06,
-  DAMPING: 5.2,
-}
-
-/** Vertical range is tighter than horizontal: necks nod less than they turn. */
-export const VERTICAL_SCALE = 0.62
 
 export interface Vec2 {
   x: number

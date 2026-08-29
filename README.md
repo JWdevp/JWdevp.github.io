@@ -124,12 +124,27 @@ prefixes and any `.`, `_`, `-` or spaces. Recognised out of the box:
 To support a differently named rig, add the name to `BONE_CANDIDATES` in
 `src/components/Character/bones.ts`. A missing bone is skipped, never an error.
 
+### Checking and tuning
+
+```bash
+npm run check:model            # inspects public/models/character.glb
+npm run check:model -- x.glb   # or any other file
+```
+
+Every knob — tracking amounts, damping, rig orientation, framing — lives in
+`src/components/Character/characterConfig.ts`, documented in place.
+
+Scale and position are automatic: the loader measures the model, finds the head
+and crops to a bust, so an avatar of any size frames correctly.
+
+**How to make the model:** [`docs/CHARACTER-MODEL.md`](docs/CHARACTER-MODEL.md).
+
 ---
 
 ## Translations
 
 All interface copy lives in **`src/i18n/translations.ts`** — Spanish, English and
-German. Spanish is the default and also defines the type every other language
+German. German is the default; Spanish defines the type every other language
 must satisfy, so adding a key to `es` makes the compiler demand it in `en` and
 `de` too.
 
@@ -227,8 +242,25 @@ which just looked broken.)
 
 `.github/workflows/deploy.yml` builds and deploys on every push to `main`.
 
-One-time setup: **Settings → Pages → Build and deployment → Source: GitHub
-Actions**.
+### Required one-time setting
+
+**Settings → Pages → Build and deployment → Source: `GitHub Actions`.**
+
+This is not optional. With the default `Deploy from a branch`, GitHub publishes
+the repository *as it is* — so visitors receive the development `index.html`,
+whose entry point is `/src/main.tsx`, and the browser has nothing it can run.
+The result is a blank white page.
+
+You can tell which mode is active from the Actions tab. Under `Deploy from a
+branch` there is a second, GitHub-generated run called **“pages build and
+deployment”** alongside our **“Deploy to GitHub Pages”**. Both publish, and
+whichever finishes last wins — so the site can even flip between working and
+blank between deploys. Once the source is set to `GitHub Actions`, only our
+workflow runs.
+
+If the deployed page is ever blank, it says so itself: an inline fallback in
+`index.html` detects that the source is being served and prints the fix on the
+page after a few seconds.
 
 The workflow derives the Vite base path from the repository name, so nothing is
 hardcoded:
@@ -250,7 +282,8 @@ Nothing below is invented or filled in with placeholder facts — these are your
 to supply:
 
 - [ ] `public/models/character.glb` — the rigged character with `Greeting` and
-      `Idle` clips
+      `Idle` clips (see [`docs/CHARACTER-MODEL.md`](docs/CHARACTER-MODEL.md),
+      then `npm run check:model`)
 - [ ] Real projects in `src/data/projects.ts`
 - [ ] Project cover images in `public/images/`
 - [ ] A public email address, if you want one shown next to the form

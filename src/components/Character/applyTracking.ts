@@ -1,6 +1,7 @@
 import { Euler, Quaternion, type Object3D } from 'three'
 import type { CharacterBones } from './bones'
-import { TRACKING_LIMITS, VERTICAL_SCALE, type Vec2 } from './useMouseTracking'
+import { ORIENTATION, TRACKING_LIMITS, VERTICAL_SCALE } from './characterConfig'
+import type { Vec2 } from './useMouseTracking'
 
 /**
  * Composes the pointer offset on top of whatever the animation mixer produced.
@@ -72,9 +73,13 @@ export function applyTracking(
     const factor = weight * part.responsiveness
     // Yaw follows the cursor horizontally; pitch is inverted because screen Y
     // grows downwards while a head tilting up is a negative X rotation.
-    const yaw = clamp(pointer.x * part.maxYaw * factor, -part.maxYaw, part.maxYaw)
+    const yaw = clamp(
+      pointer.x * part.maxYaw * factor * ORIENTATION.yawSign,
+      -part.maxYaw,
+      part.maxYaw,
+    )
     const pitch = clamp(
-      -pointer.y * part.maxPitch * factor,
+      -pointer.y * part.maxPitch * factor * ORIENTATION.pitchSign,
       -part.maxPitch,
       part.maxPitch,
     )

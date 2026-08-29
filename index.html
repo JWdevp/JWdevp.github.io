@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -7,7 +7,7 @@
     <title>Jason Wiersum — Portfolio</title>
     <meta
       name="description"
-      content="Jason Wiersum — Anwendungsentwickler certificado por la IHK en Nürnberg. Software, diseño y creatividad en un mismo perfil."
+      content="Jason Wiersum — IHK-zertifizierter Anwendungsentwickler aus Nürnberg. Software, Design und Kreativität in einem Profil."
     />
     <meta name="author" content="Jason Wiersum" />
     <meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)" />
@@ -19,14 +19,14 @@
     <meta property="og:title" content="Jason Wiersum — Portfolio" />
     <meta
       property="og:description"
-      content="Anwendungsentwickler (IHK) en Nürnberg con background en diseño industrial. Software · Diseño · Creatividad."
+      content="Anwendungsentwickler (IHK) aus Nürnberg mit Hintergrund im Industriedesign. Software · Design · Kreativität."
     />
-    <meta property="og:locale" content="es" />
+    <meta property="og:locale" content="de" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Jason Wiersum — Portfolio" />
     <meta
       name="twitter:description"
-      content="Anwendungsentwickler (IHK) en Nürnberg con background en diseño industrial. Software · Diseño · Creatividad."
+      content="Anwendungsentwickler (IHK) aus Nürnberg mit Hintergrund im Industriedesign. Software · Design · Kreativität."
     />
 
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -65,5 +65,42 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      Safety net. If the app has not mounted after a few seconds, explain why
+      instead of leaving a blank white page.
+
+      The most common cause is a GitHub Pages misconfiguration: when "Source" is
+      set to "Deploy from a branch", Pages publishes the repository *as-is*, so
+      the browser receives this file with its development entry point
+      (`/src/main.tsx`) and nothing can run. That case is detected precisely and
+      named, because a white page gives no clue on its own.
+    -->
+    <script>
+      ;(function () {
+        setTimeout(function () {
+          var root = document.getElementById('root')
+          if (!root || root.children.length > 0) return
+
+          var servingSource = !!document.querySelector('script[src*="/src/main.tsx"]')
+          var body = servingSource
+            ? '<p><strong>GitHub Pages is serving the repository source instead of the build.</strong></p>' +
+              '<p>Open <em>Settings &rarr; Pages</em> and set <em>Source</em> to <em>GitHub Actions</em>, ' +
+              'then re-run the &ldquo;Deploy to GitHub Pages&rdquo; workflow.</p>'
+            : '<p><strong>The application failed to load.</strong></p>' +
+              '<p>Check the browser console for the underlying error.</p>'
+
+          root.innerHTML =
+            '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;' +
+            'padding:2rem;font:15px/1.6 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;' +
+            'color:#12131a;background:#f4f4f2;text-align:center">' +
+            '<div style="max-width:34rem">' +
+            '<p style="font:500 11px/1 ui-monospace,monospace;letter-spacing:.14em;' +
+            'text-transform:uppercase;color:#8d8f99;margin:0 0 1rem">Jason Wiersum</p>' +
+            body +
+            '</div></div>'
+        }, 4000)
+      })()
+    </script>
   </body>
 </html>

@@ -88,12 +88,9 @@ export function CharacterScene() {
         <Suspense fallback={placeholder}>
           {modelStatus === 'available' ? (
             <CharacterErrorBoundary fallback={placeholder}>
-              <Character
-                url={SITE.characterModel}
-                scale={1}
-                position={[0, -1.15, 0]}
-                reducedMotion={reducedMotion}
-              />
+              {/* No scale or position here: Character measures the model and
+                  frames it itself. Pass `scale`/`position` only to nudge. */}
+              <Character url={SITE.characterModel} reducedMotion={reducedMotion} />
             </CharacterErrorBoundary>
           ) : (
             placeholder

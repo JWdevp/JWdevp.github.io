@@ -111,5 +111,5 @@ export function findClip(
   return clips.find((clip) => pattern.test(clip.name)) ?? null
 }
 
-export const GREETING_PATTERN = /greet|wave|hello|hallo|hi\b|salud/i
+export const GREETING_PATTERN = /greet|wav|hello|hallo|winke|salud|hi\b/i
 export const IDLE_PATTERN = /idle|breath|stand|loop/i

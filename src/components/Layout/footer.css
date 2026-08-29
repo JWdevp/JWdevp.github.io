@@ -1,7 +1,6 @@
 .footer {
   border-top: 1px solid var(--border);
-  padding-block: var(--space-6) calc(var(--space-6) + 3.5rem);
-  margin-block-start: clamp(3rem, 8vh, 6rem);
+  padding-block: var(--space-5) calc(var(--space-5) + 3.5rem);
 }
 
 .footer__inner {

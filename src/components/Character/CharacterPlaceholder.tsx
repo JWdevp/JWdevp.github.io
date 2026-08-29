@@ -217,20 +217,20 @@ export function CharacterPlaceholder({
           </mesh>
         </group>
 
-        <group ref={armWave} position={[0.56, -1.06, 0.1]} rotation={[0, 0, ARM_REST]}>
+        <group ref={armWave} position={[0.48, -1.06, 0.1]} rotation={[0, 0, ARM_REST]}>
           {/* Sleeve */}
-          <mesh castShadow position={[0, -0.4, 0]}>
-            <capsuleGeometry args={[0.155, 0.56, 8, 24]} />
+          <mesh castShadow position={[0, -0.37, 0]}>
+            <capsuleGeometry args={[0.15, 0.5, 8, 24]} />
             <meshStandardMaterial color={c.sweater} roughness={0.92} />
           </mesh>
           {/* Wrist */}
-          <mesh castShadow position={[0, -0.76, 0]}>
-            <capsuleGeometry args={[0.105, 0.12, 6, 18]} />
+          <mesh castShadow position={[0, -0.7, 0]}>
+            <capsuleGeometry args={[0.1, 0.1, 6, 18]} />
             <meshStandardMaterial color={c.skin} roughness={0.62} />
           </mesh>
           {/* Hand */}
-          <mesh castShadow position={[0, -0.94, 0]} scale={[1, 1.2, 0.62]}>
-            <sphereGeometry args={[0.185, 28, 24]} />
+          <mesh castShadow position={[0, -0.86, 0]} scale={[1, 1.2, 0.62]}>
+            <sphereGeometry args={[0.175, 28, 24]} />
             <meshStandardMaterial color={c.skin} roughness={0.62} />
           </mesh>
         </group>
