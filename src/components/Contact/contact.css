@@ -1,3 +1,9 @@
+/* The contact form is the last thing on the page; a full section's worth of
+   padding under it just left a hole above the footer. */
+.contact {
+  padding-block-end: clamp(2.5rem, 5vh, 3.5rem);
+}
+
 .contact__grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -209,7 +215,13 @@ textarea.field__control {
 }
 
 @media (max-width: 900px) {
-  .contact__grid {
+  /* The contact form is the last thing on the page; a full section's worth of
+   padding under it just left a hole above the footer. */
+.contact {
+  padding-block-end: clamp(2.5rem, 5vh, 3.5rem);
+}
+
+.contact__grid {
     grid-template-columns: 1fr;
   }
 

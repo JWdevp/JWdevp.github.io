@@ -124,12 +124,27 @@ prefixes and any `.`, `_`, `-` or spaces. Recognised out of the box:
 To support a differently named rig, add the name to `BONE_CANDIDATES` in
 `src/components/Character/bones.ts`. A missing bone is skipped, never an error.
 
+### Checking and tuning
+
+```bash
+npm run check:model            # inspects public/models/character.glb
+npm run check:model -- x.glb   # or any other file
+```
+
+Every knob — tracking amounts, damping, rig orientation, framing — lives in
+`src/components/Character/characterConfig.ts`, documented in place.
+
+Scale and position are automatic: the loader measures the model, finds the head
+and crops to a bust, so an avatar of any size frames correctly.
+
+**How to make the model:** [`docs/CHARACTER-MODEL.md`](docs/CHARACTER-MODEL.md).
+
 ---
 
 ## Translations
 
 All interface copy lives in **`src/i18n/translations.ts`** — Spanish, English and
-German. Spanish is the default and also defines the type every other language
+German. German is the default; Spanish defines the type every other language
 must satisfy, so adding a key to `es` makes the compiler demand it in `en` and
 `de` too.
 
@@ -267,7 +282,8 @@ Nothing below is invented or filled in with placeholder facts — these are your
 to supply:
 
 - [ ] `public/models/character.glb` — the rigged character with `Greeting` and
-      `Idle` clips
+      `Idle` clips (see [`docs/CHARACTER-MODEL.md`](docs/CHARACTER-MODEL.md),
+      then `npm run check:model`)
 - [ ] Real projects in `src/data/projects.ts`
 - [ ] Project cover images in `public/images/`
 - [ ] A public email address, if you want one shown next to the form

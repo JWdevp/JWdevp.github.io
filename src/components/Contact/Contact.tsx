@@ -9,7 +9,7 @@ import './contact.css'
 export function Contact() {
   const { t } = useLanguage()
   const root = useRef<HTMLElement>(null)
-  useReveal(root, { stagger: 0.06 })
+  useReveal(root)
 
   return (
     <section id="contact" className="section contact" ref={root}>

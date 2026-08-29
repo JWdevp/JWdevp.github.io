@@ -9,5 +9,4 @@
  */
 export type CharacterState = 'initializing' | 'greeting' | 'idle' | 'tracking'
 
-/** Seconds spent blending the pointer offset in once idle begins. */
-export const TRACKING_RAMP = 0.8
+export { TRACKING_RAMP } from './characterConfig'
