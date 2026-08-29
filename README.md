@@ -227,8 +227,25 @@ which just looked broken.)
 
 `.github/workflows/deploy.yml` builds and deploys on every push to `main`.
 
-One-time setup: **Settings → Pages → Build and deployment → Source: GitHub
-Actions**.
+### Required one-time setting
+
+**Settings → Pages → Build and deployment → Source: `GitHub Actions`.**
+
+This is not optional. With the default `Deploy from a branch`, GitHub publishes
+the repository *as it is* — so visitors receive the development `index.html`,
+whose entry point is `/src/main.tsx`, and the browser has nothing it can run.
+The result is a blank white page.
+
+You can tell which mode is active from the Actions tab. Under `Deploy from a
+branch` there is a second, GitHub-generated run called **“pages build and
+deployment”** alongside our **“Deploy to GitHub Pages”**. Both publish, and
+whichever finishes last wins — so the site can even flip between working and
+blank between deploys. Once the source is set to `GitHub Actions`, only our
+workflow runs.
+
+If the deployed page is ever blank, it says so itself: an inline fallback in
+`index.html` detects that the source is being served and prints the fix on the
+page after a few seconds.
 
 The workflow derives the Vite base path from the repository name, so nothing is
 hardcoded:
