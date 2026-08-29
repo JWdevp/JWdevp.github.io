@@ -59,6 +59,10 @@
   --radius-xl: 28px;
   --radius-pill: 999px;
 
+  /* Every floating island shares one height so they line up across the top. */
+  --island-h: 2.875rem;
+  --island-pad: 5px;
+
   /* --- Motion ------------------------------------------------------------ */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -114,6 +118,14 @@
   --glow-b: rgba(255, 138, 76, 0.1);
 
   color-scheme: light;
+}
+
+/* Compact islands on small screens. Declared here, next to the base value, so
+   the cascade order between stylesheets can never leave it dead. */
+@media (max-width: 720px) {
+  :root {
+    --island-h: 2.6rem;
+  }
 }
 
 [data-theme='dark'] {

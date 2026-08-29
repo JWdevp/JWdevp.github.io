@@ -177,7 +177,13 @@
 
 @media (max-width: 900px) {
   .hero__stage-fallback {
-    max-height: 42vh;
+    max-height: 38vh;
     aspect-ratio: 4 / 3;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero__stage-fallback {
+    max-height: 32vh;
   }
 }

@@ -319,7 +319,7 @@ const de: Translation = {
     home: 'Home',
     about: 'Über mich',
     projects: 'Projekte',
-    contact: 'Schreib mich an',
+    contact: 'Kontakt',
   },
   hero: {
     greeting: 'Hallo, ich bin Jason!',

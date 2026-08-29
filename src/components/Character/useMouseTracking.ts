@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react'
+import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 
 /**
  * Pointer tracking for the 3D character.
@@ -97,7 +97,7 @@ export function useMouseTracking(options: Options = {}): MouseTracking {
     }
   }, [])
 
-  const update = (delta: number, elapsed: number): Vec2 => {
+  const update = useCallback((delta: number, elapsed: number): Vec2 => {
     // Exponential smoothing: identical feel at 60fps and at 144fps.
     const alpha = 1 - Math.exp(-damping * Math.min(delta, 0.1))
 
@@ -119,7 +119,13 @@ export function useMouseTracking(options: Options = {}): MouseTracking {
     smoothed.current.x += (goalX - smoothed.current.x) * alpha
     smoothed.current.y += (goalY - smoothed.current.y) * alpha
     return smoothed.current
-  }
+  }, [damping])
 
-  return { target, smoothed, enabled, coarsePointer, update }
+  // Stable identity: every field is a ref, so the object never needs to change.
+  // Returning a fresh literal made it an unstable effect dependency, which is
+  // how a theme toggle ended up restarting the greeting.
+  return useMemo(
+    () => ({ target, smoothed, enabled, coarsePointer, update }),
+    [update],
+  )
 }
