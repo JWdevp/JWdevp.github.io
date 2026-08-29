@@ -1,0 +1,26 @@
+.ambience {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambience__wash {
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 90vh;
+  background:
+    radial-gradient(60% 55% at 72% 18%, var(--glow-a), transparent 70%),
+    radial-gradient(45% 40% at 12% 8%, var(--glow-b), transparent 72%);
+  opacity: 0.75;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.ambience__grain {
+  position: absolute;
+  inset: 0;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}

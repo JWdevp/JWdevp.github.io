@@ -1,0 +1,302 @@
+@import './tokens.css';
+
+/* ===========================================================================
+   Reset + base
+   =========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto; /* smooth scrolling is driven by GSAP ScrollToPlugin */
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  transition: background-color var(--dur-slow) var(--ease-out),
+    color var(--dur-slow) var(--ease-out);
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 560;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===========================================================================
+   Layout primitives
+   =========================================================================== */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-padding-y);
+  scroll-margin-top: 6rem;
+}
+
+.section + .section {
+  padding-block-start: 0;
+}
+
+.section__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-block-end: var(--space-7);
+  max-width: 46rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 18px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.section__title {
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-tight);
+}
+
+.section__lead {
+  max-width: var(--measure);
+  color: var(--muted);
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+}
+
+.rule {
+  height: 1px;
+  border: 0;
+  background: var(--border);
+}
+
+/* ===========================================================================
+   Shared surfaces
+   =========================================================================== */
+
+.glass {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-island);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--surface-glass-strong);
+  }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+/* ===========================================================================
+   Buttons
+   =========================================================================== */
+
+.btn {
+  --btn-bg: var(--accent);
+  --btn-fg: var(--accent-contrast);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.8rem 1.35rem;
+  min-height: 2.875rem;
+  border-radius: var(--radius-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: var(--text-sm);
+  font-weight: 520;
+  letter-spacing: var(--tracking-normal);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out), opacity var(--dur-base) linear;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--foreground);
+  border: 1px solid var(--border-strong);
+  box-shadow: none;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--surface-sunken);
+  box-shadow: none;
+}
+
+/* ===========================================================================
+   Utilities
+   =========================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: var(--z-skip);
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-solid);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-sm);
+  transform: translateY(-160%);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Elements animated in by GSAP start hidden; the `.js-reveal` opt-in keeps the
+   page fully readable if JavaScript motion never runs. */
+.no-js-safe {
+  opacity: 1;
+}
+
+/* ===========================================================================
+   Reduced motion
+   =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Page content sits above the fixed ambience layer. */
+.page {
+  position: relative;
+  z-index: var(--z-content);
+}

@@ -1,0 +1,219 @@
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.contact__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  top: 7rem;
+}
+
+.contact__links {
+  margin-block-start: var(--space-4);
+}
+
+.contact__links-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-block-end: var(--space-3);
+}
+
+.contact__links ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--muted-strong);
+  transition: color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.contact__link:hover {
+  color: var(--foreground);
+  border-color: var(--border-strong);
+  background: var(--surface-sunken);
+}
+
+/* --- Form ---------------------------------------------------------------- */
+
+.contact__form-wrap {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  background: var(--background-elevated);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field__label {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: var(--tracking-normal);
+}
+
+.field__control {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-solid);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  transition: border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+[data-theme='dark'] .field__control {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.field__control::placeholder {
+  color: var(--faint);
+}
+
+.field__control:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.field__control:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.field__control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+textarea.field__control {
+  resize: vertical;
+  min-height: 8.5rem;
+}
+
+.field[data-invalid] .field__control {
+  border-color: var(--danger);
+}
+
+.field[data-invalid] .field__control:focus {
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+.field__error {
+  font-size: var(--text-xs);
+  color: var(--danger);
+}
+
+.form__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block-start: var(--space-1);
+}
+
+.form__submit {
+  align-self: flex-start;
+}
+
+.form__spinner {
+  animation: form-spin 0.9s linear infinite;
+}
+
+@keyframes form-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Result states ------------------------------------------------------- */
+
+.form__result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+.form__result-text {
+  flex: 1;
+}
+
+.form__result-icon {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  flex: none;
+}
+
+.form__result--success {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-5);
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+
+.form__result--success .form__result-icon {
+  background: var(--success);
+  color: var(--background);
+}
+
+.form__result--success .form__result-text {
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-snug);
+  color: var(--foreground);
+}
+
+.form__result--error {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+@media (max-width: 900px) {
+  .contact__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact__intro {
+    position: static;
+  }
+}
