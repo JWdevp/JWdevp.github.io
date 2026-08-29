@@ -52,7 +52,7 @@ export function createTrackedParts(
   push(bones.torso, limits.MAX_TORSO_ROTATION, 0.7)
   push(bones.neck, limits.MAX_NECK_ROTATION, 0.85)
   push(bones.head, limits.MAX_HEAD_ROTATION, 1)
-  for (const eye of bones.eyes) push(eye, limits.MAX_EYE_ROTATION, 1.15)
+  for (const eye of bones.eyes) push(eye, limits.MAX_EYE_ROTATION, 1.05)
 
   return parts
 }

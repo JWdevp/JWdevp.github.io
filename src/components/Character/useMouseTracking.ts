@@ -22,7 +22,7 @@ export interface TrackingLimits {
 }
 
 export const TRACKING_LIMITS: TrackingLimits = {
-  MAX_EYE_ROTATION: 0.34,
+  MAX_EYE_ROTATION: 0.26,
   MAX_HEAD_ROTATION: 0.42,
   MAX_NECK_ROTATION: 0.16,
   MAX_TORSO_ROTATION: 0.06,
