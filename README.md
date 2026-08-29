@@ -53,10 +53,15 @@ item is detected with an `IntersectionObserver`.
 public/models/character.glb
 ```
 
-The file is **not** in the repository. Until it exists, an abstract 3D
-placeholder is shown that waves, breathes and tracks the cursor exactly like the
-real model will. Drop the GLB in and it is picked up automatically — no code
-change. (`public/models/README.md` repeats this next to the folder.)
+The file is **not** in the repository. Until it exists, a stand-in built from
+Three.js primitives is shown — the same proportions and palette as the reference
+(swept brown hair, round dark glasses, beard, light sweater) — and it waves,
+blinks, breathes and tracks the cursor exactly like the real model will. Drop the
+GLB in and it is picked up automatically, no code change.
+(`public/models/README.md` repeats this next to the folder.)
+
+The stand-in lives in `src/components/Character/CharacterPlaceholder.tsx`; its
+palette is the `palette` object near the top of that file.
 
 ### Animations
 
@@ -74,6 +79,9 @@ INITIALIZING → GREETING → IDLE → TRACKING
   in when the greeting ends and looped from there.
 * **Tracking** — enabled only once the greeting is over, and blended in over
   0.8 s so it never snaps on.
+
+The greeting replays whenever the hero scrolls back into view, so a visitor who
+arrives while the 3D chunk is still loading still gets waved at.
 
 Missing clips degrade quietly: with no greeting the character starts in idle;
 with no clips at all it simply stands there.
@@ -133,6 +141,16 @@ Project titles and descriptions are content rather than interface, so they live
 with the rest of the project data (see below) — already translated per language.
 
 ---
+
+## Scroll transitions
+
+Each top-level section owns one scrubbed GSAP timeline covering its whole
+passage through the viewport: it rises and resolves as it arrives, holds at full
+strength while it is being read, then settles back and dims as it leaves. One
+timeline per section means the arriving and departing phases can never fight
+over the same properties. Tuned in `src/hooks/useSectionTransitions.ts`.
+
+Inside a section, `src/hooks/useReveal.ts` staggers the individual elements.
 
 ## Dark mode
 
@@ -194,9 +212,14 @@ Social links (LinkedIn, GitHub) are in `src/config/site.ts`.
 
 Keyboard navigable throughout, with a skip link, visible focus rings, labelled
 form fields, `aria-live` feedback on submit and `aria-label`s on the icon-only
-controls. `prefers-reduced-motion: reduce` removes the entrance animations, the
-greeting and the cursor tracking, and drops the 3D canvas to a single rendered
-frame.
+controls.
+
+`prefers-reduced-motion: reduce` removes every autonomous animation: the
+entrance reveals, the scroll transitions, the greeting wave, the idle float, the
+breathing and the blinking. The render loop itself stays live so the character's
+gaze still follows the pointer — that motion is small, user-driven and stops the
+moment the pointer does. (An earlier version froze the canvas entirely here,
+which just looked broken.)
 
 ---
 

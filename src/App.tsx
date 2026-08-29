@@ -1,6 +1,8 @@
+import { useRef } from 'react'
 import { SECTION_IDS } from './config/site'
 import { useLanguage } from './hooks/useLanguage'
 import { useSectionObserver } from './hooks/useSectionObserver'
+import { useSectionTransitions } from './hooks/useSectionTransitions'
 import { About } from './components/About/About'
 import { Contact } from './components/Contact/Contact'
 import { Hero } from './components/Hero/Hero'
@@ -16,6 +18,8 @@ import './components/Navigation/navigation.css'
 export default function App() {
   const { t } = useLanguage()
   const activeSection = useSectionObserver(SECTION_IDS)
+  const mainRef = useRef<HTMLElement>(null)
+  useSectionTransitions(mainRef)
 
   return (
     <>
@@ -29,7 +33,7 @@ export default function App() {
       <LanguageSwitcher />
       <ThemeToggle />
 
-      <main id="main" className="page">
+      <main id="main" className="page" ref={mainRef}>
         <Hero />
 
         {/* About and Skills share one scroll target: they are one chapter. */}

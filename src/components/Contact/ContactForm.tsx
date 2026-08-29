@@ -68,7 +68,22 @@ export function ContactForm() {
 
     setStatus('loading')
 
+    // Honeypot: a person never checks a field they cannot see.
+    //
+    // This is checked here and deliberately NOT forwarded. The previous version
+    // read `.value` and sent it, but an *unchecked* checkbox still reports
+    // "on" — so every real submission arrived at Web3Forms carrying a truthy
+    // botcheck and was silently discarded as spam. Nothing about the honeypot
+    // needs to reach the API for it to do its job.
     const form = event.currentTarget
+    const honeypot = form.elements.namedItem('botcheck') as HTMLInputElement | null
+    if (honeypot?.checked) {
+      // Pretend it worked; a bot gets no signal that it was filtered.
+      setValues(EMPTY)
+      setStatus('success')
+      return
+    }
+
     const payload = {
       access_key: WEB3FORMS_ACCESS_KEY,
       subject: WEB3FORMS_SUBJECT,
@@ -76,9 +91,6 @@ export function ContactForm() {
       name: values.name.trim(),
       email: values.email.trim(),
       message: values.message.trim(),
-      // Honeypot: real people leave this empty.
-      botcheck: (form.elements.namedItem('botcheck') as HTMLInputElement | null)
-        ?.value,
       language,
     }
 

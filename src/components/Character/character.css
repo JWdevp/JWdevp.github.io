@@ -31,7 +31,14 @@
 
 @media (max-width: 900px) {
   .character-stage {
-    max-height: 42vh;
+    max-height: 38vh;
     aspect-ratio: 4 / 3;
+  }
+}
+
+/* Keep the hero's call to action above the bottom navigation island. */
+@media (max-width: 720px) {
+  .character-stage {
+    max-height: 32vh;
   }
 }
