@@ -1,0 +1,171 @@
+/* ===========================================================================
+   Floating islands
+   ---------------------------------------------------------------------------
+   Fixed, never scrolling with the page. Treated as small pieces of hardware
+   resting above the document: one crisp hairline, one soft shadow, one inner
+   highlight — and nothing else.
+   =========================================================================== */
+
+.island {
+  position: fixed;
+  z-index: var(--z-island);
+  border-radius: var(--radius-pill);
+  transition: background-color var(--dur-slow) var(--ease-out),
+    border-color var(--dur-slow) var(--ease-out),
+    box-shadow var(--dur-slow) var(--ease-out);
+}
+
+/* --- Main navigation ----------------------------------------------------- */
+
+.island--nav {
+  top: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px;
+}
+
+.island__list {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.island__pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+}
+
+[data-theme='dark'] .island__pill {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+.island__item {
+  position: relative;
+  z-index: 1;
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 480;
+  letter-spacing: var(--tracking-normal);
+  white-space: nowrap;
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.island__item:hover {
+  color: var(--foreground);
+}
+
+.island__item[data-active] {
+  color: var(--foreground);
+  font-weight: 540;
+}
+
+/* --- Controls: language + theme ------------------------------------------ */
+
+.island--lang,
+.island--theme {
+  top: var(--space-4);
+}
+
+.island--lang {
+  right: calc(var(--space-4) + 2.75rem);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px;
+}
+
+.island--lang .island__pill--sm {
+  height: calc(100% - 10px);
+  top: 5px;
+}
+
+.lang__item {
+  position: relative;
+  z-index: 1;
+  padding: 0.36rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  transition: color var(--dur-base) var(--ease-out);
+}
+
+.lang__item:hover {
+  color: var(--foreground);
+}
+
+.lang__item[data-active] {
+  color: var(--foreground);
+}
+
+.island--theme {
+  right: var(--space-4);
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+
+.theme-toggle__icon {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  color: var(--foreground);
+  will-change: transform, opacity;
+}
+
+.theme-toggle:hover {
+  background: var(--surface-glass-strong);
+}
+
+/* ===========================================================================
+   Mobile: navigation moves to the bottom, controls stay at the top
+   =========================================================================== */
+
+@media (max-width: 720px) {
+  .island--nav {
+    top: auto;
+    bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 2 * var(--space-3));
+  }
+
+  .island__item {
+    padding: 0.5rem 0.7rem;
+    font-size: var(--text-xs);
+  }
+
+  .island--lang {
+    right: calc(var(--space-3) + 2.5rem);
+    top: var(--space-3);
+  }
+
+  .island--theme {
+    right: var(--space-3);
+    top: var(--space-3);
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .island__item {
+    padding: 0.5rem 0.55rem;
+    font-size: 0.75rem;
+  }
+}

@@ -1,0 +1,37 @@
+.character-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: min(64vh, 34rem);
+  isolation: isolate;
+}
+
+.character-stage__canvas {
+  position: relative;
+  z-index: 1;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: pan-y;
+}
+
+/* Soft light behind the figure — gives the scene depth without a heavy
+   post-processing pass. */
+.character-stage__glow {
+  position: absolute;
+  inset: 8% 4% 12%;
+  z-index: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 42%, var(--glow-a), transparent 62%),
+    radial-gradient(circle at 68% 74%, var(--glow-b), transparent 58%);
+  filter: blur(28px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .character-stage {
+    max-height: 42vh;
+    aspect-ratio: 4 / 3;
+  }
+}
