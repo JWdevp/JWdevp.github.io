@@ -32,6 +32,8 @@ const es = {
     switchToDark: 'Activar modo oscuro',
     switchToLight: 'Activar modo claro',
     openInNewTab: 'Se abre en una pestaña nueva',
+    openSettings: 'Abrir ajustes',
+    closeSettings: 'Cerrar ajustes',
     character3d:
       'Escena tridimensional decorativa: un personaje que saluda y sigue el cursor.',
   },
@@ -44,14 +46,10 @@ const es = {
   hero: {
     greeting: '¡Hola, soy Jason!',
     tagline: 'Si estás viendo esto, tienes buen gusto.',
-    role: 'Anwendungsentwickler · Certificado por la IHK desde julio de 2026',
-    triad: 'Software · Diseño · Creatividad',
-    location: 'Nürnberg, Bayern · Alemania',
     intro:
       'Desarrollo aplicaciones con una mirada de diseñador: pienso el producto entero, no solo el código que lo sostiene.',
     ctaProjects: 'Ver proyectos',
     ctaContact: 'Escríbeme',
-    scrollHint: 'Desplázate',
   },
   about: {
     eyebrow: 'Sobre mí',
@@ -176,6 +174,8 @@ const en: Translation = {
     switchToDark: 'Switch to dark mode',
     switchToLight: 'Switch to light mode',
     openInNewTab: 'Opens in a new tab',
+    openSettings: 'Open settings',
+    closeSettings: 'Close settings',
     character3d:
       'Decorative 3D scene: a character that waves and follows the cursor.',
   },
@@ -188,14 +188,10 @@ const en: Translation = {
   hero: {
     greeting: "Hi, I'm Jason!",
     tagline: "If you're seeing this, you have good taste.",
-    role: 'Anwendungsentwickler · IHK-certified since July 2026',
-    triad: 'Software · Design · Creativity',
-    location: 'Nürnberg, Bavaria · Germany',
     intro:
       'I build applications with a designer’s eye: I think about the whole product, not only the code holding it up.',
     ctaProjects: 'See projects',
     ctaContact: 'Get in touch',
-    scrollHint: 'Scroll',
   },
   about: {
     eyebrow: 'About',
@@ -312,6 +308,8 @@ const de: Translation = {
     switchToDark: 'In den Dunkelmodus wechseln',
     switchToLight: 'In den Hellmodus wechseln',
     openInNewTab: 'Wird in einem neuen Tab geöffnet',
+    openSettings: 'Einstellungen öffnen',
+    closeSettings: 'Einstellungen schließen',
     character3d:
       'Dekorative 3D-Szene: eine Figur, die winkt und dem Mauszeiger folgt.',
   },
@@ -324,14 +322,10 @@ const de: Translation = {
   hero: {
     greeting: 'Hallo, ich bin Jason!',
     tagline: 'Wenn du das hier siehst, hast du guten Geschmack.',
-    role: 'Anwendungsentwickler · IHK-zertifiziert seit Juli 2026',
-    triad: 'Software · Design · Kreativität',
-    location: 'Nürnberg, Bayern · Deutschland',
     intro:
       'Ich entwickle Anwendungen mit dem Blick eines Gestalters: Ich denke das ganze Produkt, nicht nur den Code darunter.',
     ctaProjects: 'Projekte ansehen',
     ctaContact: 'Schreib mich an',
-    scrollHint: 'Scrollen',
   },
   about: {
     eyebrow: 'Über mich',

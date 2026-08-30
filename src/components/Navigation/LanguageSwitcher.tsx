@@ -10,7 +10,6 @@ const ORDER: Language[] = ['de', 'en', 'es']
 
 export function LanguageSwitcher() {
   const { language, setLanguage, t } = useLanguage()
-  const wrapRef = useRef<HTMLDivElement>(null)
   const pillRef = useRef<HTMLSpanElement>(null)
   const buttons = useRef<Partial<Record<Language, HTMLButtonElement | null>>>({})
   const positioned = useRef(false)
@@ -39,7 +38,6 @@ export function LanguageSwitcher() {
 
   return (
     <div
-      ref={wrapRef}
       className="island island--lang glass"
       role="group"
       aria-label={t.a11y.languageSelector}

@@ -73,11 +73,13 @@
   border-radius: var(--radius-pill);
   color: var(--muted);
   font-size: var(--text-sm);
-  font-weight: 480;
+  /* Weight stays fixed. Changing it on the active item re-flowed the row,
+     which fired the ResizeObserver mid-tween and made the pill wobble as it
+     landed. The accent fill carries the active state on its own. */
+  font-weight: 500;
   letter-spacing: var(--tracking-normal);
   white-space: nowrap;
-  transition: color var(--dur-base) var(--ease-out),
-    font-weight var(--dur-base) var(--ease-out);
+  transition: color var(--dur-base) var(--ease-out);
 }
 
 .island__item:hover {
@@ -86,21 +88,65 @@
 
 .island__item[data-active] {
   color: var(--accent-contrast);
-  font-weight: 580;
 }
 
-/* --- Controls: language + theme ------------------------------------------ */
+/* --- Settings disclosure: language + theme ------------------------------- */
 
-/* Absolute, not fixed: positioned against the initial containing block, so they
-   rest at the top of the *document* and scroll out of view with the hero. */
-.island--lang,
-.island--theme {
+/* Absolute, not fixed: these rest at the top of the *document* and scroll out
+   of view with the hero, unlike the navigation. */
+.settings {
   position: absolute;
   top: var(--space-4);
+  right: var(--space-4);
+  z-index: var(--z-island);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* Sits to the left of the gear and out of the flow, so opening and closing
+   never shifts the button it came from. */
+.settings__panel {
+  position: absolute;
+  top: 0;
+  right: calc(var(--island-h) + var(--space-2));
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings__panel > * {
+  transform-origin: right center;
+  will-change: transform, opacity;
+}
+
+.island--settings {
+  position: relative;
+  width: var(--island-h);
+  justify-content: center;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.island--settings:hover {
+  background: var(--surface-glass-strong);
+}
+
+.settings__icon {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  color: var(--foreground);
+  will-change: transform, opacity;
 }
 
 .island--lang {
-  right: calc(var(--space-4) + var(--island-h) + var(--space-2));
+  /* Explicit, not inherited from `backdrop-filter`'s containing block: that
+     disappears in the no-backdrop-filter fallback and the pill would then be
+     positioned against the panel instead of the island. */
+  position: relative;
   gap: 2px;
   padding-inline: var(--island-pad);
 }
@@ -110,19 +156,19 @@
   height: calc(var(--island-h) - 2 * var(--island-pad));
 }
 
+/* Same type as the navigation island, so the two read as one system. */
 .lang__item {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
   height: calc(var(--island-h) - 2 * var(--island-pad));
-  padding-inline: 0.6rem;
+  padding-inline: 0.62rem;
   border-radius: var(--radius-pill);
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
+  font-size: var(--text-sm);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--faint);
+  letter-spacing: var(--tracking-normal);
+  color: var(--muted);
   transition: color var(--dur-base) var(--ease-out);
 }
 
@@ -132,14 +178,18 @@
 
 .lang__item[data-active] {
   color: var(--accent-contrast);
-  font-weight: 600;
 }
 
 .island--theme {
-  right: var(--space-4);
   width: var(--island-h);
   justify-content: center;
   padding: 0;
+}
+
+.theme-toggle {
+  /* Both icons occupy the same cell so they can cross-fade in place. */
+  display: grid;
+  place-items: center;
 }
 
 .theme-toggle__icon {
@@ -148,12 +198,6 @@
   place-items: center;
   color: var(--foreground);
   will-change: transform, opacity;
-}
-
-.theme-toggle {
-  /* Both icons occupy the same cell so they can cross-fade in place. */
-  display: grid;
-  place-items: center;
 }
 
 .theme-toggle:hover {
@@ -176,12 +220,7 @@
     font-size: var(--text-xs);
   }
 
-  .island--lang {
-    top: var(--space-3);
-    right: calc(var(--space-3) + var(--island-h) + var(--space-2));
-  }
-
-  .island--theme {
+  .settings {
     top: var(--space-3);
     right: var(--space-3);
   }

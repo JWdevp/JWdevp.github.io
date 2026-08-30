@@ -4,10 +4,10 @@ import { useEffect, useRef } from 'react'
 import { SECTION_IDS, type SectionId } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
 import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
-import { useScrollTo } from '../../hooks/useScrollTo'
 
 interface Props {
   activeSection: string
+  onSelect: (id: SectionId) => void
 }
 
 /**
@@ -16,10 +16,13 @@ interface Props {
  * The active state is a single pill element that physically travels between
  * items — measured from the DOM and moved with GSAP, so it stays correct when
  * the labels change length (three languages) or the island is resized.
+ *
+ * Which item is active is decided by App, not here: during a click-driven scroll
+ * the target is held fixed so the pill glides once to its destination instead of
+ * hopping through every section the page passes on the way.
  */
-export function FloatingNavigation({ activeSection }: Props) {
+export function FloatingNavigation({ activeSection, onSelect }: Props) {
   const { t, language } = useLanguage()
-  const scrollTo = useScrollTo()
 
   const listRef = useRef<HTMLUListElement>(null)
   const pillRef = useRef<HTMLSpanElement>(null)
@@ -66,14 +69,33 @@ export function FloatingNavigation({ activeSection }: Props) {
     hasPositioned.current = true
   }, { dependencies: [activeSection, language] })
 
-  // Re-measure on layout changes (viewport resize, font swap, wrap change).
+  // Keep the latest measurement closure reachable from an observer that is
+  // created once and never re-created.
+  const movePillRef = useRef(movePill)
+  useEffect(() => {
+    movePillRef.current = movePill
+  })
+
+  // Re-measure on real layout changes (viewport resize, font swap, wrap change).
+  //
+  // Created once, on purpose. Re-creating it whenever the active item changed
+  // meant `observe()` fired its initial callback in the middle of the travel
+  // tween and hard-set the pill to the destination, so every navigation showed
+  // a jump to the target and then a slide back into it.
   useEffect(() => {
     const list = listRef.current
     if (!list) return
-    const observer = new ResizeObserver(() => movePill(false))
+    let initial = true
+    const observer = new ResizeObserver(() => {
+      if (initial) {
+        initial = false // observe() always reports once straight away
+        return
+      }
+      movePillRef.current(false)
+    })
     observer.observe(list)
     return () => observer.disconnect()
-  }, [activeSection, language])
+  }, [])
 
   return (
     <nav
@@ -92,7 +114,7 @@ export function FloatingNavigation({ activeSection }: Props) {
               className="island__item"
               data-active={activeSection === id || undefined}
               aria-current={activeSection === id ? 'true' : undefined}
-              onClick={() => scrollTo(id)}
+              onClick={() => onSelect(id)}
             >
               {labels[id]}
             </button>

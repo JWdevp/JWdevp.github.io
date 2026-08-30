@@ -17,16 +17,20 @@ function navOffset(): number {
 }
 
 export function useScrollTo() {
-  return useCallback((targetId: string) => {
+  return useCallback((targetId: string, onComplete?: () => void) => {
     const target =
       targetId === 'top' ? 0 : document.getElementById(targetId)
-    if (target === null) return
+    if (target === null) {
+      onComplete?.()
+      return
+    }
 
     if (prefersReducedMotionNow()) {
       window.scrollTo({
         top: target === 0 ? 0 : (target as HTMLElement).offsetTop - navOffset(),
         behavior: 'auto',
       })
+      onComplete?.()
       return
     }
 
@@ -39,6 +43,8 @@ export function useScrollTo() {
         autoKill: true,
       },
       overwrite: 'auto',
+      onComplete,
+      onInterrupt: onComplete,
     })
   }, [])
 }

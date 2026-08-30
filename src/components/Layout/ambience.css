@@ -8,12 +8,11 @@
 
 .ambience__wash {
   position: absolute;
-  inset: -20% -10% auto -10%;
-  height: 90vh;
+  inset: 0;
   background:
-    radial-gradient(60% 55% at 72% 18%, var(--glow-a), transparent 70%),
-    radial-gradient(45% 40% at 12% 8%, var(--glow-b), transparent 72%);
-  opacity: 0.75;
+    radial-gradient(58% 52% at 50% 50%, var(--glow-a), transparent 70%),
+    radial-gradient(42% 38% at 50% 50%, var(--glow-b), transparent 74%);
+  opacity: 0.85;
   transition: opacity var(--dur-slow) var(--ease-out);
 }
 

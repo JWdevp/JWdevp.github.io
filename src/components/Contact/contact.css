@@ -64,14 +64,14 @@
 /* --- Form ---------------------------------------------------------------- */
 
 .contact__form-wrap {
-  padding: clamp(1.5rem, 3vw, 2.25rem);
+  padding: clamp(1.1rem, 2vw, 1.5rem);
   background: var(--background-elevated);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .field {
@@ -89,7 +89,7 @@
 
 .field__control {
   width: 100%;
-  padding: 0.75rem 0.9rem;
+  padding: 0.6rem 0.8rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-solid);
@@ -126,7 +126,7 @@
 
 textarea.field__control {
   resize: vertical;
-  min-height: 8.5rem;
+  min-height: 6.5rem;
 }
 
 .field[data-invalid] .field__control {

@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ArrowDown, ArrowRight, MapPin } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Suspense, lazy, useRef } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
@@ -56,11 +56,6 @@ export function Hero() {
     <section id="home" className="section hero" ref={root}>
       <div className="container hero__grid">
         <div className="hero__copy">
-          <p className="eyebrow" data-hero-item>
-            <MapPin size={12} strokeWidth={2} aria-hidden="true" />
-            {t.hero.location}
-          </p>
-
           <h1 className="hero__greeting" data-hero-item>
             {t.hero.greeting}
           </h1>
@@ -69,17 +64,8 @@ export function Hero() {
             {t.hero.tagline}
           </p>
 
-          <p className="hero__role" data-hero-item>
-            <span className="hero__role-dot" aria-hidden="true" />
-            {t.hero.role}
-          </p>
-
           <p className="hero__intro" data-hero-item>
             {t.hero.intro}
-          </p>
-
-          <p className="hero__triad" data-hero-item>
-            {t.hero.triad}
           </p>
 
           <div className="hero__actions" data-hero-item>
@@ -109,16 +95,6 @@ export function Hero() {
         </div>
       </div>
 
-      <button
-        type="button"
-        className="hero__scroll"
-        onClick={() => scrollTo('about')}
-        tabIndex={-1}
-        aria-hidden="true"
-      >
-        <ArrowDown size={13} strokeWidth={2} />
-        {t.hero.scrollHint}
-      </button>
     </section>
   )
 }
