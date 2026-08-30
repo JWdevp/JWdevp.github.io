@@ -169,7 +169,9 @@ Inside a section, `src/hooks/useReveal.ts` staggers the individual elements.
 
 ## Dark mode
 
-Toggle at the top right, next to the language island. **Light is the default.**
+Behind the gear at the top right, alongside the language island: the two slide
+out together and the gear becomes a chevron that puts them back. **Light is the
+default.**
 The choice is stored in `localStorage` under `jw-theme`, and a tiny inline
 script in `index.html` applies it before first paint so there is no flash.
 

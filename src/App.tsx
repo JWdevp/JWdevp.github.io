@@ -1,6 +1,7 @@
-import { useRef } from 'react'
-import { SECTION_IDS } from './config/site'
+import { useCallback, useRef, useState } from 'react'
+import { SECTION_IDS, type SectionId } from './config/site'
 import { useLanguage } from './hooks/useLanguage'
+import { useScrollTo } from './hooks/useScrollTo'
 import { useSectionObserver } from './hooks/useSectionObserver'
 import { useSectionTransitions } from './hooks/useSectionTransitions'
 import { About } from './components/About/About'
@@ -9,17 +10,31 @@ import { Hero } from './components/Hero/Hero'
 import { Ambience } from './components/Layout/Ambience'
 import { Footer } from './components/Layout/Footer'
 import { FloatingNavigation } from './components/Navigation/FloatingNavigation'
-import { LanguageSwitcher } from './components/Navigation/LanguageSwitcher'
-import { ThemeToggle } from './components/Navigation/ThemeToggle'
+import { SettingsIsland } from './components/Navigation/SettingsIsland'
 import { Projects } from './components/Projects/Projects'
 import { Skills } from './components/Skills/Skills'
 import './components/Navigation/navigation.css'
 
 export default function App() {
   const { t } = useLanguage()
-  const activeSection = useSectionObserver(SECTION_IDS)
+  const observedSection = useSectionObserver(SECTION_IDS)
   const mainRef = useRef<HTMLElement>(null)
   useSectionTransitions(mainRef)
+
+  // While a click-driven scroll is in flight, the destination wins over what the
+  // observer sees: the page sweeps past every section in between, and letting
+  // that reach the pill turned one glide into a stutter.
+  const scrollTo = useScrollTo()
+  const [pendingSection, setPendingSection] = useState<SectionId | null>(null)
+  const activeSection = pendingSection ?? observedSection
+
+  const goToSection = useCallback(
+    (id: SectionId) => {
+      setPendingSection(id)
+      scrollTo(id, () => setPendingSection(null))
+    },
+    [scrollTo],
+  )
 
   return (
     <>
@@ -29,9 +44,8 @@ export default function App() {
 
       <Ambience />
 
-      <FloatingNavigation activeSection={activeSection} />
-      <LanguageSwitcher />
-      <ThemeToggle />
+      <FloatingNavigation activeSection={activeSection} onSelect={goToSection} />
+      <SettingsIsland />
 
       <main id="main" className="page" ref={mainRef}>
         <Hero />
