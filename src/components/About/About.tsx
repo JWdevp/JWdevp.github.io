@@ -1,7 +1,32 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { SITE } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useReveal } from '../../hooks/useReveal'
 import './about.css'
+
+/**
+ * Portrait. The filename lives in `SITE.portrait`.
+ *
+ * The figure removes itself if the image fails to load, rather than leaving a
+ * broken-image icon in the middle of the section — so renaming or removing the
+ * file degrades quietly instead of breaking the layout.
+ */
+function Portrait({ alt }: { alt: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return null
+
+  return (
+    <figure className="about__portrait" data-reveal>
+      <img
+        src={SITE.portrait}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onError={() => setFailed(true)}
+      />
+    </figure>
+  )
+}
 
 export function About() {
   const { t } = useLanguage()
@@ -32,16 +57,20 @@ export function About() {
             ))}
           </div>
 
-          <aside className="about__facts card" data-reveal>
-            <h3 className="about__facts-title">{t.about.factsTitle}</h3>
-            <dl className="about__facts-list">
-              {t.about.facts.map((fact) => (
-                <div className="about__fact" key={fact.label}>
-                  <dt>{fact.label}</dt>
-                  <dd>{fact.value}</dd>
-                </div>
-              ))}
-            </dl>
+          <aside className="about__aside">
+            <Portrait alt={t.about.portraitAlt} />
+
+            <div className="about__facts card" data-reveal>
+              <h3 className="about__facts-title">{t.about.factsTitle}</h3>
+              <dl className="about__facts-list">
+                {t.about.facts.map((fact) => (
+                  <div className="about__fact" key={fact.label}>
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </aside>
         </div>
 
@@ -61,6 +90,10 @@ export function About() {
             ))}
           </ul>
         </div>
+
+        <p className="about__closing" data-reveal>
+          {t.about.closing}
+        </p>
       </div>
     </div>
   )

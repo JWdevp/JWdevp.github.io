@@ -48,8 +48,10 @@
 .contact__link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.7rem;
   min-width: 12rem;
+  min-height: 3.5rem;
   padding: 0.85rem 1.3rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
@@ -70,7 +72,7 @@
 /* --- Form ---------------------------------------------------------------- */
 
 .contact__form-wrap {
-  padding: clamp(1.1rem, 2vw, 1.5rem);
+  padding: clamp(0.8rem, 1.3vw, 1.05rem);
   background: var(--background-elevated);
 }
 
@@ -90,7 +92,7 @@
 .field__control {
   width: 100%;
   min-height: var(--field-h);
-  padding: 0.7rem 1.05rem;
+  padding: 0.6rem 0.95rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-solid);
@@ -128,7 +130,7 @@
 textarea.field__control {
   resize: vertical;
   min-height: 6.5rem;
-  padding-block: 0.8rem;
+  padding-block: 0.7rem;
 }
 
 .field[data-invalid] .field__control {
@@ -160,7 +162,7 @@ textarea.field__control {
   min-height: var(--field-h);
   height: var(--field-h);
   padding-block: 0;
-  padding-inline: 1.05rem;
+  padding-inline: 0.95rem;
   border-radius: var(--radius-md);
 }
 

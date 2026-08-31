@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { SECTION_IDS, type SectionId } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
 import { motionBudget } from '../../hooks/usePrefersReducedMotion'
+import { useScrollDirection } from '../../hooks/useScrollDirection'
 
 interface Props {
   activeSection: string
@@ -24,6 +25,7 @@ interface Props {
 export function FloatingNavigation({ activeSection, onSelect }: Props) {
   const { t, language } = useLanguage()
 
+  const navRef = useRef<HTMLElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
   const pillRef = useRef<HTMLSpanElement>(null)
   const itemRefs = useRef<Partial<Record<SectionId, HTMLButtonElement | null>>>({})
@@ -72,6 +74,36 @@ export function FloatingNavigation({ activeSection, onSelect }: Props) {
     hasPositioned.current = true
   }, { dependencies: [activeSection, language] })
 
+  // --- Hide on the way down, come back on the way up ----------------------
+  //
+  // Reading is the priority: scrolling down means the visitor is heading into
+  // the content, so the island gets out of the way. The first upward movement
+  // brings it straight back, wherever on the page that happens.
+  const direction = useScrollDirection()
+
+  useGSAP(
+    () => {
+      const nav = navRef.current
+      if (!nav) return
+
+      const hidden = direction === 'down'
+      // It sits at the top on desktop and at the bottom on mobile, so it leaves
+      // in whichever direction is closest to its own edge.
+      const atBottom = window.matchMedia('(max-width: 720px)').matches
+      const distance = nav.offsetHeight + 28
+      const budget = motionBudget()
+
+      gsap.to(nav, {
+        y: hidden ? (atBottom ? distance : -distance) : 0,
+        autoAlpha: hidden ? 0 : 1,
+        duration: budget.duration(0.42),
+        ease: 'power2.inOut',
+        overwrite: 'auto',
+      })
+    },
+    { dependencies: [direction] },
+  )
+
   // Keep the latest measurement closure reachable from an observer that is
   // created once and never re-created.
   const movePillRef = useRef(movePill)
@@ -102,6 +134,7 @@ export function FloatingNavigation({ activeSection, onSelect }: Props) {
 
   return (
     <nav
+      ref={navRef}
       className="island island--nav glass"
       aria-label={t.a11y.mainNavigation}
     >

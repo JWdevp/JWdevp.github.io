@@ -25,12 +25,17 @@
 
 /* --- Main navigation ----------------------------------------------------- */
 
+/* Centred with auto margins rather than a translate, so GSAP owns `transform`
+   outright for the hide-on-scroll motion. */
 .island--nav {
   position: fixed;
   top: var(--space-4);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  width: max-content;
+  margin-inline: auto;
   padding-inline: var(--island-pad);
+  will-change: transform, opacity;
 }
 
 .island__list {

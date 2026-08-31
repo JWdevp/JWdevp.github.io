@@ -1,0 +1,256 @@
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ArrowLeft, ArrowUpRight } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import type { Project } from '../../data/projects'
+import { useLanguage } from '../../hooks/useLanguage'
+import { motionBudget } from '../../hooks/usePrefersReducedMotion'
+
+interface Props {
+  project: Project
+  /** Where the card sat when it was clicked, so the panel grows out of it. */
+  origin: DOMRect | null
+  onClose: () => void
+}
+
+/** Blurred while the dialog is open, so the panel is the only thing in focus. */
+const BACKDROP_SELECTOR = '.page, .footer, .back-to-top, .island--nav, .settings'
+
+export function ProjectDialog({ project, origin, onClose }: Props) {
+  const { t, language } = useLanguage()
+  const panel = useRef<HTMLDivElement>(null)
+  const scrim = useRef<HTMLDivElement>(null)
+  const closeButton = useRef<HTMLButtonElement>(null)
+  const detail = project.detail
+
+  // --- Open: grow out of the card, blur everything behind ------------------
+  useGSAP(() => {
+    const node = panel.current
+    const veil = scrim.current
+    if (!node || !veil) return
+
+    const budget = motionBudget()
+    const behind = gsap.utils.toArray<HTMLElement>(BACKDROP_SELECTOR)
+    const duration = budget.duration(0.55)
+
+    gsap.to(veil, { autoAlpha: 1, duration, ease: 'power2.inOut' })
+    gsap.to(behind, {
+      filter: 'blur(9px)',
+      duration,
+      ease: 'power2.inOut',
+      overwrite: 'auto',
+    })
+
+    if (budget.reduced || !origin) {
+      gsap.fromTo(
+        node,
+        { autoAlpha: 0, scale: budget.reduced ? 1 : 0.96 },
+        { autoAlpha: 1, scale: 1, duration, ease: 'power2.inOut' },
+      )
+      return
+    }
+
+    // Measure where the panel has landed, then start it back at the card.
+    const target = node.getBoundingClientRect()
+    const scale = Math.max(0.2, origin.width / target.width)
+
+    gsap.fromTo(
+      node,
+      {
+        autoAlpha: 0,
+        x: origin.left - target.left,
+        y: origin.top - target.top,
+        scale,
+        transformOrigin: 'top left',
+      },
+      {
+        autoAlpha: 1,
+        x: 0,
+        y: 0,
+        scale: 1,
+        duration,
+        ease: 'power2.inOut',
+      },
+    )
+    gsap.from(node.querySelector('.dialog__body'), {
+      autoAlpha: 0,
+      duration: budget.duration(0.4),
+      delay: budget.duration(0.16),
+      ease: 'power2.out',
+    })
+  }, [])
+
+  // --- Close: reverse it, then hand control back ---------------------------
+  const dismiss = () => {
+    const node = panel.current
+    const veil = scrim.current
+    const budget = motionBudget()
+    const behind = gsap.utils.toArray<HTMLElement>(BACKDROP_SELECTOR)
+    const duration = budget.duration(0.4)
+
+    gsap.to(behind, {
+      filter: 'blur(0px)',
+      duration,
+      ease: 'power2.inOut',
+      overwrite: 'auto',
+      onComplete: () => gsap.set(behind, { clearProps: 'filter' }),
+    })
+    if (veil) gsap.to(veil, { autoAlpha: 0, duration, ease: 'power2.inOut' })
+    if (!node) return onClose()
+
+    const shrink =
+      !budget.reduced && origin
+        ? (() => {
+            const target = node.getBoundingClientRect()
+            return {
+              x: origin.left - target.left,
+              y: origin.top - target.top,
+              scale: Math.max(0.2, origin.width / target.width),
+              transformOrigin: 'top left',
+            }
+          })()
+        : { scale: budget.reduced ? 1 : 0.97 }
+
+    gsap.to(node, {
+      ...shrink,
+      autoAlpha: 0,
+      duration,
+      ease: 'power2.inOut',
+      onComplete: onClose,
+    })
+  }
+
+  // Escape closes it, the page behind stays put, and focus starts on the way out.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') dismiss()
+    }
+    const { overflow } = document.body.style
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', onKey)
+    closeButton.current?.focus()
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = overflow
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const titleId = `${project.id}-title`
+
+  return createPortal(
+    <div className="dialog">
+      <div className="dialog__scrim" ref={scrim} onClick={dismiss} />
+
+      <div
+        className="dialog__panel"
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+      >
+        <button
+          type="button"
+          className="dialog__back"
+          ref={closeButton}
+          onClick={dismiss}
+        >
+          <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
+          {t.projects.back}
+        </button>
+
+        <div className="dialog__body">
+          <header className="dialog__head">
+            {detail?.client ? (
+              <p className="eyebrow">{detail.client}</p>
+            ) : null}
+            <h2 className="dialog__title" id={titleId}>
+              {project.title[language]}
+            </h2>
+            <p className="dialog__lead">{project.description[language]}</p>
+          </header>
+
+          {detail ? (
+            <>
+              <div className="dialog__prose">
+                {detail.body[language].map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+              </div>
+
+              <section className="dialog__section">
+                <h3 className="dialog__section-title">{t.projects.highlights}</h3>
+                <ul className="dialog__highlights">
+                  {detail.highlights[language].map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+
+              <Shots images={detail.images ?? []} title={project.title[language]} />
+            </>
+          ) : null}
+
+          <div className="dialog__meta">
+            <section className="dialog__section">
+              <h3 className="dialog__section-title">{t.projects.stack}</h3>
+              <ul className="dialog__tags">
+                {project.technologies.map((tech) => (
+                  <li key={tech}>{tech}</li>
+                ))}
+              </ul>
+            </section>
+
+            {detail?.tooling?.length ? (
+              <section className="dialog__section">
+                <h3 className="dialog__section-title">{t.projects.tooling}</h3>
+                <ul className="dialog__tags">
+                  {detail.tooling.map((tool) => (
+                    <li key={tool}>{tool}</li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+          </div>
+
+          {project.url ? (
+            <a
+              className="btn dialog__link"
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t.projects.visitSite}
+              <ArrowUpRight size={15} strokeWidth={2} aria-hidden="true" />
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
+/** Screenshots that quietly drop out if the file is not there yet. */
+function Shots({ images, title }: { images: string[]; title: string }) {
+  const [broken, setBroken] = useState<string[]>([])
+  const usable = images.filter((src) => !broken.includes(src))
+  if (usable.length === 0) return null
+
+  return (
+    <div className="dialog__shots">
+      {usable.map((src) => (
+        <figure key={src}>
+          <img
+            src={`${import.meta.env.BASE_URL}${src.replace(/^\//, '')}`}
+            alt={title}
+            loading="lazy"
+            decoding="async"
+            onError={() => setBroken((current) => [...current, src])}
+          />
+        </figure>
+      ))}
+    </div>
+  )
+}
