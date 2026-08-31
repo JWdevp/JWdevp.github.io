@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import { Moon, Sun } from 'lucide-react'
 import { useRef } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
-import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
+import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 import { useTheme } from '../../hooks/useTheme'
 
 export function ThemeToggle() {
@@ -23,21 +23,26 @@ export function ThemeToggle() {
       const shown = isDark ? moon : sun
       const hidden = isDark ? sun : moon
 
-      if (!positioned.current || prefersReducedMotionNow()) {
+      const budget = motionBudget()
+      // Reduced motion keeps the cross-fade but drops the spin and the scale.
+      const spin = budget.reduced ? 0 : 70
+      const shrink = budget.reduced ? 1 : 0.6
+
+      if (!positioned.current) {
         gsap.set(shown, { autoAlpha: 1, rotate: 0, scale: 1 })
-        gsap.set(hidden, { autoAlpha: 0, rotate: -70, scale: 0.6 })
+        gsap.set(hidden, { autoAlpha: 0, rotate: -spin, scale: shrink })
         positioned.current = true
         return
       }
 
       gsap
-        .timeline({ defaults: { duration: 0.34, ease: 'power2.out' } })
-        .to(hidden, { autoAlpha: 0, rotate: 70, scale: 0.6 }, 0)
+        .timeline({ defaults: { duration: budget.duration(0.34), ease: 'power2.out' } })
+        .to(hidden, { autoAlpha: 0, rotate: spin, scale: shrink }, 0)
         .fromTo(
           shown,
-          { autoAlpha: 0, rotate: -70, scale: 0.6 },
+          { autoAlpha: 0, rotate: -spin, scale: shrink },
           { autoAlpha: 1, rotate: 0, scale: 1 },
-          0.06,
+          budget.reduced ? 0 : 0.06,
         )
     },
     { dependencies: [theme] },

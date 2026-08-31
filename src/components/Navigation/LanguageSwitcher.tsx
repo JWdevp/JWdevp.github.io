@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import { useRef } from 'react'
 import { LANGUAGE_LABELS, type Language } from '../../i18n/translations'
 import { useLanguage } from '../../hooks/useLanguage'
-import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
+import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 
 /** Order shown in the UI. */
 const ORDER: Language[] = ['de', 'en', 'es']
@@ -26,12 +26,18 @@ export function LanguageSwitcher() {
         autoAlpha: 1,
       }
 
-      if (!positioned.current || prefersReducedMotionNow()) {
+      if (!positioned.current) {
         gsap.set(pill, to)
         positioned.current = true
         return
       }
-      gsap.to(pill, { ...to, duration: 0.38, ease: 'power3.out', overwrite: 'auto' })
+      const budget = motionBudget()
+      gsap.to(pill, {
+        ...to,
+        duration: budget.duration(0.38),
+        ease: budget.reduced ? 'power1.out' : 'power3.out',
+        overwrite: 'auto',
+      })
     },
     { dependencies: [language] },
   )

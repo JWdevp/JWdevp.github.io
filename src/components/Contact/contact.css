@@ -1,7 +1,10 @@
 /* The contact form is the last thing on the page; a full section's worth of
-   padding under it just left a hole above the footer. */
-.contact {
-  padding-block-end: clamp(2.5rem, 5vh, 3.5rem);
+   padding under it just left a hole above the "back to top" button.
+   `.section.contact` and not `.contact`: the shorthand `padding-block` on
+   `.section` sits later in the bundle and quietly won, so the override read as
+   applied while the computed value stayed at 99px. */
+.section.contact {
+  padding-block-end: clamp(2rem, 5.5vh, 3.25rem);
 }
 
 .contact__grid {
@@ -216,9 +219,12 @@ textarea.field__control {
 
 @media (max-width: 900px) {
   /* The contact form is the last thing on the page; a full section's worth of
-   padding under it just left a hole above the footer. */
-.contact {
-  padding-block-end: clamp(2.5rem, 5vh, 3.5rem);
+   padding under it just left a hole above the "back to top" button.
+   `.section.contact` and not `.contact`: the shorthand `padding-block` on
+   `.section` sits later in the bundle and quietly won, so the override read as
+   applied while the computed value stayed at 99px. */
+.section.contact {
+  padding-block-end: clamp(2rem, 5.5vh, 3.25rem);
 }
 
 .contact__grid {

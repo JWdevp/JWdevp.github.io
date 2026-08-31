@@ -1,7 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import type { RefObject } from 'react'
-import { prefersReducedMotionNow } from './usePrefersReducedMotion'
+import { motionBudget } from './usePrefersReducedMotion'
 
 gsap.registerPlugin(useGSAP)
 
@@ -19,9 +19,9 @@ gsap.registerPlugin(useGSAP)
  * IntersectionObserver reports real rendered geometry every time, so the two
  * effects can no longer disagree.
  *
- * Elements are visible by default in CSS; they are only hidden when this hook is
- * actually going to animate them, so a reduced-motion visitor (or a failed
- * script) still sees a complete page.
+ * Under `prefers-reduced-motion` the lift collapses to zero and the timings
+ * tighten, so the entrance becomes a quick cross-fade rather than disappearing
+ * altogether — see `motionBudget`.
  */
 export function useReveal(
   scope: RefObject<HTMLElement | null>,
@@ -31,12 +31,12 @@ export function useReveal(
 
   useGSAP(
     () => {
-      if (prefersReducedMotionNow()) return
-
+      const budget = motionBudget()
       const targets = gsap.utils.toArray<HTMLElement>('[data-reveal]')
       if (targets.length === 0) return
 
-      gsap.set(targets, { opacity: 0, y })
+      const lift = budget.travel(y)
+      gsap.set(targets, { opacity: 0, y: lift })
 
       // Elements that cross the line within the same tick animate as one
       // staggered group; a later arrival starts its own group.
@@ -50,9 +50,9 @@ export function useReveal(
         gsap.to(batch, {
           opacity: 1,
           y: 0,
-          duration,
+          duration: budget.duration(duration),
           ease: 'power2.inOut',
-          stagger,
+          stagger: budget.stagger(stagger),
           overwrite: 'auto',
         })
       }

@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import { useEffect, useRef } from 'react'
 import { SECTION_IDS, type SectionId } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
-import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
+import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 
 interface Props {
   activeSection: string
@@ -47,19 +47,22 @@ export function FloatingNavigation({ activeSection, onSelect }: Props) {
     const height = active.offsetHeight
     const y = active.offsetTop
 
-    if (!animate || prefersReducedMotionNow()) {
+    if (!animate) {
       gsap.set(pill, { x, y, width, height, autoAlpha: 1 })
       return
     }
 
+    // A small indicator sliding a couple of hundred pixels is not a vestibular
+    // trigger, so reduced motion shortens the travel rather than removing it.
+    const budget = motionBudget()
     gsap.to(pill, {
       x,
       y,
       width,
       height,
       autoAlpha: 1,
-      duration: 0.42,
-      ease: 'power3.out',
+      duration: budget.duration(0.42),
+      ease: budget.reduced ? 'power1.out' : 'power3.out',
       overwrite: 'auto',
     })
   }
