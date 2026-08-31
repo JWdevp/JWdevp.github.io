@@ -19,9 +19,6 @@ export function Skills() {
           <h2 className="section__title" data-reveal>
             {t.skills.title}
           </h2>
-          <p className="section__lead" data-reveal>
-            {t.skills.lead}
-          </p>
         </header>
 
         <div className="skills__groups">

@@ -31,8 +31,8 @@ export function FloatingNavigation({ activeSection, onSelect }: Props) {
 
   const labels: Record<SectionId, string> = {
     home: t.nav.home,
+    work: t.nav.work,
     about: t.nav.about,
-    projects: t.nav.projects,
     contact: t.nav.contact,
   }
 

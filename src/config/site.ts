@@ -10,9 +10,9 @@ export const SITE = {
   characterModel: `${import.meta.env.BASE_URL}models/character.glb`,
   links: {
     linkedin: 'https://www.linkedin.com/in/jason-wiersum',
-    github: 'https://github.com/JWdevp',
+    github: 'https://github.com/jasonwiersum',
   },
 } as const
 
-export const SECTION_IDS = ['home', 'about', 'projects', 'contact'] as const
+export const SECTION_IDS = ['home', 'work', 'about', 'contact'] as const
 export type SectionId = (typeof SECTION_IDS)[number]

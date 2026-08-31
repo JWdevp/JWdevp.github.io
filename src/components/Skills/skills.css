@@ -2,15 +2,32 @@
   padding-block-start: clamp(4rem, 10vh, 7rem);
 }
 
+/* Five equal columns on one row. `minmax(0, 1fr)` rather than auto-fit: the
+   categories are a single comparable set, so they should not reflow into two
+   ragged rows on a medium screen. */
 .skills__groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(1rem, 2.2vw, 2rem);
+}
+
+@media (max-width: 900px) {
+  .skills__groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: var(--space-6);
+  }
+}
+
+@media (max-width: 460px) {
+  .skills__groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .skills__group-title {
   font-family: var(--font-mono);
   font-size: var(--text-micro);
+  text-wrap: balance;
   font-weight: 500;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
@@ -36,7 +53,7 @@
 }
 
 .skills__name {
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   font-weight: 480;
   letter-spacing: var(--tracking-snug);
   color: var(--foreground);

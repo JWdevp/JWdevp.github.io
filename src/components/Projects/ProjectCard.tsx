@@ -42,9 +42,6 @@ export function ProjectCard({ project, index }: Props) {
             {String(index + 1).padStart(2, '0')}
           </span>
         )}
-        {project.placeholder ? (
-          <span className="project__badge">{t.projects.placeholderBadge}</span>
-        ) : null}
       </div>
 
       <div className="project__body">
@@ -57,12 +54,12 @@ export function ProjectCard({ project, index }: Props) {
           ))}
         </ul>
 
-        <span className="project__action">
-          {isLinked ? t.projects.viewProject : t.projects.comingSoon}
-          {isLinked ? (
+        {isLinked ? (
+          <span className="project__action">
+            {t.projects.viewProject}
             <ArrowUpRight size={15} strokeWidth={2} aria-hidden="true" />
-          ) : null}
-        </span>
+          </span>
+        ) : null}
       </div>
     </>
   )

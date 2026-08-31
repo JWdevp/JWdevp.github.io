@@ -15,7 +15,9 @@
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
     "gsap": "^3.13.0",
+    "lucide": "^1.38.0",
     "lucide-react": "^0.544.0",
+    "morphicons": "^1.7.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "three": "^0.180.0"

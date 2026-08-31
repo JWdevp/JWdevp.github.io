@@ -50,13 +50,16 @@ export default function App() {
       <main id="main" className="page" ref={mainRef}>
         <Hero />
 
-        {/* About and Skills share one scroll target: they are one chapter. */}
-        <section id="about" className="section">
-          <About />
+        {/* Work is what he does: the tools first, then the output. */}
+        <section id="work" className="section">
           <Skills />
+          <Projects />
         </section>
 
-        <Projects />
+        <section id="about" className="section">
+          <About />
+        </section>
+
         <Contact />
       </main>
 

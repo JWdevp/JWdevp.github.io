@@ -40,7 +40,7 @@ export const skillGroups: SkillGroup[] = [
     items: [{ name: 'Atlassian' }, { name: 'Adobe Creative Cloud' }],
   },
   {
-    category: 'creative',
+    category: 'design',
     items: [
       { name: 'Photoshop', note: (t) => t.skills.photoshopNote },
     ],
