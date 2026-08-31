@@ -135,11 +135,8 @@
 }
 
 .settings__icon {
-  grid-area: 1 / 1;
-  display: grid;
-  place-items: center;
+  display: block;
   color: var(--foreground);
-  will-change: transform, opacity;
 }
 
 .island--lang {

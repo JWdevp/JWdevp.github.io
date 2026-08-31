@@ -7,11 +7,11 @@ import './projects.css'
 
 export function Projects() {
   const { t } = useLanguage()
-  const root = useRef<HTMLElement>(null)
+  const root = useRef<HTMLDivElement>(null)
   useReveal(root, { y: 28 })
 
   return (
-    <section id="projects" className="section projects" ref={root}>
+    <div className="projects" ref={root}>
       <div className="container">
         <header className="section__head">
           <p className="eyebrow" data-reveal>
@@ -20,9 +20,6 @@ export function Projects() {
           <h2 className="section__title" data-reveal>
             {t.projects.title}
           </h2>
-          <p className="section__lead" data-reveal>
-            {t.projects.lead}
-          </p>
         </header>
 
         <div className="projects__grid">
@@ -33,6 +30,6 @@ export function Projects() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   )
 }

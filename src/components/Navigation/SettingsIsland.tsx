@@ -1,6 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ChevronRight, Settings } from 'lucide-react'
+import { ChevronRight, Settings } from 'lucide' // icon data, not components
+import { MorphIcon } from 'morphicons/react'
 import { useRef, useState } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { motionBudget } from '../../hooks/usePrefersReducedMotion'
@@ -18,59 +19,38 @@ import { ThemeToggle } from './ThemeToggle'
  * `display`), so the pills inside it can still measure themselves — a panel that
  * is display:none reports zero widths and the language pill lands in the wrong
  * place the first time you open it.
+ *
+ * The button's icon is a single `MorphIcon` that interpolates between the gear
+ * and the chevron, so the two states are one shape changing rather than two
+ * icons trading places.
  */
 export function SettingsIsland() {
   const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
-  const gear = useRef<HTMLSpanElement>(null)
-  const chevron = useRef<HTMLSpanElement>(null)
   const started = useRef(false)
 
   useGSAP(
     () => {
       const items = panel.current?.children
-      if (!items || !gear.current || !chevron.current) return
-
-      const shown = open ? chevron.current : gear.current
-      const hidden = open ? gear.current : chevron.current
+      if (!items) return
 
       // Reduced motion keeps the disclosure legible as a cross-fade: the slide
       // distance and the overshoot go, the fade stays.
       const budget = motionBudget()
       const slide = budget.travel(26)
       const shrink = budget.reduced ? 1 : 0.88
-      const spin = budget.reduced ? 0 : 90
 
       const first = !started.current
       started.current = true
 
       if (first) {
         gsap.set(items, { autoAlpha: open ? 1 : 0, x: open ? 0 : slide, scale: open ? 1 : shrink })
-        gsap.set(shown, { autoAlpha: 1, rotate: 0, scale: 1 })
-        gsap.set(hidden, { autoAlpha: 0, rotate: open ? -spin : spin, scale: budget.reduced ? 1 : 0.6 })
         return
       }
 
       const tl = gsap.timeline()
-
-      tl.to(
-        hidden,
-        {
-          autoAlpha: 0,
-          rotate: open ? spin : -spin,
-          scale: budget.reduced ? 1 : 0.6,
-          duration: budget.duration(0.24),
-          ease: 'power2.in',
-        },
-        0,
-      ).fromTo(
-        shown,
-        { autoAlpha: 0, rotate: open ? -spin : spin, scale: budget.reduced ? 1 : 0.6 },
-        { autoAlpha: 1, rotate: 0, scale: 1, duration: budget.duration(0.3), ease: 'power2.out' },
-        budget.reduced ? 0 : 0.06,
-      )
 
       if (open) {
         // Emerge from behind the gear, nearest island first.
@@ -119,12 +99,16 @@ export function SettingsIsland() {
         aria-expanded={open}
         aria-label={open ? t.a11y.closeSettings : t.a11y.openSettings}
       >
-        <span className="settings__icon" ref={gear}>
-          <Settings size={16} strokeWidth={1.9} aria-hidden="true" />
-        </span>
-        <span className="settings__icon" ref={chevron}>
-          <ChevronRight size={17} strokeWidth={2.1} aria-hidden="true" />
-        </span>
+        {/* One icon that morphs between the two shapes rather than two icons
+            cross-fading: the gear unwinds into the chevron and back. */}
+        <MorphIcon
+          className="settings__icon"
+          icon={open ? ChevronRight : Settings}
+          size={17}
+          strokeWidth={1.9}
+          spring="snappy"
+          reducedMotion="user"
+        />
       </button>
     </div>
   )

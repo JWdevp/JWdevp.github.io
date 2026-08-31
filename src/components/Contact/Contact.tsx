@@ -15,9 +15,6 @@ export function Contact() {
     <section id="contact" className="section contact" ref={root}>
       <div className="container contact__grid">
         <div className="contact__intro">
-          <p className="eyebrow" data-reveal>
-            {t.contact.eyebrow}
-          </p>
           <h2 className="section__title" data-reveal>
             {t.contact.title}
           </h2>

@@ -1,3 +1,9 @@
+/* Skills and projects share the #work section now, so the block needs the
+   breathing room the old section padding used to give it. */
+.projects {
+  margin-block-start: clamp(4rem, 10vh, 7rem);
+}
+
 .projects__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));

@@ -153,7 +153,6 @@ export function ContactForm() {
       <Field
         id="contact-name"
         label={t.contact.form.name}
-        placeholder={t.contact.form.namePlaceholder}
         value={values.name}
         onChange={update('name')}
         error={errors.name}
@@ -165,7 +164,6 @@ export function ContactForm() {
         id="contact-email"
         type="email"
         label={t.contact.form.email}
-        placeholder={t.contact.form.emailPlaceholder}
         value={values.email}
         onChange={update('email')}
         error={errors.email}
@@ -177,7 +175,6 @@ export function ContactForm() {
         id="contact-message"
         multiline
         label={t.contact.form.message}
-        placeholder={t.contact.form.messagePlaceholder}
         value={values.message}
         onChange={update('message')}
         error={errors.message}
@@ -225,7 +222,6 @@ export function ContactForm() {
 interface FieldProps {
   id: string
   label: string
-  placeholder: string
   value: string
   onChange: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -240,7 +236,6 @@ interface FieldProps {
 function Field({
   id,
   label,
-  placeholder,
   value,
   onChange,
   error,
@@ -250,11 +245,14 @@ function Field({
   disabled,
 }: FieldProps) {
   const errorId = `${id}-error`
+  // The label sits inside the field as its placeholder. The real <label> stays
+  // in the markup, visually hidden, so screen readers and click-to-focus keep
+  // working — a placeholder alone is not an accessible name.
   const shared = {
     id,
     value,
     onChange,
-    placeholder,
+    placeholder: label,
     disabled,
     'aria-invalid': error ? (true as const) : undefined,
     'aria-describedby': error ? errorId : undefined,
@@ -263,11 +261,11 @@ function Field({
 
   return (
     <div className="field" data-invalid={error ? true : undefined}>
-      <label className="field__label" htmlFor={id}>
+      <label className="visually-hidden" htmlFor={id}>
         {label}
       </label>
       {multiline ? (
-        <textarea {...shared} rows={5} />
+        <textarea {...shared} rows={4} />
       ) : (
         <input {...shared} type={type} autoComplete={autoComplete} />
       )}

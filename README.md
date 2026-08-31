@@ -29,7 +29,7 @@ src/
 │   ├── Hero/          first screen
 │   ├── About/         biography, facts panel, the four creative pillars
 │   ├── Skills/        technologies by category + spoken languages
-│   ├── Projects/      grid + project card
+│   ├── Projects/      grid + project card   (Skills + Projects make up #work)
 │   ├── Contact/       section + Web3Forms form
 │   └── Layout/        footer, background ambience
 ├── hooks/             theme · language · section observer · scroll · reveal
@@ -39,7 +39,7 @@ src/
 └── styles/            tokens.css (design system) · globals.css
 ```
 
-The page has four sections — `#home`, `#about`, `#projects`, `#contact` — in one
+The page has four sections — `#home`, `#work`, `#about`, `#contact` — in one
 document. There is no router: navigation is smooth scrolling, and the active
 item is detected with an `IntersectionObserver`.
 

@@ -15,8 +15,6 @@ export interface Project {
   image: string | null
   /** Live/repository URL, or `null` when there is nothing to link to yet. */
   url: string | null
-  /** Placeholders are visibly marked as such so nothing reads as real work. */
-  placeholder: boolean
 }
 
 /**
@@ -26,8 +24,8 @@ export interface Project {
  * For each project: write the three translations, list the technologies,
  * drop a cover image in `public/images/` and point `image` at it
  * (e.g. `image: 'images/my-project.jpg'` — no leading slash, so it keeps
- * working under any GitHub Pages base path), set `url`, and switch
- * `placeholder` to false.
+ * working under any GitHub Pages base path) and set `url`. A project without a
+ * `url` simply renders without its "view project" link.
  */
 export const projects: Project[] = [
   {
@@ -45,7 +43,6 @@ export const projects: Project[] = [
     technologies: ['Java', 'Spring', 'Git'],
     image: null,
     url: null,
-    placeholder: true,
   },
   {
     id: 'project-02',
@@ -62,7 +59,6 @@ export const projects: Project[] = [
     technologies: ['Python', 'JavaScript', 'Git'],
     image: null,
     url: null,
-    placeholder: true,
   },
   {
     id: 'project-03',
@@ -79,6 +75,5 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'Adobe Creative Cloud'],
     image: null,
     url: null,
-    placeholder: true,
   },
 ]

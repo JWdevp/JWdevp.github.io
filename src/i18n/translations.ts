@@ -39,8 +39,8 @@ const es = {
   },
   nav: {
     home: 'Inicio',
+    work: 'Trabajo',
     about: 'Sobre mí',
-    projects: 'Proyectos',
     contact: 'Escríbeme',
   },
   hero: {
@@ -90,13 +90,12 @@ const es = {
   skills: {
     eyebrow: 'Stack',
     title: 'Herramientas con las que trabajo.',
-    lead: 'Tecnologías que uso de forma habitual, agrupadas por lo que hacen. Sin porcentajes: una herramienta se conoce o no se conoce.',
     categories: {
       programming: 'Programación',
       frameworks: 'Frameworks Java',
       versionControl: 'Control de versiones',
       tools: 'Herramientas',
-      creative: 'Creatividad',
+      design: 'Diseño',
     },
     photoshopNote: '15 años de experiencia',
     languagesTitle: 'Idiomas',
@@ -107,24 +106,17 @@ const es = {
     ],
   },
   projects: {
-    eyebrow: 'Proyectos',
+    eyebrow: 'Trabajo',
     title: 'Trabajo seleccionado.',
-    lead: 'Espacio reservado para los proyectos. Estas tarjetas son marcadores de posición y se sustituirán por trabajo real.',
-    placeholderBadge: 'Marcador de posición',
     viewProject: 'Ver proyecto',
-    comingSoon: 'Próximamente',
   },
   contact: {
-    eyebrow: 'Escríbeme',
     title: '¿Hablamos?',
     lead: 'Si tienes un proyecto, una vacante o simplemente una idea que quieras comentar, el mensaje llega directo a mi correo.',
     form: {
       name: 'Nombre',
-      namePlaceholder: 'Cómo te llamas',
       email: 'Email',
-      emailPlaceholder: 'tu@email.com',
       message: 'Mensaje',
-      messagePlaceholder: 'Cuéntame en qué estás pensando…',
       submit: 'Enviar mensaje',
       sending: 'Enviando…',
       required: 'Obligatorio',
@@ -181,8 +173,8 @@ const en: Translation = {
   },
   nav: {
     home: 'Home',
+    work: 'Work',
     about: 'About',
-    projects: 'Projects',
     contact: 'Get in touch',
   },
   hero: {
@@ -232,13 +224,12 @@ const en: Translation = {
   skills: {
     eyebrow: 'Stack',
     title: 'Tools I work with.',
-    lead: 'Technologies I use regularly, grouped by what they do. No percentages — you either know a tool or you don’t.',
     categories: {
       programming: 'Programming',
       frameworks: 'Java frameworks',
       versionControl: 'Version control',
       tools: 'Tools',
-      creative: 'Creative',
+      design: 'Design',
     },
     photoshopNote: '15 years of experience',
     languagesTitle: 'Languages',
@@ -249,24 +240,17 @@ const en: Translation = {
     ],
   },
   projects: {
-    eyebrow: 'Projects',
+    eyebrow: 'Work',
     title: 'Selected work.',
-    lead: 'Space reserved for the projects. These cards are placeholders and will be replaced with real work.',
-    placeholderBadge: 'Placeholder',
     viewProject: 'View project',
-    comingSoon: 'Coming soon',
   },
   contact: {
-    eyebrow: 'Get in touch',
     title: 'Let’s talk.',
     lead: 'If you have a project, a role or simply an idea worth discussing, the message lands straight in my inbox.',
     form: {
       name: 'Name',
-      namePlaceholder: 'Your name',
       email: 'Email',
-      emailPlaceholder: 'you@email.com',
       message: 'Message',
-      messagePlaceholder: 'Tell me what you have in mind…',
       submit: 'Send message',
       sending: 'Sending…',
       required: 'Required',
@@ -315,8 +299,8 @@ const de: Translation = {
   },
   nav: {
     home: 'Home',
+    work: 'Work',
     about: 'Über mich',
-    projects: 'Projekte',
     contact: 'Kontakt',
   },
   hero: {
@@ -366,13 +350,12 @@ const de: Translation = {
   skills: {
     eyebrow: 'Stack',
     title: 'Womit ich arbeite.',
-    lead: 'Technologien, die ich regelmäßig einsetze, gruppiert nach ihrer Aufgabe. Ohne Prozentangaben — ein Werkzeug beherrscht man oder eben nicht.',
     categories: {
       programming: 'Programmierung',
       frameworks: 'Java-Frameworks',
       versionControl: 'Versionsverwaltung',
       tools: 'Werkzeuge',
-      creative: 'Kreativ',
+      design: 'Design',
     },
     photoshopNote: '15 Jahre Erfahrung',
     languagesTitle: 'Sprachen',
@@ -383,24 +366,17 @@ const de: Translation = {
     ],
   },
   projects: {
-    eyebrow: 'Projekte',
+    eyebrow: 'Work',
     title: 'Ausgewählte Arbeiten.',
-    lead: 'Platz für die Projekte. Diese Karten sind Platzhalter und werden durch echte Arbeiten ersetzt.',
-    placeholderBadge: 'Platzhalter',
     viewProject: 'Projekt ansehen',
-    comingSoon: 'Demnächst',
   },
   contact: {
-    eyebrow: 'Schreib mich an',
     title: 'Reden wir?',
     lead: 'Ob Projekt, Stelle oder einfach eine Idee, über die du sprechen möchtest — die Nachricht landet direkt in meinem Postfach.',
     form: {
       name: 'Name',
-      namePlaceholder: 'Dein Name',
       email: 'E-Mail',
-      emailPlaceholder: 'du@email.com',
       message: 'Nachricht',
-      messagePlaceholder: 'Erzähl mir, worum es geht…',
       submit: 'Nachricht senden',
       sending: 'Wird gesendet…',
       required: 'Pflichtfeld',
