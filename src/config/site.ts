@@ -8,6 +8,11 @@ export const SITE = {
   location: 'Nürnberg, Bayern',
   /** Path of the optional character model, resolved against the Vite base. */
   characterModel: `${import.meta.env.BASE_URL}models/character.glb`,
+  /**
+   * Portrait shown in the About section. Point this at whatever the file in
+   * `public/images/` is called; if it is missing the figure removes itself.
+   */
+  portrait: `${import.meta.env.BASE_URL}images/sanfran.grey.wide.jpg`,
   links: {
     linkedin: 'https://www.linkedin.com/in/jason-wiersum',
     github: 'https://github.com/jasonwiersum',

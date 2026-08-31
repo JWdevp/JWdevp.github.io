@@ -1,14 +1,15 @@
 import { useRef, useState } from 'react'
+import { SITE } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useReveal } from '../../hooks/useReveal'
 import './about.css'
 
 /**
- * Portrait, dropped in at `public/images/jason.jpg`.
+ * Portrait. The filename lives in `SITE.portrait`.
  *
- * The file is not in the repository, so the figure removes itself if the image
- * fails to load rather than leaving a broken-image icon in the middle of the
- * section. Add the file and it appears; nothing else has to change.
+ * The figure removes itself if the image fails to load, rather than leaving a
+ * broken-image icon in the middle of the section — so renaming or removing the
+ * file degrades quietly instead of breaking the layout.
  */
 function Portrait({ alt }: { alt: string }) {
   const [failed, setFailed] = useState(false)
@@ -17,7 +18,7 @@ function Portrait({ alt }: { alt: string }) {
   return (
     <figure className="about__portrait" data-reveal>
       <img
-        src={`${import.meta.env.BASE_URL}images/jason.jpg`}
+        src={SITE.portrait}
         alt={alt}
         loading="lazy"
         decoding="async"
