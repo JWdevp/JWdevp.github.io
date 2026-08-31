@@ -46,8 +46,6 @@ const es = {
   hero: {
     greeting: '¡Hola, soy Jason!',
     tagline: 'Si estás viendo esto, tienes buen gusto.',
-    intro:
-      'Desarrollo aplicaciones con una mirada de diseñador: pienso el producto entero, no solo el código que lo sostiene.',
     ctaProjects: 'Ver proyectos',
     ctaContact: 'Escríbeme',
   },
@@ -79,6 +77,9 @@ const es = {
         text: 'Entender por qué existe lo que estoy construyendo, no solo cómo funciona.',
       },
     ],
+    closing:
+      'Desarrollo aplicaciones con una mirada de diseñador: pienso el producto entero, no solo el código que lo sostiene.',
+    portraitAlt: 'Jason Wiersum',
     factsTitle: 'En breve',
     facts: [
       { label: 'Nombre', value: 'Jason Wiersum' },
@@ -180,8 +181,6 @@ const en: Translation = {
   hero: {
     greeting: "Hi, I'm Jason!",
     tagline: "If you're seeing this, you have good taste.",
-    intro:
-      'I build applications with a designer’s eye: I think about the whole product, not only the code holding it up.',
     ctaProjects: 'See projects',
     ctaContact: 'Get in touch',
   },
@@ -213,6 +212,9 @@ const en: Translation = {
         text: 'Understanding why the thing I am building exists, not only how it works.',
       },
     ],
+    closing:
+      'I build applications with a designer’s eye: I think about the whole product, not only the code holding it up.',
+    portraitAlt: 'Jason Wiersum',
     factsTitle: 'At a glance',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },
@@ -306,8 +308,6 @@ const de: Translation = {
   hero: {
     greeting: 'Hallo, ich bin Jason!',
     tagline: 'Wenn du das hier siehst, hast du guten Geschmack.',
-    intro:
-      'Ich entwickle Anwendungen mit dem Blick eines Gestalters: Ich denke das ganze Produkt, nicht nur den Code darunter.',
     ctaProjects: 'Projekte ansehen',
     ctaContact: 'Schreib mich an',
   },
@@ -339,6 +339,9 @@ const de: Translation = {
         text: 'Verstehen, warum das Ding existiert, das ich baue — nicht nur, wie es funktioniert.',
       },
     ],
+    closing:
+      'Ich entwickle Anwendungen mit dem Blick eines Gestalters: Ich denke das ganze Produkt, nicht nur den Code darunter.',
+    portraitAlt: 'Jason Wiersum',
     factsTitle: 'Kurz gefasst',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },

@@ -63,26 +63,12 @@
   flex: none;
 }
 
-.hero__intro {
-  max-width: var(--measure);
-  color: var(--muted);
-  font-size: var(--text-base);
-  line-height: var(--leading-relaxed);
-}
-
 .hero__triad {
   font-family: var(--font-mono);
   font-size: var(--text-micro);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--faint);
-}
-
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-block-start: var(--space-2);
 }
 
 .hero__stage {

@@ -48,8 +48,10 @@
 .contact__link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.7rem;
   min-width: 12rem;
+  min-height: 3.5rem;
   padding: 0.85rem 1.3rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);

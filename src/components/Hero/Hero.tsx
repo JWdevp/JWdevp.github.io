@@ -1,10 +1,8 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ArrowRight } from 'lucide-react'
 import { Suspense, lazy, useRef } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { motionBudget } from '../../hooks/usePrefersReducedMotion'
-import { useScrollTo } from '../../hooks/useScrollTo'
 
 /**
  * Three.js is by far the heaviest dependency on the page, and nothing above the
@@ -19,7 +17,6 @@ import './hero.css'
 
 export function Hero() {
   const { t, language } = useLanguage()
-  const scrollTo = useScrollTo()
   const root = useRef<HTMLElement>(null)
 
   useGSAP(
@@ -68,27 +65,6 @@ export function Hero() {
             {t.hero.tagline}
           </p>
 
-          <p className="hero__intro" data-hero-item>
-            {t.hero.intro}
-          </p>
-
-          <div className="hero__actions" data-hero-item>
-            <button
-              type="button"
-              className="btn"
-              onClick={() => scrollTo('projects')}
-            >
-              {t.hero.ctaProjects}
-              <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              className="btn btn--ghost"
-              onClick={() => scrollTo('contact')}
-            >
-              {t.hero.ctaContact}
-            </button>
-          </div>
         </div>
 
         <div className="hero__stage">

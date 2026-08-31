@@ -23,10 +23,34 @@
 
 /* --- Facts panel --------------------------------------------------------- */
 
-.about__facts {
-  padding: var(--space-5);
+/* Portrait and facts travel together as one column. */
+.about__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   position: sticky;
   top: 6rem;
+}
+
+.about__portrait {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-sm);
+}
+
+.about__portrait img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 22%;
+}
+
+.about__facts {
+  padding: var(--space-5);
 }
 
 .about__facts-title {
@@ -137,7 +161,24 @@
     grid-template-columns: 1fr;
   }
 
-  .about__facts {
+  .about__aside {
     position: static;
   }
+
+  .about__portrait {
+    max-width: 22rem;
+  }
+}
+
+/* Closing statement: the last thing said in the section, so it carries more
+   weight than the body copy above it. */
+.about__closing {
+  margin-block-start: clamp(2.5rem, 6vh, 4rem);
+  max-width: 46rem;
+  font-size: var(--text-xl);
+  font-weight: 400;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+  color: var(--muted-strong);
+  text-wrap: balance;
 }
