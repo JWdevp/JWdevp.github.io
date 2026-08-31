@@ -7,9 +7,10 @@ import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
 interface Props {
   project: Project
   index: number
+  onOpen: (project: Project, origin: DOMRect) => void
 }
 
-export function ProjectCard({ project, index }: Props) {
+export function ProjectCard({ project, index, onOpen }: Props) {
   const { t, language } = useLanguage()
   const cardRef = useRef<HTMLElement>(null)
 
@@ -23,13 +24,12 @@ export function ProjectCard({ project, index }: Props) {
     card.style.setProperty('--py', `${((event.clientY - rect.top) / rect.height) * 100}%`)
   }
 
-  const isLinked = project.url !== null
   const title = project.title[language]
   const description = project.description[language]
 
   const content = (
     <>
-      <div className="project__cover" data-index={index}>
+      <span className="project__cover" data-index={index}>
         {project.image ? (
           <img
             src={`${import.meta.env.BASE_URL}${project.image.replace(/^\//, '')}`}
@@ -42,25 +42,25 @@ export function ProjectCard({ project, index }: Props) {
             {String(index + 1).padStart(2, '0')}
           </span>
         )}
-      </div>
+      </span>
 
-      <div className="project__body">
-        <h3 className="project__title">{title}</h3>
-        <p className="project__description">{description}</p>
+      {/* Phrasing content throughout: this subtree lives inside a <button>,
+          which cannot legally contain headings, paragraphs or lists. */}
+      <span className="project__body">
+        <span className="project__title">{title}</span>
+        <span className="project__description">{description}</span>
 
-        <ul className="project__tech">
+        <span className="project__tech">
           {project.technologies.map((tech) => (
-            <li key={tech}>{tech}</li>
+            <span key={tech}>{tech}</span>
           ))}
-        </ul>
+        </span>
 
-        {isLinked ? (
-          <span className="project__action">
-            {t.projects.viewProject}
-            <ArrowUpRight size={15} strokeWidth={2} aria-hidden="true" />
-          </span>
-        ) : null}
-      </div>
+        <span className="project__action">
+          {t.projects.openDetail}
+          <ArrowUpRight size={15} strokeWidth={2} aria-hidden="true" />
+        </span>
+      </span>
     </>
   )
 
@@ -68,22 +68,20 @@ export function ProjectCard({ project, index }: Props) {
     <article
       ref={cardRef}
       className="project card"
-      data-linked={isLinked || undefined}
       onPointerMove={handlePointerMove}
     >
-      {isLinked ? (
-        <a
-          className="project__link"
-          href={project.url ?? '#'}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {content}
-          <span className="visually-hidden">{t.a11y.openInNewTab}</span>
-        </a>
-      ) : (
-        <div className="project__link">{content}</div>
-      )}
+      {/* The whole card is the control. Opening happens in place, so this is a
+          button rather than a link — there is no other page to go to. */}
+      <button
+        type="button"
+        className="project__link"
+        onClick={() => {
+          const rect = cardRef.current?.getBoundingClientRect()
+          if (rect) onOpen(project, rect)
+        }}
+      >
+        {content}
+      </button>
     </article>
   )
 }

@@ -3,6 +3,27 @@ import type { Language } from '../i18n/translations'
 /** A string that exists in every interface language. */
 export type LocalizedText = Record<Language, string>
 
+/** A list of strings that exists in every interface language. */
+export type LocalizedList = Record<Language, string[]>
+
+/** The long-form content shown when a project card is opened. */
+export interface ProjectDetail {
+  /** Who it was built for. Not localized — it is a proper name. */
+  client?: string
+  /** Body copy, one entry per paragraph. */
+  body: LocalizedList
+  /** Short statements of what the thing does. */
+  highlights: LocalizedList
+  /** Editor, tracker, CI — anything that is not part of the running product. */
+  tooling?: string[]
+  /**
+   * Screenshots, relative to `public/` and without a leading slash, e.g.
+   * `images/projects/buergermeisterverzeichnis-01.png`. An image that fails to
+   * load removes itself, so the dialog never shows a broken thumbnail.
+   */
+  images?: string[]
+}
+
 export interface Project {
   id: string
   title: LocalizedText
@@ -15,6 +36,8 @@ export interface Project {
   image: string | null
   /** Live/repository URL, or `null` when there is nothing to link to yet. */
   url: string | null
+  /** Omit while a card is still a placeholder. */
+  detail?: ProjectDetail
 }
 
 /**
@@ -31,18 +54,63 @@ export const projects: Project[] = [
   {
     id: 'project-01',
     title: {
-      es: 'Proyecto uno',
-      en: 'Project one',
-      de: 'Projekt eins',
+      es: 'Bürgermeisterverzeichnis',
+      en: 'Bürgermeisterverzeichnis',
+      de: 'Bürgermeisterverzeichnis',
     },
     description: {
-      es: 'Espacio reservado para el primer proyecto: qué problema resolvía, qué decisiones tomé y qué aprendí construyéndolo.',
-      en: 'Reserved space for the first project: which problem it solved, which decisions I made and what building it taught me.',
-      de: 'Platz für das erste Projekt: welches Problem es löste, welche Entscheidungen ich traf und was ich dabei gelernt habe.',
+      es: 'Tabla editable para los resultados de las elecciones municipales bávaras, dentro de la aplicación web interna del organismo estadístico.',
+      en: 'An editable table for the results of the Bavarian municipal elections, inside the statistical office’s internal web application.',
+      de: 'Editierbare Tabelle für die Ergebnisse der bayerischen Kommunalwahlen, in der internen Webanwendung des Landesamts.',
     },
-    technologies: ['Java', 'Spring', 'Git'],
+    technologies: ['Grails', 'Groovy', 'AJAX', 'Git'],
     image: null,
     url: null,
+    detail: {
+      client: 'Bayerisches Landesamt für Statistik, Fürth',
+      tooling: ['IntelliJ IDEA', 'Jira', 'Bitbucket'],
+      images: [],
+      body: {
+        es: [
+          'Para el Bayerisches Landesamt für Statistik de Fürth construí una tabla dentro de la aplicación web interna del organismo. Renderiza los resultados de las elecciones municipales —Bürgermeister y Oberbürgermeister— y permite editarlos en la propia fila mediante AJAX, sin recargar ni salir de la página.',
+          'Los resultados los envía cada municipio por separado. Tras la importación manual había que revisarlos en busca de erratas, problemas de formato y datos que faltaban: una pasada que antes ocupaba a dos Sachbearbeiter durante más de dos meses.',
+          'La tabla separa las elecciones principales de las segundas vueltas y las ordena por fecha. Al elegir una fecha aparece cada Landkreis y cada ciudad independiente que votó ese día. Todas las columnas se pueden filtrar y ordenar, y un botón aparte deja a la vista solo los registros marcados como incompletos, de modo que la revisión empieza justo donde falta algo.',
+        ],
+        en: [
+          'For the Bayerisches Landesamt für Statistik in Fürth I built a table into the office’s internal web application. It renders the results of the municipal elections — Bürgermeister and Oberbürgermeister — and lets them be edited in place over AJAX, without a reload and without leaving the page.',
+          'The results are submitted by each municipality separately, so after the manual import they had to be checked for typos, formatting problems and missing values: a pass that had previously occupied two case workers for more than two months.',
+          'The table separates main elections from run-offs and orders them by polling day. Pick a date and every Landkreis and every kreisfreie Stadt that voted on it appears. Every column filters and sorts, and a separate button leaves only the records flagged incomplete on screen, so the review starts exactly where something is missing.',
+        ],
+        de: [
+          'Für das Bayerische Landesamt für Statistik in Fürth habe ich eine Tabelle in die interne Webanwendung des Hauses gebaut. Sie rendert die Ergebnisse der Kommunalwahlen — Bürgermeister und Oberbürgermeister — und macht sie direkt in der Zeile per AJAX editierbar, ohne Reload und ohne die Seite zu verlassen.',
+          'Die Ergebnisse melden die Gemeinden einzeln. Nach dem manuellen Import mussten sie deshalb auf Tippfehler, Formatprobleme und fehlende Angaben durchgesehen werden — eine Nachbearbeitung, die zuvor zwei Sachbearbeiter über zwei Monate beschäftigt hat.',
+          'Die Tabelle trennt Hauptwahlen und Stichwahlen und sortiert sie nach Wahltag. Ist ein Datum gewählt, erscheint jeder Landkreis und jede kreisfreie Stadt, in der an diesem Tag gewählt wurde. Jede Spalte lässt sich filtern und sortieren, und ein eigener Schalter zeigt ausschließlich die als unvollständig markierten Datensätze — die Durchsicht beginnt damit genau dort, wo etwas fehlt.',
+        ],
+      },
+      highlights: {
+        es: [
+          'Edición en línea por AJAX, sin salir de la página',
+          'Elecciones principales y segundas vueltas separadas, listadas por fecha',
+          'Desglose por Landkreis y ciudad independiente',
+          'Filtrado y ordenación en todas las columnas',
+          'Un botón para aislar los registros incompletos',
+        ],
+        en: [
+          'Inline editing over AJAX, without leaving the page',
+          'Main elections and run-offs separated, listed by polling day',
+          'Breakdown by Landkreis and kreisfreie Stadt',
+          'Filtering and sorting on every column',
+          'One button to isolate the records flagged incomplete',
+        ],
+        de: [
+          'Inline-Bearbeitung per AJAX, ohne die Seite zu verlassen',
+          'Haupt- und Stichwahlen getrennt, nach Wahltag gelistet',
+          'Aufschlüsselung nach Landkreis und kreisfreier Stadt',
+          'Filtern und Sortieren in jeder Spalte',
+          'Ein Schalter für die als unvollständig markierten Datensätze',
+        ],
+      },
+    },
   },
   {
     id: 'project-02',

@@ -6,6 +6,36 @@ import { prefersReducedMotionNow } from './usePrefersReducedMotion'
 gsap.registerPlugin(ScrollToPlugin)
 
 /**
+ * True while a scroll started by the navigation is still running, plus a short
+ * grace period afterwards.
+ *
+ * The floating island hides on downward scroll, and a click on "Contact"
+ * scrolls downward — without this it would hide the control the visitor just
+ * used, mid-journey.
+ *
+ * The grace period matters: scroll handlers read on the next animation frame,
+ * so a frame scheduled during the tween can run after it has finished and
+ * compare against a position several hundred pixels back. On a slow device that
+ * one stale frame was enough to hide the island anyway.
+ */
+const SETTLE_MS = 250
+let programmaticUntil = 0
+let programmaticActive = false
+
+export function isProgrammaticScroll(): boolean {
+  return programmaticActive || performance.now() < programmaticUntil
+}
+
+function beginProgrammatic() {
+  programmaticActive = true
+}
+
+function endProgrammatic() {
+  programmaticActive = false
+  programmaticUntil = performance.now() + SETTLE_MS
+}
+
+/**
  * Smooth, short scroll to a section. Fast on purpose: navigation should feel
  * like a cut, not like a ride. Honours reduced-motion by jumping instantly.
  */
@@ -48,9 +78,17 @@ export function useScrollTo() {
       target === 0 ? 0 : Math.max(0, layoutTop(target as HTMLElement) - navOffset())
 
     if (prefersReducedMotionNow()) {
+      beginProgrammatic()
       window.scrollTo({ top: y, behavior: 'auto' })
+      endProgrammatic()
       onComplete?.()
       return
+    }
+
+    beginProgrammatic()
+    const release = () => {
+      endProgrammatic()
+      onComplete?.()
     }
 
     gsap.to(window, {
@@ -65,8 +103,8 @@ export function useScrollTo() {
         autoKill: false,
       },
       overwrite: 'auto',
-      onComplete,
-      onInterrupt: onComplete,
+      onComplete: release,
+      onInterrupt: release,
     })
   }, [])
 }

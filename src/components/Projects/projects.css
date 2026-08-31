@@ -58,12 +58,21 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
 }
 
 .project__cover {
   position: relative;
   display: grid;
+  width: 100%;
   place-items: center;
   aspect-ratio: 16 / 10;
   overflow: hidden;
@@ -114,12 +123,15 @@
 }
 
 .project__title {
+  display: block;
   font-size: var(--text-lg);
   font-weight: 540;
   letter-spacing: var(--tracking-snug);
+  color: var(--foreground);
 }
 
 .project__description {
+  display: block;
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
   color: var(--muted);
@@ -135,7 +147,7 @@
   list-style: none;
 }
 
-.project__tech li {
+.project__tech > span {
   padding: 0.18rem 0.5rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -155,10 +167,201 @@
   transition: color var(--dur-base) var(--ease-out), gap var(--dur-base) var(--ease-out);
 }
 
-.project[data-linked] .project__action {
+.project__action {
   color: var(--accent);
 }
 
-.project[data-linked]:hover .project__action {
+.project:hover .project__action,
+.project:focus-within .project__action {
   gap: 0.55rem;
+}
+
+.project:focus-within {
+  border-color: var(--border-strong);
+}
+
+
+/* ===========================================================================
+   Project dialog
+   ---------------------------------------------------------------------------
+   Large enough to read comfortably, deliberately short of full screen: the
+   page stays visible, blurred, around it.
+   =========================================================================== */
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.dialog__scrim {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  background: color-mix(in srgb, var(--background) 55%, transparent);
+}
+
+.dialog__panel {
+  position: relative;
+  width: min(62rem, 100%);
+  max-height: min(86vh, 54rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--background-elevated);
+  box-shadow: var(--shadow-lg);
+  will-change: transform, opacity;
+}
+
+.dialog__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-block-end: var(--space-5);
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  color: var(--muted);
+  transition: color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.dialog__back:hover {
+  color: var(--foreground);
+  border-color: var(--border-strong);
+  background: var(--surface-sunken);
+}
+
+.dialog__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block-end: var(--space-6);
+}
+
+.dialog__title {
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-tight);
+}
+
+.dialog__lead {
+  max-width: 46rem;
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+  color: var(--muted);
+}
+
+.dialog__prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 44rem;
+}
+
+.dialog__prose p {
+  color: var(--muted);
+  line-height: var(--leading-relaxed);
+}
+
+.dialog__section {
+  margin-block-start: var(--space-6);
+}
+
+.dialog__section-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--faint);
+  padding-block-end: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  margin-block-end: var(--space-4);
+}
+
+.dialog__highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dialog__highlights li {
+  position: relative;
+  padding-inline-start: 1.1rem;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--muted);
+}
+
+.dialog__highlights li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.dialog__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-5);
+}
+
+.dialog__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dialog__tags li {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.dialog__shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-4);
+  margin-block-start: var(--space-6);
+}
+
+.dialog__shots figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.dialog__shots img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.dialog__link {
+  margin-block-start: var(--space-6);
 }
