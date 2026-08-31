@@ -16,6 +16,25 @@ function navOffset(): number {
   return window.matchMedia('(max-width: 720px)').matches ? 28 : 96
 }
 
+/**
+ * Layout position of an element in the document, ignoring transforms.
+ *
+ * Sections carry a scroll-scrubbed `translateY` (see `useSectionTransitions`),
+ * so their rendered position is not where they will settle. Handing the element
+ * itself to ScrollToPlugin resolved that moving position and landed the page
+ * about 40px off every time. `offsetTop` reports the laid-out position, which
+ * the transform does not touch.
+ */
+function layoutTop(element: HTMLElement): number {
+  let top = 0
+  let node: HTMLElement | null = element
+  while (node) {
+    top += node.offsetTop
+    node = node.offsetParent as HTMLElement | null
+  }
+  return top
+}
+
 export function useScrollTo() {
   return useCallback((targetId: string, onComplete?: () => void) => {
     const target =
@@ -25,11 +44,11 @@ export function useScrollTo() {
       return
     }
 
+    const y =
+      target === 0 ? 0 : Math.max(0, layoutTop(target as HTMLElement) - navOffset())
+
     if (prefersReducedMotionNow()) {
-      window.scrollTo({
-        top: target === 0 ? 0 : (target as HTMLElement).offsetTop - navOffset(),
-        behavior: 'auto',
-      })
+      window.scrollTo({ top: y, behavior: 'auto' })
       onComplete?.()
       return
     }
@@ -38,9 +57,12 @@ export function useScrollTo() {
       duration: 0.72,
       ease: 'power3.inOut',
       scrollTo: {
-        y: target === 0 ? 0 : (target as HTMLElement),
-        offsetY: target === 0 ? 0 : navOffset(),
-        autoKill: true,
+        y,
+        // Never autoKill. On a touch screen the slight movement of a real tap
+        // registers as "the user is scrolling", which cancelled the tween
+        // partway: taps on the island and on "back to top" left you stranded
+        // somewhere in the middle of the page.
+        autoKill: false,
       },
       overwrite: 'auto',
       onComplete,

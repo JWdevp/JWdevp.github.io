@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import { ArrowRight } from 'lucide-react'
 import { Suspense, lazy, useRef } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
-import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
+import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 import { useScrollTo } from '../../hooks/useScrollTo'
 
 /**
@@ -24,8 +24,7 @@ export function Hero() {
 
   useGSAP(
     () => {
-      if (prefersReducedMotionNow()) return
-
+      const budget = motionBudget()
       const targets = gsap.utils.toArray<HTMLElement>('[data-hero-item]')
       const stage = root.current?.querySelector('.hero__stage')
 
@@ -36,16 +35,21 @@ export function Hero() {
 
       tl.from(targets, {
         opacity: 0,
-        y: 18,
-        duration: 0.72,
-        stagger: 0.075,
+        y: budget.travel(18),
+        duration: budget.duration(0.72),
+        stagger: budget.stagger(0.075),
       })
 
       if (stage) {
         tl.from(
           stage,
-          { opacity: 0, scale: 0.94, duration: 1.05, ease: 'power2.out' },
-          0.1,
+          {
+            opacity: 0,
+            scale: budget.reduced ? 1 : 0.94,
+            duration: budget.duration(1.05),
+            ease: 'power2.out',
+          },
+          budget.reduced ? 0 : 0.1,
         )
       }
     },
