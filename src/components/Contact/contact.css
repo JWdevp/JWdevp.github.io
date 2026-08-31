@@ -37,8 +37,7 @@
 
 .contact__links ul {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
   gap: var(--space-3);
   margin: 0;
   padding: 0;

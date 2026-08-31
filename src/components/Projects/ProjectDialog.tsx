@@ -150,17 +150,17 @@ export function ProjectDialog({ project, origin, onClose }: Props) {
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <button
-          type="button"
-          className="dialog__back"
-          ref={closeButton}
-          onClick={dismiss}
-        >
-          <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
-          {t.projects.back}
-        </button>
-
         <div className="dialog__body">
+          <button
+            type="button"
+            className="dialog__back"
+            ref={closeButton}
+            onClick={dismiss}
+          >
+            <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
+            {t.projects.back}
+          </button>
+
           <header className="dialog__head">
             {detail?.client ? (
               <p className="eyebrow">{detail.client}</p>

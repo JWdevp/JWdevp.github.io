@@ -107,7 +107,10 @@ export function SettingsIsland() {
           size={17}
           strokeWidth={1.9}
           spring="snappy"
-          reducedMotion="user"
+          /* A 17px glyph changing shape in place is not a vestibular trigger,
+             so it keeps animating under prefers-reduced-motion — "user" made it
+             swap instantly on any machine with the OS setting on. */
+          reducedMotion="never"
         />
       </button>
     </div>

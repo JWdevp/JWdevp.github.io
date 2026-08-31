@@ -22,7 +22,9 @@
   max-width: 34rem;
 }
 
+/* The tagline is the punchline; it lands better with room after the name. */
 .hero__greeting {
+  margin-block-end: var(--space-4);
   font-size: var(--text-4xl);
   font-weight: 580;
   letter-spacing: -0.045em;

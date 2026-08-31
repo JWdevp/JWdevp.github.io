@@ -1,9 +1,3 @@
-/* Skills and projects share the #work section now, so the block needs the
-   breathing room the old section padding used to give it. */
-.projects {
-  margin-block-start: clamp(4rem, 10vh, 7rem);
-}
-
 .projects__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
@@ -20,9 +14,10 @@
   position: relative;
   flex: 1;
   overflow: hidden;
-  transition: transform var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out);
+  /* Slower than the rest of the interface on purpose: the card is a surface
+     lifting, not a control responding. */
+  transition: transform 480ms var(--ease-out), box-shadow 480ms var(--ease-out),
+    border-color 480ms var(--ease-out);
 }
 
 /* A single soft highlight that follows the pointer — the only "effect" on the
@@ -38,7 +33,7 @@
     transparent 62%
   );
   opacity: 0;
-  transition: opacity var(--dur-slow) var(--ease-out);
+  transition: opacity 560ms var(--ease-out);
   pointer-events: none;
 }
 
@@ -95,6 +90,64 @@
   letter-spacing: -0.04em;
   color: var(--foreground);
   opacity: 0.07;
+}
+
+/* Client mark, shown while the card is at rest. */
+.project__client {
+  padding-inline: var(--space-5);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+  text-align: center;
+  text-wrap: balance;
+  color: var(--muted);
+  transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out);
+}
+
+.project__logo {
+  width: auto;
+  max-width: 62%;
+  max-height: 58%;
+  object-fit: contain;
+  transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out);
+}
+
+/* Screenshot underneath, revealed on hover. Anchored to the top-left: these are
+   wide strips, and a centred crop showed the middle of the table rather than the
+   header and first columns that make it recognisable. */
+.project__preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 520ms var(--ease-out), transform 640ms var(--ease-out);
+}
+
+.project:hover .project__preview,
+.project:focus-within .project__preview {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.project:hover .project__client,
+.project:focus-within .project__client,
+.project:hover .project__logo,
+.project:focus-within .project__logo {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project__preview,
+  .project__client,
+  .project__logo {
+    transition-duration: 1ms;
+  }
 }
 
 .project__badge {
@@ -157,30 +210,6 @@
   color: var(--muted);
 }
 
-.project__action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--faint);
-  transition: color var(--dur-base) var(--ease-out), gap var(--dur-base) var(--ease-out);
-}
-
-.project__action {
-  color: var(--accent);
-}
-
-.project:hover .project__action,
-.project:focus-within .project__action {
-  gap: 0.55rem;
-}
-
-.project:focus-within {
-  border-color: var(--border-strong);
-}
-
-
 /* ===========================================================================
    Project dialog
    ---------------------------------------------------------------------------
@@ -211,12 +240,26 @@
   max-height: min(86vh, 54rem);
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Scrollable, but without the bar: the panel is a reading surface and the
+     track cut into its rounded corner. */
+  scrollbar-width: none;
   padding: clamp(1.5rem, 3.5vw, 2.75rem);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   background: var(--background-elevated);
   box-shadow: var(--shadow-lg);
   will-change: transform, opacity;
+}
+
+.dialog__panel::-webkit-scrollbar {
+  display: none;
+}
+
+/* One centred column, so the text is not stranded against the left edge of a
+   panel much wider than its measure. */
+.dialog__body {
+  max-width: 46rem;
+  margin-inline: auto;
 }
 
 .dialog__back {
@@ -253,7 +296,6 @@
 }
 
 .dialog__lead {
-  max-width: 46rem;
   font-size: var(--text-lg);
   line-height: var(--leading-snug);
   letter-spacing: var(--tracking-snug);
@@ -264,7 +306,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  max-width: 44rem;
 }
 
 .dialog__prose p {
@@ -290,7 +331,7 @@
 
 .dialog__highlights {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   gap: var(--space-3) var(--space-5);
   margin: 0;
   padding: 0;
@@ -341,9 +382,11 @@
   color: var(--muted);
 }
 
+/* The screenshots are wide strips; one per row reads them far better than a
+   two-up grid that would shrink them to illegibility. */
 .dialog__shots {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
   margin-block-start: var(--space-6);
 }

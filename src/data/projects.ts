@@ -34,6 +34,11 @@ export interface Project {
    * placeholder (a generated gradient is rendered instead).
    */
   image: string | null
+  /**
+   * Client mark shown on the card at rest, before the hover preview. Optional:
+   * without one the card sets the client's name instead.
+   */
+  logo?: string | null
   /** Live/repository URL, or `null` when there is nothing to link to yet. */
   url: string | null
   /** Omit while a card is still a placeholder. */
@@ -59,9 +64,9 @@ export const projects: Project[] = [
       de: 'Bürgermeisterverzeichnis',
     },
     description: {
-      es: 'Tabla editable para los resultados de las elecciones municipales bávaras, dentro de la aplicación web interna del organismo estadístico.',
-      en: 'An editable table for the results of the Bavarian municipal elections, inside the statistical office’s internal web application.',
-      de: 'Editierbare Tabelle für die Ergebnisse der bayerischen Kommunalwahlen, in der internen Webanwendung des Landesamts.',
+      es: 'Tabla editable para los resultados de las elecciones municipales bávaras, en la aplicación web interna del Bayerisches Landesamt für Statistik.',
+      en: 'An editable table for the results of the Bavarian municipal elections, inside the internal web application of the Bayerisches Landesamt für Statistik.',
+      de: 'Editierbare Tabelle für die Ergebnisse der bayerischen Kommunalwahlen, in der internen Webanwendung des Bayerischen Landesamts für Statistik.',
     },
     technologies: ['Grails', 'Groovy', 'AJAX', 'Git'],
     image: null,
@@ -69,7 +74,10 @@ export const projects: Project[] = [
     detail: {
       client: 'Bayerisches Landesamt für Statistik, Fürth',
       tooling: ['IntelliJ IDEA', 'Jira', 'Bitbucket'],
-      images: [],
+      images: [
+        'images/projects/buergermeisterverzeichnis-01.png',
+        'images/projects/buergermeisterverzeichnis-02.png',
+      ],
       body: {
         es: [
           'Para el Bayerisches Landesamt für Statistik de Fürth construí una tabla dentro de la aplicación web interna del organismo. Renderiza los resultados de las elecciones municipales —Bürgermeister y Oberbürgermeister— y permite editarlos en la propia fila mediante AJAX, sin recargar ni salir de la página.',

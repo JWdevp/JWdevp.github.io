@@ -1,3 +1,5 @@
+/* Skills sits under the projects inside #work and needs the breathing room the
+   old section padding used to give it. */
 .skills {
   padding-block-start: clamp(4rem, 10vh, 7rem);
 }

@@ -50,10 +50,10 @@ export default function App() {
       <main id="main" className="page" ref={mainRef}>
         <Hero />
 
-        {/* Work is what he does: the tools first, then the output. */}
+        {/* Work is what he does: the output first, the tools underneath it. */}
         <section id="work" className="section">
-          <Skills />
           <Projects />
+          <Skills />
         </section>
 
         <section id="about" className="section">
