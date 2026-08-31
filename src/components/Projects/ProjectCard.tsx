@@ -1,5 +1,4 @@
-import { ArrowUpRight } from 'lucide-react'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { Project } from '../../data/projects'
 import { useLanguage } from '../../hooks/useLanguage'
 import { prefersReducedMotionNow } from '../../hooks/usePrefersReducedMotion'
@@ -11,8 +10,14 @@ interface Props {
 }
 
 export function ProjectCard({ project, index, onOpen }: Props) {
-  const { t, language } = useLanguage()
+  const { language } = useLanguage()
   const cardRef = useRef<HTMLElement>(null)
+  const [previewBroken, setPreviewBroken] = useState(false)
+
+  // At rest the cover carries the client's mark; on hover it cross-fades to the
+  // first screenshot, so the card previews the thing itself before you open it.
+  const preview = previewBroken ? null : (project.detail?.images?.[0] ?? null)
+  const client = project.detail?.client ?? null
 
   // Pointer position is written straight to CSS custom properties: no React
   // state, so moving the cursor never re-renders anything.
@@ -29,19 +34,33 @@ export function ProjectCard({ project, index, onOpen }: Props) {
 
   const content = (
     <>
-      <span className="project__cover" data-index={index}>
-        {project.image ? (
+      <span className="project__cover" data-index={index} data-preview={preview ? '' : undefined}>
+        {project.logo ? (
           <img
-            src={`${import.meta.env.BASE_URL}${project.image.replace(/^\//, '')}`}
+            className="project__logo"
+            src={`${import.meta.env.BASE_URL}${project.logo.replace(/^\//, '')}`}
             alt=""
             loading="lazy"
             decoding="async"
           />
+        ) : client ? (
+          <span className="project__client">{client}</span>
         ) : (
           <span className="project__cover-mark" aria-hidden="true">
             {String(index + 1).padStart(2, '0')}
           </span>
         )}
+
+        {preview ? (
+          <img
+            className="project__preview"
+            src={`${import.meta.env.BASE_URL}${preview.replace(/^\//, '')}`}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={() => setPreviewBroken(true)}
+          />
+        ) : null}
       </span>
 
       {/* Phrasing content throughout: this subtree lives inside a <button>,
@@ -54,11 +73,6 @@ export function ProjectCard({ project, index, onOpen }: Props) {
           {project.technologies.map((tech) => (
             <span key={tech}>{tech}</span>
           ))}
-        </span>
-
-        <span className="project__action">
-          {t.projects.openDetail}
-          <ArrowUpRight size={15} strokeWidth={2} aria-hidden="true" />
         </span>
       </span>
     </>

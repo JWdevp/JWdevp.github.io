@@ -1,8 +1,20 @@
+.about__eyebrow {
+  margin-block-end: var(--space-4);
+}
+
 .about__grid {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
   gap: clamp(2rem, 5vw, 4rem);
-  align-items: start;
+  /* Stretch, not start: the aside has to run the full height of the text so the
+     facts panel can sit flush with the bottom of it. */
+  align-items: stretch;
+}
+
+.about__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .about__prose {
@@ -10,6 +22,7 @@
   flex-direction: column;
   gap: var(--space-4);
   max-width: 40rem;
+  margin-block-start: var(--space-3);
 }
 
 .about__prose p {
@@ -23,16 +36,19 @@
 
 /* --- Facts panel --------------------------------------------------------- */
 
-/* Portrait and facts travel together as one column. */
+/* Portrait and facts share the column: the portrait absorbs whatever height is
+   left over, which pins its top to the title and the facts panel to the bottom
+   of the prose. */
 .about__aside {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  position: sticky;
-  top: 6rem;
+  height: 100%;
 }
 
 .about__portrait {
+  flex: 1 1 auto;
+  min-height: 16rem;
   margin: 0;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -44,12 +60,13 @@
 .about__portrait img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  height: 100%;
   object-fit: cover;
-  object-position: center 22%;
+  object-position: center 18%;
 }
 
 .about__facts {
+  flex: 0 0 auto;
   padding: var(--space-5);
 }
 
@@ -162,11 +179,13 @@
   }
 
   .about__aside {
-    position: static;
+    height: auto;
   }
 
   .about__portrait {
+    flex: 0 0 auto;
     max-width: 22rem;
+    aspect-ratio: 4 / 5;
   }
 }
 
@@ -174,8 +193,7 @@
    weight than the body copy above it. */
 .about__closing {
   margin-block-start: clamp(2.5rem, 6vh, 4rem);
-  max-width: 46rem;
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-weight: 400;
   line-height: var(--leading-snug);
   letter-spacing: var(--tracking-snug);

@@ -36,25 +36,28 @@ export function About() {
   return (
     <div className="about" ref={root}>
       <div className="container">
-        <header className="section__head">
-          <p className="eyebrow" data-reveal>
-            {t.about.eyebrow}
-          </p>
-          <h2 className="section__title" data-reveal>
-            {t.about.title}
-          </h2>
-          <p className="section__lead" data-reveal>
-            {t.about.lead}
-          </p>
-        </header>
+        <p className="eyebrow about__eyebrow" data-reveal>
+          {t.about.eyebrow}
+        </p>
 
+        {/* The eyebrow sits above the grid so that the first row starts at the
+            title — which is where the portrait's top edge has to line up. */}
         <div className="about__grid">
-          <div className="about__prose">
-            {t.about.paragraphs.map((paragraph, index) => (
-              <p key={index} data-reveal>
-                {paragraph}
-              </p>
-            ))}
+          <div className="about__main">
+            <h2 className="section__title" data-reveal>
+              {t.about.title}
+            </h2>
+            <p className="section__lead" data-reveal>
+              {t.about.lead}
+            </p>
+
+            <div className="about__prose">
+              {t.about.paragraphs.map((paragraph, index) => (
+                <p key={index} data-reveal>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           </div>
 
           <aside className="about__aside">

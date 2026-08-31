@@ -21,7 +21,7 @@ export const HTML_LANG: Record<Language, string> = {
 
 const es = {
   meta: {
-    title: 'Jason Wiersum — Portfolio',
+    title: 'Jason Wiersum — Anwendungsentwickler',
     description:
       'Jason Wiersum — Anwendungsentwickler certificado por la IHK en Nürnberg. Software, diseño y creatividad en un mismo perfil.',
   },
@@ -51,7 +51,7 @@ const es = {
   },
   about: {
     eyebrow: 'Sobre mí',
-    title: 'Tecnología con criterio de diseño.',
+    title: 'Técnica con estilo.',
     lead: 'Anwendungsentwickler certificado por la IHK desde julio de 2026, con tres años previos de formación en Ingeniería de Diseño Industrial y Desarrollo del Producto.',
     paragraphs: [
       'Vivo y trabajo en Nürnberg (Bayern). Mi formación como Anwendungsentwickler me dio la base técnica: estructura, lógica, arquitectura y un método claro para construir software que se mantiene en el tiempo.',
@@ -83,9 +83,11 @@ const es = {
     factsTitle: 'En breve',
     facts: [
       { label: 'Nombre', value: 'Jason Wiersum' },
-      { label: 'Ubicación', value: 'Nürnberg, Bayern (Alemania)' },
-      { label: 'Perfil', value: 'Anwendungsentwickler (IHK)' },
-      { label: 'Enfoque', value: 'Software · Diseño · Creatividad' },
+      { label: 'Ubicación', value: 'Nuremberg, Baviera, Alemania' },
+      {
+        label: 'Perfil',
+        value: 'Fachinformatiker für Anwendungsentwicklung (IHK)',
+      },
     ],
   },
   skills: {
@@ -163,7 +165,7 @@ export type Translation = typeof es
 
 const en: Translation = {
   meta: {
-    title: 'Jason Wiersum — Portfolio',
+    title: 'Jason Wiersum — Anwendungsentwickler',
     description:
       'Jason Wiersum — IHK-certified Anwendungsentwickler based in Nürnberg. Software, design and creativity in one profile.',
   },
@@ -193,7 +195,7 @@ const en: Translation = {
   },
   about: {
     eyebrow: 'About',
-    title: 'Engineering with a designer’s judgement.',
+    title: 'Engineering with style.',
     lead: 'IHK-certified Anwendungsentwickler since July 2026, with three prior years of study in Industrial Design Engineering and Product Development.',
     paragraphs: [
       'I live and work in Nürnberg, Bavaria. Training as an Anwendungsentwickler gave me the technical foundation: structure, logic, architecture and a clear method for building software that keeps working over time.',
@@ -225,9 +227,11 @@ const en: Translation = {
     factsTitle: 'At a glance',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },
-      { label: 'Location', value: 'Nürnberg, Bavaria (Germany)' },
-      { label: 'Profile', value: 'Anwendungsentwickler (IHK)' },
-      { label: 'Focus', value: 'Software · Design · Creativity' },
+      { label: 'Location', value: 'Nuremberg, Bavaria, Germany' },
+      {
+        label: 'Profile',
+        value: 'Fachinformatiker für Anwendungsentwicklung (IHK)',
+      },
     ],
   },
   skills: {
@@ -297,7 +301,7 @@ const en: Translation = {
 
 const de: Translation = {
   meta: {
-    title: 'Jason Wiersum — Portfolio',
+    title: 'Jason Wiersum — Anwendungsentwickler',
     description:
       'Jason Wiersum — IHK-zertifizierter Anwendungsentwickler aus Nürnberg. Software, Design und Kreativität in einem Profil.',
   },
@@ -327,7 +331,7 @@ const de: Translation = {
   },
   about: {
     eyebrow: 'Über mich',
-    title: 'Technik mit gestalterischem Urteil.',
+    title: 'Technik mit Style.',
     lead: 'Anwendungsentwickler, IHK-zertifiziert seit Juli 2026, davor drei Jahre Studium im Bereich Industriedesign-Ingenieurwesen und Produktentwicklung.',
     paragraphs: [
       'Ich lebe und arbeite in Nürnberg, Bayern. Die Ausbildung zum Anwendungsentwickler hat mir das technische Fundament gegeben: Struktur, Logik, Architektur und eine klare Methode, um Software zu bauen, die auch später noch trägt.',
@@ -359,9 +363,11 @@ const de: Translation = {
     factsTitle: 'Kurz gefasst',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },
-      { label: 'Ort', value: 'Nürnberg, Bayern (Deutschland)' },
-      { label: 'Profil', value: 'Anwendungsentwickler (IHK)' },
-      { label: 'Fokus', value: 'Software · Design · Kreativität' },
+      { label: 'Ort', value: 'Nürnberg, Bayern' },
+      {
+        label: 'Profil',
+        value: 'Fachinformatiker für Anwendungsentwicklung (IHK)',
+      },
     ],
   },
   skills: {
