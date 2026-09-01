@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { Suspense, lazy, useRef } from 'react'
+import { Suspense, lazy, useRef, useState } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 
@@ -17,9 +17,17 @@ export function Hero() {
   const { t, language } = useLanguage()
   const root = useRef<HTMLElement>(null)
 
+  // Which line greets you is drawn once per load, not per render — picking it
+  // inline would hand you a different one on every re-render, including the
+  // one that happens when you switch language.
+  const [pick] = useState(() => Math.floor(Math.random() * 6))
+  const taglines = t.hero.taglines
+  const tagline = taglines[pick % taglines.length]
+
   useGSAP(
     () => {
       const budget = motionBudget()
+      const greeting = root.current?.querySelector('.hero__greeting')
       const targets = gsap.utils.toArray<HTMLElement>('[data-hero-item]')
       const stage = root.current?.querySelector('.hero__stage')
 
@@ -28,12 +36,27 @@ export function Hero() {
         delay: 0.08,
       })
 
-      tl.from(targets, {
-        opacity: 0,
-        y: budget.travel(18),
-        duration: budget.duration(0.72),
-        stagger: budget.stagger(0.075),
-      })
+      // The greeting arrives on its own, and quickly — it is the first thing
+      // read, so it should be there almost at once rather than easing in over
+      // most of a second like the copy that follows it.
+      if (greeting) {
+        tl.from(greeting, {
+          opacity: 0,
+          y: budget.travel(14),
+          duration: budget.duration(0.3),
+        })
+      }
+
+      tl.from(
+        targets,
+        {
+          opacity: 0,
+          y: budget.travel(18),
+          duration: budget.duration(0.72),
+          stagger: budget.stagger(0.075),
+        },
+        budget.duration(0.16),
+      )
 
       if (stage) {
         tl.from(
@@ -55,12 +78,10 @@ export function Hero() {
     <section id="home" className="section hero" ref={root}>
       <div className="container hero__grid">
         <div className="hero__copy">
-          <h1 className="hero__greeting" data-hero-item>
-            {t.hero.greeting}
-          </h1>
+          <h1 className="hero__greeting">{t.hero.greeting}</h1>
 
           <p className="hero__tagline" data-hero-item>
-            {t.hero.tagline}
+            {tagline}
           </p>
 
         </div>

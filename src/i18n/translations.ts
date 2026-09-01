@@ -44,7 +44,15 @@ const es = {
   },
   hero: {
     greeting: '¡Hola, soy Jason!',
-    tagline: 'Si estás viendo esto, tienes buen gusto.',
+    /** One is picked at random on each load — see `pickTagline`. */
+    taglines: [
+      'Si estás viendo esto, tienes buen gusto.',
+      'Bienvenido. La cabeza te sigue, es normal.',
+      'Hecho a mano, sin plantilla.',
+      'Cuidado: aquí se mira el detalle.',
+      'Sí, el personaje también trabaja aquí.',
+      'Café, código y bastante paciencia.',
+    ],
     ctaProjects: 'Ver proyectos',
     ctaContact: 'Escríbeme',
   },
@@ -64,7 +72,6 @@ const es = {
     cvIntro: 'Si quieres ver toda mi trayectoria laboral, puedes consultar el CV aquí mismo o descargarlo.',
     cvView: 'Ver CV',
     cv: 'Descargar CV',
-    cvHint: 'PDF',
     cvTitle: 'Currículum',
     factsTitle: 'En breve',
     facts: [
@@ -173,7 +180,14 @@ const en: Translation = {
   },
   hero: {
     greeting: "Hi, I'm Jason!",
-    tagline: "If you're seeing this, you have good taste.",
+    taglines: [
+      "If you're seeing this, you have good taste.",
+      'Welcome. Yes, the head follows you.',
+      'Hand-built, no template.',
+      'Careful: details are taken seriously here.',
+      'The character works here too.',
+      'Coffee, code and a fair amount of patience.',
+    ],
     ctaProjects: 'See projects',
     ctaContact: 'Get in touch',
   },
@@ -193,7 +207,6 @@ const en: Translation = {
     cvIntro: 'If you would like the whole work history, you can read the CV here or download it.',
     cvView: 'View CV',
     cv: 'Download CV',
-    cvHint: 'PDF',
     cvTitle: 'Curriculum vitae',
     factsTitle: 'At a glance',
     facts: [
@@ -294,7 +307,14 @@ const de: Translation = {
   },
   hero: {
     greeting: 'Hallo, ich bin Jason!',
-    tagline: 'Wenn du das hier siehst, hast du guten Geschmack.',
+    taglines: [
+      'Wenn du das hier siehst, hast du guten Geschmack.',
+      'Willkommen. Ja, der Kopf folgt dir.',
+      'Von Hand gebaut, ohne Vorlage.',
+      'Achtung: hier wird aufs Detail geschaut.',
+      'Die Figur arbeitet hier übrigens auch.',
+      'Kaffee, Code und einiges an Geduld.',
+    ],
     ctaProjects: 'Projekte ansehen',
     ctaContact: 'Schreib mich an',
   },
@@ -314,7 +334,6 @@ const de: Translation = {
     cvIntro: 'Wenn Sie den vollständigen beruflichen Werdegang sehen möchten, können Sie den Lebenslauf hier ansehen oder herunterladen.',
     cvView: 'Lebenslauf ansehen',
     cv: 'Lebenslauf herunterladen',
-    cvHint: 'PDF',
     cvTitle: 'Lebenslauf',
     factsTitle: 'Kurz gefasst',
     facts: [

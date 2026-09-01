@@ -7,7 +7,14 @@
   opacity: 0;
   transition: opacity 420ms var(--ease-out);
   /* The sheet has real transparency, so the page's own background shows
-     through in either theme. Nothing here paints a backdrop. */
+     through in either theme. Nothing here paints a backdrop.
+
+     The bust runs off the bottom of the source frame, so its lowest row is a
+     straight cut. Against the old near-white ground that went unnoticed; on a
+     coloured one it reads as the figure having been sliced. Fading the last
+     stretch lets it recede into the page instead. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 80%, transparent 98%);
 }
 
 .character[data-ready] {
@@ -34,10 +41,16 @@
   opacity: 1;
 }
 
+/* The wave has taken over; the still underneath would otherwise show around it. */
+.character__sheet[data-covered] {
+  opacity: 0;
+}
+
 .character__sheet {
   position: absolute;
   top: 0;
   left: 0;
+  transition: opacity 260ms var(--ease-out);
   width: calc(100% * var(--character-cols));
   height: calc(100% * var(--character-rows));
   max-width: none;

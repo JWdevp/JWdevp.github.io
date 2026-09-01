@@ -10,7 +10,7 @@ export const SITE = {
    * Portrait shown in the About section. Point this at whatever the file in
    * `public/images/` is called; if it is missing the figure removes itself.
    */
-  portrait: `${import.meta.env.BASE_URL}images/sanfran.grey.wide.jpg`,
+  portrait: `${import.meta.env.BASE_URL}images/JW.jpg`,
   /**
    * CV offered for download in the About section. The button only appears once
    * the file is actually there, so this can point at a file that has not been

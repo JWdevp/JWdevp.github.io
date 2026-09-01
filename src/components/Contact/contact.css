@@ -97,12 +97,12 @@
 
 .contact__link--linkedin {
   --tint-a: #0a66c2;
-  --tint-b: #38bdf8;
+  --tint-b: #7fd0ff;
 }
 
 .contact__link--github {
   --tint-a: #8957e5;
-  --tint-b: #c084fc;
+  --tint-b: #d8b4fe;
 }
 
 .contact__link--linkedin::before,
@@ -113,15 +113,18 @@
   z-index: -1;
   padding: 1px;
   border-radius: inherit;
+  /* A full sweep rather than one lit arc: colour all the way round, so the
+     turn reads as the ring rotating instead of a highlight sliding along a
+     mostly empty circle. */
   background: conic-gradient(
     from var(--angle),
-    transparent 0deg,
-    var(--tint-a) 70deg,
-    var(--tint-b) 130deg,
-    transparent 210deg,
-    transparent 360deg
+    var(--tint-a),
+    var(--tint-b),
+    var(--tint-a),
+    var(--tint-b),
+    var(--tint-a)
   );
-  opacity: 0.75;
+  opacity: 0.85;
   /* Ring, not disc: keep the padding band and cut the middle out. */
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -131,7 +134,7 @@
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   mask-composite: exclude;
-  animation: contact-link-spin 6s linear infinite;
+  animation: contact-link-spin 3s linear infinite;
 }
 
 .contact__link--linkedin:hover::before,
@@ -146,7 +149,7 @@
 @media (prefers-reduced-motion: reduce) {
   .contact__link--linkedin::before,
   .contact__link--github::before {
-    animation-duration: 24s;
+    animation-duration: 12s;
   }
 }
 
@@ -324,5 +327,16 @@ textarea.field__control {
 
   .contact__intro {
     position: static;
+  }
+
+  /* Side by side rather than stacked: two pills at half width each still hold
+     their label, and stacking them pushed the form off the first screenful. */
+  .contact__links ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .contact__link {
+    min-width: 0;
   }
 }
