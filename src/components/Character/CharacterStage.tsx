@@ -1,17 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
-import {
-  FOLLOW,
-  LAYOUT,
-  LOCALITY,
-  MAX_TRAVEL,
-} from './characterConfig'
+import { FOLLOW, LAYOUT, MAX_TRAVEL } from './characterConfig'
 import manifest from './manifest.json'
 import { useGazeTracking, type Gaze } from './useGazeTracking'
 import './character.css'
 
 const SHEET = `${import.meta.env.BASE_URL}character/${manifest.sprite}`
 const STILL = `${import.meta.env.BASE_URL}character/${manifest.still}`
+/** Touch devices get a wave instead of tracking. Not built by the pipeline —
+ *  drop the file in and it is used; if it is not there, the still is. */
+const WAVE = `${import.meta.env.BASE_URL}character/wave.mp4`
 
 /** Gaze of every frame, flattened — read once per animation frame, so the pair
  *  of numbers should be adjacent in memory rather than behind two lookups. */
@@ -56,6 +54,8 @@ export function CharacterStage() {
   const position = useRef(manifest.neutral)
   const shown = useRef(-1)
   const [ready, setReady] = useState(false)
+  const [wavePlaying, setWavePlaying] = useState(false)
+  const [waveBroken, setWaveBroken] = useState(false)
   const tracks = useMemo(hasFinePointer, [])
 
   const render = useCallback(
@@ -63,22 +63,16 @@ export function CharacterStage() {
       const img = sheet.current
       if (!img) return
 
-      // Aim: the frame that looks closest to where the cursor is, with a mild
-      // preference for one near the current position so the character does not
-      // set off towards a distant match and then double back.
-      //
-      // That preference means the frame it comes to rest on depends a little on
-      // where it came from — the clip passes through "looking straight ahead"
-      // three times and it settles on whichever is nearest. They differ by less
-      // than 0.09 of gaze, far below a single step, so all three read the same.
+      // Aim: the frame that looks closest to where the cursor is. No tie-break
+      // for nearness is needed — every frame here belongs to one pass of the
+      // recording, so the nearest match is never on the far side of the clip.
       const here = position.current
       let aim = 0
       let bestCost = Infinity
       for (let i = 0; i < COUNT; i += 1) {
         const dx = GAZE[i * 2] - gaze.x
         const dy = GAZE[i * 2 + 1] - gaze.y
-        const away = (i - here) / COUNT
-        const cost = WEIGHT_X * dx * dx + dy * dy + LOCALITY * away * away
+        const cost = WEIGHT_X * dx * dx + dy * dy
         if (cost < bestCost) {
           bestCost = cost
           aim = i
@@ -108,10 +102,15 @@ export function CharacterStage() {
   useGazeTracking(stage, tracks ? render : noop)
 
   // Without a cursor there is nothing to follow, so the sheet is never fetched
-  // and a single frame is shown instead — which is also what keeps several
-  // megabytes off a phone's budget.
+  // — which is also what keeps a megabyte off a phone's budget. A single frame
+  // is shown instead, with a wave played once over the top of it.
+  //
+  // The frame is the layer that counts: it decides the element's size and marks
+  // the character ready. The video sits on top and is pure addition, so a
+  // missing or unplayable wave.mp4 costs nothing but the wave.
   const src = tracks ? SHEET : STILL
   const neutral = manifest.neutral
+  const wave = !tracks && !waveBroken
 
   return (
     <div
@@ -149,6 +148,24 @@ export function CharacterStage() {
         }
         onLoad={() => setReady(true)}
       />
+      {wave ? (
+        <video
+          className="character__wave"
+          src={WAVE}
+          // Plays through once and holds on its last frame — no `loop`. Muted
+          // and inline are what let a phone start it without a tap.
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          // Hidden until it can actually play. A missing file does not reliably
+          // raise `error` on a media element, and an empty <video> paints as a
+          // black box in some browsers — this way it simply never appears.
+          data-playing={wavePlaying || undefined}
+          onCanPlay={() => setWavePlaying(true)}
+          onError={() => setWaveBroken(true)}
+        />
+      ) : null}
       <p className="visually-hidden">{t.a11y.character}</p>
     </div>
   )

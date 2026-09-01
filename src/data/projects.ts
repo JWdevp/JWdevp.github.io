@@ -68,7 +68,7 @@ export const projects: Project[] = [
       en: 'An editable table for the results of the Bavarian municipal elections, inside the internal web application of the Bayerisches Landesamt für Statistik.',
       de: 'Editierbare Tabelle für die Ergebnisse der bayerischen Kommunalwahlen, in der internen Webanwendung des Bayerischen Landesamts für Statistik.',
     },
-    technologies: ['Grails', 'Groovy', 'AJAX', 'Git'],
+    technologies: ['Grails', 'Groovy', 'AJAX', 'MySQL', 'MariaDB', 'Git'],
     image: null,
     logo: 'images/projects/landesamt-logo.png',
     url: null,

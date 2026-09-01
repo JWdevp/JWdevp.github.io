@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ArrowLeft, ArrowUpRight } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, MapPin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Project } from '../../data/projects'
@@ -163,7 +163,10 @@ export function ProjectDialog({ project, origin, onClose }: Props) {
 
           <header className="dialog__head">
             {detail?.client ? (
-              <p className="eyebrow">{detail.client}</p>
+              <p className="eyebrow dialog__client">
+                <MapPin size={13} strokeWidth={2} aria-hidden="true" />
+                {detail.client}
+              </p>
             ) : null}
             <h2 className="dialog__title" id={titleId}>
               {project.title[language]}
@@ -232,21 +235,40 @@ export function ProjectDialog({ project, origin, onClose }: Props) {
   )
 }
 
-/** Screenshots that quietly drop out if the file is not there yet. */
+/** Screenshots that quietly drop out if the file is not there yet.
+ *
+ *  These are dense interface captures shown a good deal smaller than they were
+ *  taken, so a click zooms in — around the point clicked, which is the part
+ *  being squinted at. Clicking again puts it back. */
 function Shots({ images, title }: { images: string[]; title: string }) {
   const [broken, setBroken] = useState<string[]>([])
+  const [zoomed, setZoomed] = useState<string | null>(null)
   const usable = images.filter((src) => !broken.includes(src))
   if (usable.length === 0) return null
+
+  const toggle = (src: string) => (event: React.MouseEvent<HTMLImageElement>) => {
+    const img = event.currentTarget
+    if (zoomed === src) {
+      setZoomed(null)
+      return
+    }
+    const rect = img.getBoundingClientRect()
+    img.style.transformOrigin = `${((event.clientX - rect.left) / rect.width) * 100}% ${
+      ((event.clientY - rect.top) / rect.height) * 100
+    }%`
+    setZoomed(src)
+  }
 
   return (
     <div className="dialog__shots">
       {usable.map((src) => (
-        <figure key={src}>
+        <figure key={src} data-zoomed={zoomed === src ? '' : undefined}>
           <img
             src={`${import.meta.env.BASE_URL}${src.replace(/^\//, '')}`}
             alt={title}
             loading="lazy"
             decoding="async"
+            onClick={toggle(src)}
             onError={() => setBroken((current) => [...current, src])}
           />
         </figure>

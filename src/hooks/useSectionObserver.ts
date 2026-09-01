@@ -50,9 +50,18 @@ export function useSectionObserver(
 
     elements.forEach((el) => observer.observe(el))
 
-    // Landing at the very top should always read as the first section.
+    // The band sits mid-screen, so the ends of the page need their own rule:
+    // at the top nothing has reached the band yet, and at the bottom the last
+    // section has already scrolled out of it — the footer occupies the bottom
+    // of the viewport — which would otherwise leave the previous section lit.
     const onScroll = () => {
-      if (window.scrollY < 40) setActiveId(sectionIds[0] ?? '')
+      if (window.scrollY < 40) {
+        setActiveId(sectionIds[0] ?? '')
+        return
+      }
+      const remaining =
+        document.documentElement.scrollHeight - window.innerHeight - window.scrollY
+      if (remaining < 40) setActiveId(sectionIds[sectionIds.length - 1] ?? '')
     }
     window.addEventListener('scroll', onScroll, { passive: true })
 

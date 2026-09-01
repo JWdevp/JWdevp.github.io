@@ -17,6 +17,14 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: auto; /* smooth scrolling is driven by GSAP ScrollToPlugin */
+  /* The page still scrolls; only the bar is gone. The floating navigation is
+     the position indicator here, the same choice the project dialog makes. */
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -284,13 +292,20 @@ p {
    Reduced motion
    =========================================================================== */
 
+/* Motion is reduced here, not removed — the same policy `motionBudget()`
+   applies to the GSAP timelines. Travel and repetition are what provoke
+   discomfort; a fade or a cross-fade carries meaning (this replaced that) and
+   costs nothing, so it survives, shortened.
+
+   The blanket `transition-duration: 0.001ms !important` that used to live here
+   was the reason the interface looked inert on a machine with the preference
+   set: it overrode every component, including ones that had already reduced
+   themselves deliberately. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
 }
