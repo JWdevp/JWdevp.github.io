@@ -6,8 +6,6 @@ export const SITE = {
   name: 'Jason Wiersum',
   role: 'Anwendungsentwickler',
   location: 'Nürnberg, Bayern',
-  /** Path of the optional character model, resolved against the Vite base. */
-  characterModel: `${import.meta.env.BASE_URL}models/character.glb`,
   /**
    * Portrait shown in the About section. Point this at whatever the file in
    * `public/images/` is called; if it is missing the figure removes itself.

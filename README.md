@@ -25,7 +25,7 @@ Node 20 or newer.
 src/
 ├── components/
 │   ├── Navigation/    FloatingNavigation · LanguageSwitcher · ThemeToggle
-│   ├── Character/     the 3D scene, GLB loader, placeholder, pointer tracking
+│   ├── Character/     sprite sheet + manifest, gaze tracking
 │   ├── Hero/          first screen
 │   ├── About/         biography, facts panel, the four creative pillars
 │   ├── Skills/        technologies by category + spoken languages
@@ -37,6 +37,13 @@ src/
 ├── data/              projects.ts · skills.ts
 ├── config/            site.ts (personal data, links) · web3forms.ts
 └── styles/            tokens.css (design system) · globals.css
+
+public/
+├── character/         sprite.webp — built, do not edit by hand
+└── images/            final.mp4 (character source) · portrait · project shots
+
+scripts/
+└── build-character.py final.mp4 → sprite.webp + manifest.json
 ```
 
 The page has four sections — `#home`, `#work`, `#about`, `#contact` — in one
@@ -45,101 +52,98 @@ item is detected with an `IntersectionObserver`.
 
 ---
 
-## The 3D character
+## The character
 
-### Where to put the model
+A 2D character cut from `public/images/final.mp4`. There is no 3D: no Three.js,
+no WebGL, no canvas. It is one `<img>` — a sprite sheet of head poses — and the
+cursor chooses which pose to show.
 
-```
-public/models/character.glb
-```
+### How the asset is built
 
-The file is **not** in the repository. Until it exists, a stand-in built from
-Three.js primitives is shown — the same proportions and palette as the reference
-(swept brown hair, round dark glasses, beard, light sweater) — and it waves,
-blinks, breathes and tracks the cursor exactly like the real model will. Drop the
-GLB in and it is picked up automatically, no code change.
-(`public/models/README.md` repeats this next to the folder.)
-
-The stand-in lives in `src/components/Character/CharacterPlaceholder.tsx`; its
-palette is the `palette` object near the top of that file.
-
-### Animations
-
-The character runs a small state machine:
+`scripts/build-character.py` turns the video into two files:
 
 ```
-INITIALIZING → GREETING → IDLE → TRACKING
+public/character/sprite.webp              # the poses, one grid
+src/components/Character/manifest.json    # geometry + the cursor lookup
 ```
 
-* **Greeting** — a clip whose name contains `greet`, `wave`, `hello`, `hallo` or
-  `salud`. Played once. The transition out of it is driven by the animation
-  mixer's own `finished` event, i.e. the real clip length, not a guessed
-  `setTimeout`.
-* **Idle** — a clip containing `idle`, `breath`, `stand` or `loop`. Cross-faded
-  in when the greeting ends and looped from there.
-* **Tracking** — enabled only once the greeting is over, and blended in over
-  0.8 s so it never snaps on.
+```bash
+python3 scripts/build-character.py --poses 36 --width 480 --quality 76
+```
 
-The greeting replays whenever the hero scrolls back into view, so a visitor who
-arrives while the 3D chunk is still loading still gets waved at.
+It needs `ffmpeg` on `PATH` and `pillow`, `numpy`, `scipy`. The video itself is
+never shipped and never played in the browser — it is the reference original and
+stays in the repository untouched.
 
-Missing clips degrade quietly: with no greeting the character starts in idle;
-with no clips at all it simply stands there.
+What the script does, in order:
+
+1. **Extract** all 240 frames (1280×720, 24 fps, 10 s).
+2. **Measure gaze** per frame from the pupils, so poses are chosen by where the
+   character is looking rather than by timestamp — the video does not spend one
+   second per direction.
+3. **Pick poses** by farthest-point sampling in gaze space, so the 36 kept
+   frames spread over the whole range instead of clustering.
+4. **Matte** each one. The backdrop is a warm grey gradient, not white, and the
+   sweater is brighter than the backdrop in places and darker in others, so no
+   brightness threshold works. Instead a degree-3 polynomial is fitted per
+   channel to the frame borders, giving a *predicted backdrop* for every pixel;
+   the silhouette is where the frame departs from that prediction, grown with a
+   hysteresis threshold. Nothing keys on "is this pixel white", so the eyes,
+   the sweater and the highlights survive.
+5. **Unmix** the soft edge — `(pixel − (1−α)·backdrop) / α` — so no pale fringe
+   survives to glow against a dark page.
+6. **Compose** the sheet, each pose in a cell with an 8 px transparent gutter so
+   lossy compression and sub-pixel sampling cannot bleed one pose into the next.
+7. **Bake the lookup**: for each cell of a 33×33 cursor grid, the pose whose
+   gaze matches. The runtime does one array read, no search.
 
 ### Cursor tracking
 
-`src/components/Character/useMouseTracking.ts` normalises the pointer to
-`-1…1`, applies frame-rate-independent exponential damping, and never touches
-React state — nothing in the render loop causes a re-render.
+The pointer writes a target; a `requestAnimationFrame` loop eases the current
+gaze towards it and picks a pose. Nothing runs inside the `mousemove` handler
+and no React state is involved, so moving the mouse costs one assignment.
 
-Amplitude is layered per body part so the motion reads as a person looking at
-something rather than a prop being rotated. Limits live in the same file:
+Smoothing is exponential and frame-rate independent (`1 − e^(−k·Δt)`), so it
+feels the same at 60 Hz and 144 Hz. Both axes track, measured from the centre of
+the character, with a radial dead zone so a parked cursor cannot make the pose
+twitch.
 
-```ts
-MAX_EYE_ROTATION   0.34 rad   // eyes move most
-MAX_HEAD_ROTATION  0.42 rad
-MAX_NECK_ROTATION  0.16 rad
-MAX_TORSO_ROTATION 0.06 rad   // barely moves
-DAMPING            5.2        // higher = snappier
-```
+The character never moves: no translate, no scale, no rotation, no parallax.
+Only which frame is shown changes.
 
-Vertical range is `VERTICAL_SCALE` (0.62) of the horizontal one — necks nod less
-than they turn.
+On a coarse pointer (`(pointer: fine)` not matching) tracking is off entirely
+and the character rests at centre — there is no cursor to follow, and touch,
+accelerometer and gyroscope are deliberately not used.
 
-On touch devices there is no cursor, so tracking falls back to a slow
-figure-eight drift instead of pretending to follow something.
+### Tuning
 
-### Bone names
+Every knob lives in `src/components/Character/characterConfig.ts`, documented in
+place:
 
-Bones are discovered by name, case-insensitively, ignoring `mixamorig:`
-prefixes and any `.`, `_`, `-` or spaces. Recognised out of the box:
-
-| Part | Names it looks for |
+| | |
 | --- | --- |
-| Head | `Head`, `head`, `Kopf`, `cabeza`, … |
-| Neck | `Neck`, `neck`, `Hals`, `cuello`, … |
-| Torso | `Spine`, `Chest`, `UpperChest`, `torso`, `body` |
-| Eyes | `LeftEye`/`RightEye`, `Eye_L`/`Eye_R`, `eye.l`/`eye.r`, or a single `Eyes` node |
+| `LAYOUT.width`, `maxWidth`, `mobileMaxWidth` | size |
+| `LAYOUT.offsetX`, `offsetY` | position |
+| `SENSITIVITY.x`, `.y` | how far the cursor travels for a full look |
+| `DEAD_ZONE` | the still area around centre |
+| `SMOOTHING` | follow speed |
+| `MAX_GAZE` | how far the gaze is allowed to go |
 
-To support a differently named rig, add the name to `BONE_CANDIDATES` in
-`src/components/Character/bones.ts`. A missing bone is skipped, never an error.
+Asset quality and pose count are arguments to the build script; `GAZE_WEIGHT_X`
+in it decides how much horizontal accuracy is worth relative to vertical.
 
-### Checking and tuning
+### What the source video can and cannot do
 
-```bash
-npm run check:model            # inspects public/models/character.glb
-npm run check:model -- x.glb   # or any other file
-```
+The subject never looks up-and-right, so that corner of the cursor plane has no
+matching pose and is approximated by the nearest one. The lookup weights
+horizontal error 2.5× vertical, because looking the wrong way left/right reads
+as an error while a shallow nod does not. Vertical range on the right side is
+weak for the same reason.
 
-Every knob — tracking amounts, damping, rig orientation, framing — lives in
-`src/components/Character/characterConfig.ts`, documented in place.
-
-Scale and position are automatic: the loader measures the model, finds the head
-and crops to a bust, so an avatar of any size frames correctly.
-
-**How to make the model:** [`docs/CHARACTER-MODEL.md`](docs/CHARACTER-MODEL.md).
+There are no blinks in the video, so there are none in the sprite.
 
 ---
+
 
 ## Translations
 
@@ -283,9 +287,6 @@ BASE_PATH=/my-repo/ npm run build
 Nothing below is invented or filled in with placeholder facts — these are yours
 to supply:
 
-- [ ] `public/models/character.glb` — the rigged character with `Greeting` and
-      `Idle` clips (see [`docs/CHARACTER-MODEL.md`](docs/CHARACTER-MODEL.md),
-      then `npm run check:model`)
 - [ ] Real projects in `src/data/projects.ts`
 - [ ] Project cover images in `public/images/`
 - [ ] A public email address, if you want one shown next to the form

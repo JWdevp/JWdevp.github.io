@@ -1,44 +1,40 @@
-.character-stage {
+/* A window one pose wide, with the whole sheet inside it. Only the sheet's
+   transform changes, so choosing a pose costs a composite and nothing else. */
+.character {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-height: min(64vh, 34rem);
-  isolation: isolate;
+  overflow: hidden;
+  margin-inline: auto;
+  opacity: 0;
+  transition: opacity 420ms var(--ease-out);
+  /* The sheet has real transparency, so the page's own background shows
+     through in either theme. Nothing here paints a backdrop. */
 }
 
-.character-stage__canvas {
-  position: relative;
-  z-index: 1;
-  width: 100% !important;
-  height: 100% !important;
-  touch-action: pan-y;
+.character[data-ready] {
+  opacity: 1;
 }
 
-/* Soft light behind the figure — gives the scene depth without a heavy
-   post-processing pass. */
-.character-stage__glow {
+.character__sheet {
   position: absolute;
-  inset: 8% 4% 12%;
-  z-index: 0;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 42%, var(--glow-a), transparent 62%),
-    radial-gradient(circle at 68% 74%, var(--glow-b), transparent 58%);
-  filter: blur(28px);
-  opacity: 0.9;
+  top: 0;
+  left: 0;
+  width: calc(100% * var(--character-cols));
+  height: calc(100% * var(--character-rows));
+  max-width: none;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  user-select: none;
   pointer-events: none;
 }
 
 @media (max-width: 900px) {
-  .character-stage {
-    max-height: 38vh;
-    aspect-ratio: 4 / 3;
+  .character {
+    max-width: var(--character-mobile-max) !important;
   }
 }
 
-/* Keep the hero's call to action above the bottom navigation island. */
-@media (max-width: 720px) {
-  .character-stage {
-    max-height: 32vh;
+@media (prefers-reduced-motion: reduce) {
+  .character {
+    transition-duration: 1ms;
   }
 }

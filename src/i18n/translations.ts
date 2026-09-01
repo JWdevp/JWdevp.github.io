@@ -34,8 +34,7 @@ const es = {
     openInNewTab: 'Se abre en una pestaña nueva',
     openSettings: 'Abrir ajustes',
     closeSettings: 'Cerrar ajustes',
-    character3d:
-      'Escena tridimensional decorativa: un personaje que saluda y sigue el cursor.',
+    character: 'Ilustración decorativa: un personaje que sigue el cursor con la mirada.',
   },
   nav: {
     home: 'Inicio',
@@ -178,8 +177,7 @@ const en: Translation = {
     openInNewTab: 'Opens in a new tab',
     openSettings: 'Open settings',
     closeSettings: 'Close settings',
-    character3d:
-      'Decorative 3D scene: a character that waves and follows the cursor.',
+    character: 'Decorative illustration: a character whose gaze follows the cursor.',
   },
   nav: {
     home: 'Home',
@@ -314,8 +312,7 @@ const de: Translation = {
     openInNewTab: 'Wird in einem neuen Tab geöffnet',
     openSettings: 'Einstellungen öffnen',
     closeSettings: 'Einstellungen schließen',
-    character3d:
-      'Dekorative 3D-Szene: eine Figur, die winkt und dem Mauszeiger folgt.',
+    character: 'Dekorative Illustration: eine Figur, deren Blick dem Mauszeiger folgt.',
   },
   nav: {
     home: 'Home',
