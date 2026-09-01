@@ -4,13 +4,11 @@ import { Suspense, lazy, useRef } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 
-/**
- * Three.js is by far the heaviest dependency on the page, and nothing above the
- * fold depends on it. Loading it in its own chunk lets the copy paint first.
- */
-const CharacterScene = lazy(() =>
-  import('../Character/CharacterScene').then((module) => ({
-    default: module.CharacterScene,
+/** The sprite sheet is the single heaviest asset on the page, so the character
+ *  arrives in its own chunk and the copy paints first. */
+const CharacterStage = lazy(() =>
+  import('../Character/CharacterStage').then((module) => ({
+    default: module.CharacterStage,
   })),
 )
 import './hero.css'
@@ -69,9 +67,8 @@ export function Hero() {
 
         <div className="hero__stage">
           <Suspense fallback={<div className="hero__stage-fallback" aria-hidden="true" />}>
-            <CharacterScene />
+            <CharacterStage />
           </Suspense>
-          <p className="visually-hidden">{t.a11y.character3d}</p>
         </div>
       </div>
 

@@ -7,3 +7,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Python bytecode from scripts/
+__pycache__/
+*.pyc
