@@ -6,10 +6,18 @@ import { motionBudget } from './usePrefersReducedMotion'
 gsap.registerPlugin(useGSAP)
 
 /**
- * Scroll-linked entrance for a section.
+ * Scroll-linked entrance and exit for a section.
  *
  * Any descendant carrying `data-reveal` fades and lifts into place as it comes
- * into view, staggered in document order.
+ * into view, staggered in document order, and fades back out once it has left
+ * — so scrolling back up plays the entrance again rather than finding
+ * everything already there.
+ *
+ * Two observers rather than one, with different margins. A single observer
+ * toggling on the same edge would flicker for anyone stopped right on it: one
+ * pixel either way would fade the element in and out. So the box an element
+ * has to enter to appear sits *inside* the box it has to leave to disappear,
+ * and the gap between them is dead space where nothing changes.
  *
  * Driven by IntersectionObserver rather than ScrollTrigger on purpose. Sections
  * carry their own scroll-scrubbed transform (see `useSectionTransitions`), which
@@ -20,8 +28,8 @@ gsap.registerPlugin(useGSAP)
  * effects can no longer disagree.
  *
  * Under `prefers-reduced-motion` the lift collapses to zero and the timings
- * tighten, so the entrance becomes a quick cross-fade rather than disappearing
- * altogether — see `motionBudget`.
+ * tighten, so this becomes a cross-fade rather than disappearing altogether —
+ * see `motionBudget`.
  */
 export function useReveal(
   scope: RefObject<HTMLElement | null>,
@@ -38,44 +46,87 @@ export function useReveal(
       const lift = budget.travel(y)
       gsap.set(targets, { opacity: 0, y: lift })
 
-      // Elements that cross the line within the same tick animate as one
-      // staggered group; a later arrival starts its own group.
-      let queued: HTMLElement[] = []
+      // Elements crossing a line within the same tick animate as one staggered
+      // group; a later arrival starts its own group.
+      let entering: HTMLElement[] = []
+      let leaving: { el: HTMLElement; above: boolean }[] = []
       let flush: ReturnType<typeof setTimeout> | undefined
 
       const play = () => {
-        const batch = queued
-        queued = []
-        if (batch.length === 0) return
-        gsap.to(batch, {
-          opacity: 1,
-          y: 0,
-          duration: budget.duration(duration),
-          ease: 'power2.inOut',
-          stagger: budget.stagger(stagger),
-          overwrite: 'auto',
-        })
+        const shown = entering
+        const hidden = leaving
+        entering = []
+        leaving = []
+
+        if (shown.length > 0) {
+          gsap.to(shown, {
+            opacity: 1,
+            y: 0,
+            duration: budget.duration(duration),
+            ease: 'power2.inOut',
+            stagger: budget.stagger(stagger),
+            overwrite: 'auto',
+          })
+        }
+
+        for (const { el, above } of hidden) {
+          gsap.to(el, {
+            opacity: 0,
+            // Back the way it came: something that left over the top lifts
+            // away upwards, not down into the viewport it just left.
+            y: above ? -lift : lift,
+            duration: budget.duration(duration),
+            ease: 'power2.inOut',
+            overwrite: 'auto',
+          })
+        }
       }
 
-      const observer = new IntersectionObserver(
+      const schedule = () => {
+        clearTimeout(flush)
+        flush = setTimeout(play, 60)
+      }
+
+      // Inner box: an element appears once it is properly inside the viewport.
+      const show = new IntersectionObserver(
         (entries) => {
+          let queued = false
           for (const entry of entries) {
             if (!entry.isIntersecting) continue
-            queued.push(entry.target as HTMLElement)
-            observer.unobserve(entry.target) // reveal once, then stop watching
+            entering.push(entry.target as HTMLElement)
+            queued = true
           }
-          if (queued.length > 0) {
-            clearTimeout(flush)
-            flush = setTimeout(play, 60)
-          }
+          if (queued) schedule()
         },
         { rootMargin: '0px 0px -10% 0px', threshold: 0.01 },
       )
 
-      targets.forEach((target) => observer.observe(target))
+      // Outer box: it only disappears once it is clear of the viewport, well
+      // past the line that brought it in.
+      const hide = new IntersectionObserver(
+        (entries) => {
+          let queued = false
+          for (const entry of entries) {
+            if (entry.isIntersecting) continue
+            leaving.push({
+              el: entry.target as HTMLElement,
+              above: entry.boundingClientRect.top < 0,
+            })
+            queued = true
+          }
+          if (queued) schedule()
+        },
+        { rootMargin: '15% 0px 15% 0px', threshold: 0 },
+      )
+
+      targets.forEach((target) => {
+        show.observe(target)
+        hide.observe(target)
+      })
 
       return () => {
-        observer.disconnect()
+        show.disconnect()
+        hide.disconnect()
         clearTimeout(flush)
       }
     },

@@ -157,7 +157,19 @@
 
 .about__cv {
   margin-block-start: var(--space-5);
-  gap: 0.6rem;
+}
+
+.about__cv-intro {
+  max-width: 40rem;
+  margin-block-end: var(--space-4);
+  color: var(--muted);
+  line-height: var(--leading-relaxed);
+}
+
+.about__cv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
 }
 
 .about__cv-hint {

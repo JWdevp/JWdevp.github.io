@@ -61,8 +61,11 @@ const es = {
     closing:
       'Desarrollo aplicaciones con una mirada de diseñador: pienso el producto entero, no solo el código que lo sostiene.',
     portraitAlt: 'Jason Wiersum',
+    cvIntro: 'Si quieres ver toda mi trayectoria laboral, puedes consultar el CV aquí mismo o descargarlo.',
+    cvView: 'Ver CV',
     cv: 'Descargar CV',
     cvHint: 'PDF',
+    cvTitle: 'Currículum',
     factsTitle: 'En breve',
     facts: [
       { label: 'Nombre', value: 'Jason Wiersum' },
@@ -187,8 +190,11 @@ const en: Translation = {
     closing:
       'I build applications with a designer’s eye: I think about the whole product, not only the code holding it up.',
     portraitAlt: 'Jason Wiersum',
+    cvIntro: 'If you would like the whole work history, you can read the CV here or download it.',
+    cvView: 'View CV',
     cv: 'Download CV',
     cvHint: 'PDF',
+    cvTitle: 'Curriculum vitae',
     factsTitle: 'At a glance',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },
@@ -305,8 +311,11 @@ const de: Translation = {
     closing:
       'Ich entwickle Anwendungen mit dem Blick eines Gestalters: Ich denke das ganze Produkt, nicht nur den Code darunter.',
     portraitAlt: 'Jason Wiersum',
+    cvIntro: 'Wenn Sie den vollständigen beruflichen Werdegang sehen möchten, können Sie den Lebenslauf hier ansehen oder herunterladen.',
+    cvView: 'Lebenslauf ansehen',
     cv: 'Lebenslauf herunterladen',
     cvHint: 'PDF',
+    cvTitle: 'Lebenslauf',
     factsTitle: 'Kurz gefasst',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },

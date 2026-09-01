@@ -139,13 +139,14 @@
   opacity: 1;
 }
 
-/* An endlessly repeating animation is exactly what the preference is about, so
-   this one stops outright rather than shortening; the ring stays as a still
-   gradient. */
+/* Slowed right down rather than stopped. Turning it off left the ring frozen
+   at one angle, which is not what the button is for; a quarter of the speed
+   keeps it alive without anything that could be called motion. This follows
+   the same rule as motionBudget(): reduce, do not remove. */
 @media (prefers-reduced-motion: reduce) {
   .contact__link--linkedin::before,
   .contact__link--github::before {
-    animation: none;
+    animation-duration: 24s;
   }
 }
 

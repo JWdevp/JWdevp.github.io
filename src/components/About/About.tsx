@@ -1,20 +1,26 @@
-import { Download } from 'lucide-react'
+import { Download, Eye } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useReveal } from '../../hooks/useReveal'
+import { CvDialog } from './CvDialog'
 import './about.css'
 
 /**
- * Download button for the CV, shown only once the file is actually served.
+ * Read the CV here, or take the file — shown only once the file is actually
+ * served.
  *
- * A link is checked rather than assumed: the rest of the section already
+ * The link is checked rather than assumed: the rest of the section already
  * removes a missing portrait and a missing project shot rather than leaving
  * something broken on the page, and a download that 404s is worse than no
  * button at all.
  */
-function CvButton({ label, hint }: { label: string; hint: string }) {
+function Cv() {
+  const { t } = useLanguage()
   const [available, setAvailable] = useState(false)
+  const [origin, setOrigin] = useState<DOMRect | null>(null)
+  const [open, setOpen] = useState(false)
+  const viewButton = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -35,11 +41,32 @@ function CvButton({ label, hint }: { label: string; hint: string }) {
   if (!available) return null
 
   return (
-    <a className="btn about__cv" href={SITE.cv} download>
-      <Download size={16} strokeWidth={1.9} aria-hidden="true" />
-      {label}
-      <span className="about__cv-hint">{hint}</span>
-    </a>
+    <div className="about__cv" data-reveal>
+      <p className="about__cv-intro">{t.about.cvIntro}</p>
+
+      <div className="about__cv-actions">
+        <button
+          type="button"
+          className="btn"
+          ref={viewButton}
+          onClick={() => {
+            setOrigin(viewButton.current?.getBoundingClientRect() ?? null)
+            setOpen(true)
+          }}
+        >
+          <Eye size={16} strokeWidth={1.9} aria-hidden="true" />
+          {t.about.cvView}
+        </button>
+
+        <a className="btn btn--ghost" href={SITE.cv} download>
+          <Download size={16} strokeWidth={1.9} aria-hidden="true" />
+          {t.about.cv}
+          <span className="about__cv-hint">{t.about.cvHint}</span>
+        </a>
+      </div>
+
+      {open ? <CvDialog origin={origin} onClose={() => setOpen(false)} /> : null}
+    </div>
   )
 }
 
@@ -98,9 +125,7 @@ export function About() {
               ))}
             </div>
 
-            <div data-reveal>
-              <CvButton label={t.about.cv} hint={t.about.cvHint} />
-            </div>
+            <Cv />
           </div>
 
           <aside className="about__aside">
