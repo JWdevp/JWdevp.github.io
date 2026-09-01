@@ -166,10 +166,25 @@
   line-height: var(--leading-relaxed);
 }
 
+/* Both buttons the same width, set by the wider label — they sit together and
+   one being longer than the other read as an accident.
+
+   `grid-auto-columns: 1fr` in a shrink-to-fit grid is what makes them equal:
+   the tracks are all one fraction of the same space, and the grid takes its
+   width from the widest of them. A flex row with `flex: 1` only shares what is
+   left over, and `max-content` columns size each to its own label — neither
+   gives two equal buttons. */
 .about__cv-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: var(--space-3);
+}
+
+@media (max-width: 32rem) {
+  .about__cv-actions {
+    grid-auto-flow: row;
+  }
 }
 
 /* --- Reveal button -------------------------------------------------------

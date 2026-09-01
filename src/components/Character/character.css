@@ -17,12 +17,24 @@
   mask-image: linear-gradient(to bottom, #000 80%, transparent 98%);
 }
 
+/* The wave sits in a frame with an edge of its own, so the fade that softens
+   the cut-out bust would only blur the bottom of that frame. */
+.character[data-wave] {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
 .character[data-ready] {
   opacity: 1;
 }
 
-/* Touch devices: the wave, played once, over the still. Contained rather than
-   cropped, since its framing need not match the sheet's exactly.
+/* Touch devices: the wave, played once, in the character's place.
+   
+   It keeps its own pale backdrop — see CharacterStage for why it is not cut
+   out — so it is given a frame and made to look deliberate: the page's own
+   corner radius, and a crop that fills it so no letterboxing shows. The video
+   is 16:9 with the character small and centred, so it is scaled up and pulled
+   to the head.
 
    Invisible until it can play, so a missing file leaves the still showing
    rather than a black rectangle over it. */
@@ -31,7 +43,10 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  border-radius: var(--radius-lg);
+  background: #f2f2f0;
+  object-fit: cover;
+  object-position: center 32%;
   opacity: 0;
   transition: opacity 300ms var(--ease-out);
   pointer-events: none;

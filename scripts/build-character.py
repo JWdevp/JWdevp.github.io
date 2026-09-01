@@ -312,7 +312,26 @@ def main():
         sprite = OUT_DIR / 'frames.webp'
         sheet.save(sprite, 'WEBP', quality=args.quality, method=6)
 
-        norm = norm_all[idx]
+        # Rescale to what THIS window can actually do. The normalisation above
+        # spans the whole clip, but the window is one pass of it and does not
+        # reach as far in every direction — here it stops at -0.68 on the left
+        # against +1.00 on the right. Left as it was, the cursor's full travel
+        # to the left asked for a look the sheet does not contain, and the
+        # character simply never got there: it never looked down-left.
+        #
+        # Each side is scaled on its own, around zero rather than around the
+        # range's midpoint, so full deflection reaches the furthest frame there
+        # is while a cursor at rest still picks the frame looking straight
+        # ahead — recentring on the midpoint would have left it glancing left.
+        norm = norm_all[idx].copy()
+        for axis in (0, 1):
+            for side in (-1, 1):
+                on = np.sign(norm[:, axis]) == side
+                if not on.any():
+                    continue
+                reach = np.abs(norm[on, axis]).max()
+                if reach > 0:
+                    norm[on, axis] /= reach
 
         # The frame closest to looking straight ahead. Where the character rests,
         # and the only frame a touch device ever needs.

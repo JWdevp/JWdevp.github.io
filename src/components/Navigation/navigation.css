@@ -199,17 +199,15 @@
 }
 
 .theme-toggle {
-  /* Both icons occupy the same cell so they can cross-fade in place. */
   display: grid;
   place-items: center;
 }
 
+/* One morphing glyph now, not two stacked ones, so it needs no cell of its
+   own — the same shape as the settings icon beside it. */
 .theme-toggle__icon {
-  grid-area: 1 / 1;
-  display: grid;
-  place-items: center;
+  display: block;
   color: var(--foreground);
-  will-change: transform, opacity;
 }
 
 .theme-toggle:hover {

@@ -30,6 +30,21 @@
   letter-spacing: -0.045em;
   line-height: 0.98;
   margin-block-start: var(--space-1);
+  /* `fit-content`, so the hover area is the words themselves rather than the
+     full width of the column they sit in. */
+  width: fit-content;
+  color: var(--foreground);
+  transition: color 420ms var(--ease-out);
+}
+
+.hero__greeting:hover {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__greeting {
+    transition-duration: 260ms;
+  }
 }
 
 .hero__tagline {

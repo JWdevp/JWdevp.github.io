@@ -122,13 +122,17 @@ export function CharacterStage() {
 
   // Without a cursor there is nothing to follow, so the sheet is never fetched
   // — which is also what keeps a megabyte off a phone's budget. A single frame
-  // stands in, and a wave plays over it once.
+  // stands in, and the wave plays over it once.
   //
-  // The frame is the layer that counts: it holds the element's size and marks
-  // the character ready, and it is what shows if wave.mp4 is missing or will
-  // not play. Once the video is running the frame is hidden underneath it —
-  // the two are framed slightly differently, and leaving both visible showed
-  // one behind the other.
+  // The wave keeps its own backdrop and sits in a frame, rather than being cut
+  // out like the sheet is. It was shot with a pool of light in the middle that
+  // the backdrop fit — which reads the borders, and they are vignetted — comes
+  // in about 20 levels under, so the matte swallowed the gap between the raised
+  // arm and the body and pasted a slab of backdrop onto the character. A frame
+  // is the honest answer: it looks chosen, and it cannot fail.
+  //
+  // The still stays underneath as the layer that holds the size and marks the
+  // character ready, and it is what shows if the video is missing.
   const src = tracks ? SHEET : STILL
   const neutral = manifest.neutral
   const wave = !tracks && !waveBroken
@@ -148,6 +152,7 @@ export function CharacterStage() {
         ['--character-mobile-max' as string]: LAYOUT.mobileMaxWidth,
       }}
       data-ready={ready || undefined}
+      data-wave={wavePlaying || undefined}
     >
       <img
         className="character__sheet"
