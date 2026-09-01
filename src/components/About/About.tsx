@@ -62,19 +62,21 @@ export function About() {
 
           <aside className="about__aside">
             <Portrait alt={t.about.portraitAlt} />
-
-            <div className="about__facts card" data-reveal>
-              <h3 className="about__facts-title">{t.about.factsTitle}</h3>
-              <dl className="about__facts-list">
-                {t.about.facts.map((fact) => (
-                  <div className="about__fact" key={fact.label}>
-                    <dt>{fact.label}</dt>
-                    <dd>{fact.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
           </aside>
+        </div>
+
+        {/* Full width, under both columns: the facts read as one row of labelled
+            values rather than a narrow stack beside the portrait. */}
+        <div className="about__facts card" data-reveal>
+          <h3 className="about__facts-title">{t.about.factsTitle}</h3>
+          <dl className="about__facts-list">
+            {t.about.facts.map((fact) => (
+              <div className="about__fact" key={fact.label}>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
         <div className="about__pillars">

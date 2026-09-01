@@ -25,7 +25,7 @@ Node 20 or newer.
 src/
 ├── components/
 │   ├── Navigation/    FloatingNavigation · LanguageSwitcher · ThemeToggle
-│   ├── Character/     sprite sheet + manifest, gaze tracking
+│   ├── Character/     frame sheet + manifest, gaze tracking
 │   ├── Hero/          first screen
 │   ├── About/         biography, facts panel, the four creative pillars
 │   ├── Skills/        technologies by category + spoken languages
@@ -39,11 +39,11 @@ src/
 └── styles/            tokens.css (design system) · globals.css
 
 public/
-├── character/         sprite.webp — built, do not edit by hand
+├── character/         frames.webp · still.webp — built, do not edit by hand
 └── images/            final.mp4 (character source) · portrait · project shots
 
 scripts/
-└── build-character.py final.mp4 → sprite.webp + manifest.json
+└── build-character.py final.mp4 → frames.webp + still.webp + manifest.json
 ```
 
 The page has four sections — `#home`, `#work`, `#about`, `#contact` — in one
@@ -54,66 +54,102 @@ item is detected with an `IntersectionObserver`.
 
 ## The character
 
-A 2D character cut from `public/images/final.mp4`. There is no 3D: no Three.js,
-no WebGL, no canvas. It is one `<img>` — a sprite sheet of head poses — and the
-cursor chooses which pose to show.
+A 2D character taken from `public/images/final.mp4`. There is no 3D: no
+Three.js, no WebGL, no canvas. It is one `<img>` — a sheet holding the clip's
+frames in order — and the cursor decides where in the clip to be.
+
+### The idea
+
+The cursor does not pick a picture. It picks a **position in the clip**, and the
+runtime walks there **one frame at a time**. Every step is therefore two frames
+that were filmed next to each other, so what plays is movement that was actually
+recorded: the head turning, not a cut between two stills.
+
+That is the whole difference from the first attempt, which kept 36 poses chosen
+for how different they looked and jumped to the best match. Measured on the
+frames themselves:
+
+| | mean pixel difference per step | p99 |
+| --- | --- | --- |
+| adjacent recorded frames | 1.6 / 255 | 24 |
+| every 2nd frame (what ships) | 2.7 | 42 |
+| 36 poses chosen by appearance | 10.0 | 132 |
+
+Nothing crossfades — two frames are never mixed, so there is no ghosting. The
+smoothness comes from the steps being small, not from blending.
+
+### Why not the video element
+
+Driving `video.currentTime` from an animation frame does not work: seeks are
+asynchronous and coalesce, so the element presents a small fraction of the
+frames asked for. A sheet is one decode and then a transform per frame, which is
+exact and costs nothing per step.
 
 ### How the asset is built
 
-`scripts/build-character.py` turns the video into two files:
+`scripts/build-character.py` turns the video into three files:
 
 ```
-public/character/sprite.webp              # the poses, one grid
-src/components/Character/manifest.json    # geometry + the cursor lookup
+public/character/frames.webp              # the clip, in order, one sheet
+public/character/still.webp               # one frame, for touch devices
+src/components/Character/manifest.json    # sheet geometry + per-frame gaze
 ```
 
 ```bash
-python3 scripts/build-character.py --poses 36 --width 480 --quality 76
+python3 scripts/build-character.py                    # 120 frames, 400px
+python3 scripts/build-character.py --frames 240 --width 400   # smoother, ~4 MB
 ```
 
-It needs `ffmpeg` on `PATH` and `pillow`, `numpy`, `scipy`. The video itself is
-never shipped and never played in the browser — it is the reference original and
-stays in the repository untouched.
+It needs `ffmpeg` on `PATH` and `pillow`, `numpy`, `scipy`. The video is never
+shipped to the browser and never played — it is the reference original.
 
-What the script does, in order:
+What the script does:
 
 1. **Extract** all 240 frames (1280×720, 24 fps, 10 s).
-2. **Measure gaze** per frame from the pupils, so poses are chosen by where the
-   character is looking rather than by timestamp — the video does not spend one
-   second per direction.
-3. **Pick poses** by farthest-point sampling in gaze space, so the 36 kept
-   frames spread over the whole range instead of clustering.
+2. **Keep N of them evenly spaced, in filming order.** Not a selection by
+   appearance — that is the point.
+3. **Measure gaze** per frame from the pupils, so the runtime knows where each
+   frame is looking.
 4. **Matte** each one. The backdrop is a warm grey gradient, not white, and the
-   sweater is brighter than the backdrop in places and darker in others, so no
-   brightness threshold works. Instead a degree-3 polynomial is fitted per
-   channel to the frame borders, giving a *predicted backdrop* for every pixel;
-   the silhouette is where the frame departs from that prediction, grown with a
-   hysteresis threshold. Nothing keys on "is this pixel white", so the eyes,
-   the sweater and the highlights survive.
+   sweater is brighter than it in places and darker in others, so no brightness
+   threshold works. A degree-3 polynomial is fitted per channel to the frame
+   borders to predict the backdrop, and the silhouette is where the frame
+   departs from that prediction. Nothing keys on "is this pixel white", so the
+   eyes, the sweater and the highlights survive.
 5. **Unmix** the soft edge — `(pixel − (1−α)·backdrop) / α` — so no pale fringe
-   survives to glow against a dark page.
-6. **Compose** the sheet, each pose in a cell with an 8 px transparent gutter so
-   lossy compression and sub-pixel sampling cannot bleed one pose into the next.
-7. **Bake the lookup**: for each cell of a 33×33 cursor grid, the pose whose
-   gaze matches. The runtime does one array read, no search.
+   glows against a dark page.
+6. **Compose** the sheet, each frame in a cell with an 8 px transparent gutter
+   so compression and sub-pixel sampling cannot bleed one frame into the next.
+
+### Size, and why touch devices do not pay it
+
+120 frames at 400 px is a 4576×4620 sheet — 2.0 MB, 21 megapixels, about 80 MB
+decoded. Desktop handles that comfortably; a phone would not, and iOS silently
+downsamples very large images, which would break the sheet's alignment.
+
+It never has to. Tracking needs a cursor, so on a coarse pointer the sheet is
+never fetched and `still.webp` (21 KB) is shown instead.
+
+Raising `--frames` improves smoothness and costs roughly linearly: 240 frames at
+400 px is about 4 MB and 41 MP, which is past what is comfortable to hold
+decoded. 120 is the balance point.
 
 ### Cursor tracking
 
 The pointer writes a target; a `requestAnimationFrame` loop eases the current
-gaze towards it and picks a pose. Nothing runs inside the `mousemove` handler
-and no React state is involved, so moving the mouse costs one assignment.
+gaze towards it, picks the frame to aim for, and steps towards it. Nothing runs
+inside the `mousemove` handler and no React state is involved.
 
-Smoothing is exponential and frame-rate independent (`1 − e^(−k·Δt)`), so it
-feels the same at 60 Hz and 144 Hz. Both axes track, measured from the centre of
-the character, with a radial dead zone so a parked cursor cannot make the pose
-twitch.
+Gaze smoothing is exponential and frame-rate independent (`1 − e^(−k·Δt)`), so
+it feels the same at 60 Hz and 144 Hz. Both axes track, measured from the centre
+of the character, with a radial dead zone so a parked cursor cannot make the
+character drift.
+
+`MAX_TRAVEL` caps how fast the clip may run. That cap is what guarantees the
+walk passes through the frames in between rather than skipping over them.
 
 The character never moves: no translate, no scale, no rotation, no parallax.
 Only which frame is shown changes.
-
-On a coarse pointer (`(pointer: fine)` not matching) tracking is off entirely
-and the character rests at centre — there is no cursor to follow, and touch,
-accelerometer and gyroscope are deliberately not used.
 
 ### Tuning
 
@@ -126,24 +162,27 @@ place:
 | `LAYOUT.offsetX`, `offsetY` | position |
 | `SENSITIVITY.x`, `.y` | how far the cursor travels for a full look |
 | `DEAD_ZONE` | the still area around centre |
-| `SMOOTHING` | follow speed |
-| `MAX_GAZE` | how far the gaze is allowed to go |
+| `SMOOTHING` | how fast the aimed-at gaze follows the pointer |
+| `FOLLOW`, `MAX_TRAVEL` | how fast the character walks there |
+| `LOCALITY` | preference for a nearby frame over a distant equal match |
 
-Asset quality and pose count are arguments to the build script; `GAZE_WEIGHT_X`
-in it decides how much horizontal accuracy is worth relative to vertical.
+Frame count, size and quality are arguments to the build script.
 
 ### What the source video can and cannot do
 
 The subject never looks up-and-right, so that corner of the cursor plane has no
-matching pose and is approximated by the nearest one. The lookup weights
-horizontal error 2.5× vertical, because looking the wrong way left/right reads
-as an error while a shallow nod does not. Vertical range on the right side is
-weak for the same reason.
+matching frame and the nearest sensible one is used. The gaze match weights
+horizontal error 2.5× vertical (`GAZE_WEIGHT_X`), because looking the wrong way
+left/right reads as an error while a shallow nod does not.
 
-There are no blinks in the video, so there are none in the sprite.
+There are no blinks in the clip, so there are none on the page.
+
+One pair of kept frames spans a fast head movement and steps further than the
+rest (0.61 of gaze against a 0.14 average). It is real recorded motion, and even
+that step changes fewer pixels than the *average* step of the old pose-based
+build.
 
 ---
-
 
 ## Translations
 

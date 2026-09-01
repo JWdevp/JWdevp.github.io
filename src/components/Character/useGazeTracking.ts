@@ -22,7 +22,7 @@ export interface Gaze {
  */
 export function useGazeTracking(
   anchor: RefObject<HTMLElement | null>,
-  onFrame: (gaze: Gaze) => void,
+  onFrame: (gaze: Gaze, delta: number) => void,
 ) {
   const target = useRef<Gaze>({ x: 0, y: 0 })
   const current = useRef<Gaze>({ x: 0, y: 0 })
@@ -82,7 +82,7 @@ export function useGazeTracking(
       const k = 1 - Math.exp(-SMOOTHING * delta)
       current.current.x += (target.current.x - current.current.x) * k
       current.current.y += (target.current.y - current.current.y) * k
-      onFrame(current.current)
+      onFrame(current.current, delta)
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)

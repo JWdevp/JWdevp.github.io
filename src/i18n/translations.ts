@@ -99,7 +99,6 @@ const es = {
       tools: 'Herramientas',
       design: 'Diseño',
     },
-    photoshopNote: '15 años de experiencia',
     languagesTitle: 'Idiomas',
     languages: [
       { name: 'Español', level: 'Nativo' },
@@ -242,7 +241,6 @@ const en: Translation = {
       tools: 'Tools',
       design: 'Design',
     },
-    photoshopNote: '15 years of experience',
     languagesTitle: 'Languages',
     languages: [
       { name: 'Spanish', level: 'Native' },
@@ -377,7 +375,6 @@ const de: Translation = {
       tools: 'Werkzeuge',
       design: 'Design',
     },
-    photoshopNote: '15 Jahre Erfahrung',
     languagesTitle: 'Sprachen',
     languages: [
       { name: 'Spanisch', level: 'Muttersprache' },
