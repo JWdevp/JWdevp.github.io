@@ -66,35 +66,33 @@ export function About() {
         </div>
 
         {/* Full width, under both columns: the facts read as one row of labelled
-            values rather than a narrow stack beside the portrait. */}
-        <div className="about__facts card" data-reveal>
+            values rather than a narrow stack beside the portrait. The heading
+            sits outside the panel, so the panel holds only the values and can
+            centre them. */}
+        <section className="about__facts-block" data-reveal>
           <h3 className="about__facts-title">{t.about.factsTitle}</h3>
-          <dl className="about__facts-list">
-            {t.about.facts.map((fact) => (
-              <div className="about__fact" key={fact.label}>
-                <dt>{fact.label}</dt>
-                <dd>{fact.value}</dd>
+          <div className="about__facts card">
+            <dl className="about__facts-list">
+              {t.about.facts.map((fact) => (
+                <div className="about__fact" key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+              <div className="about__fact">
+                <dt>{t.about.languagesTitle}</dt>
+                <dd>
+                  {t.about.languages.map((language) => (
+                    <span className="about__language" key={language.name}>
+                      {language.name}
+                      <span className="about__language-level">{language.level}</span>
+                    </span>
+                  ))}
+                </dd>
               </div>
-            ))}
-          </dl>
-        </div>
-
-        <div className="about__pillars">
-          <h3 className="about__pillars-title" data-reveal>
-            {t.about.pillarsTitle}
-          </h3>
-          <ul className="about__pillar-list">
-            {t.about.pillars.map((pillar, index) => (
-              <li className="about__pillar" key={pillar.title} data-reveal>
-                <span className="about__pillar-index" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <h4 className="about__pillar-heading">{pillar.title}</h4>
-                <p className="about__pillar-text">{pillar.text}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+            </dl>
+          </div>
+        </section>
 
         <p className="about__closing" data-reveal>
           {t.about.closing}

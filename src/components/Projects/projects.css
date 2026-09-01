@@ -145,11 +145,17 @@
   transform: scale(0.96);
 }
 
+/* Shortened, and the drift dropped, but the cross-fade stays: it is what tells
+   you the screenshot replaced the mark. */
 @media (prefers-reduced-motion: reduce) {
   .project__preview,
   .project__client,
   .project__logo {
-    transition-duration: 1ms;
+    transition-duration: 320ms;
+  }
+
+  .project__preview {
+    transform: none;
   }
 }
 
@@ -296,6 +302,16 @@
 .dialog__title {
   font-size: var(--text-2xl);
   letter-spacing: var(--tracking-tight);
+  /* "Bürgermeisterverzeichnis" is one word wider than a phone column, and an
+     unbreakable word overflows the panel rather than wrapping. */
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 30rem) {
+  .dialog__title {
+    font-size: var(--text-xl);
+  }
 }
 
 .dialog__lead {
@@ -385,6 +401,17 @@
   color: var(--muted);
 }
 
+/* A place, not a dash: the client line names where the work was done.
+   Both classes, because `.eyebrow::before` has the same specificity and would
+   otherwise win on source order and leave the rule beside the pin. */
+.eyebrow.dialog__client::before {
+  content: none;
+}
+
+.dialog__client svg {
+  opacity: 0.7;
+}
+
 /* The screenshots are wide strips; one per row reads them far better than a
    two-up grid that would shrink them to illegibility. */
 .dialog__shots {
@@ -406,6 +433,21 @@
   display: block;
   width: 100%;
   height: auto;
+  cursor: zoom-in;
+  transition: transform 520ms var(--ease-out);
+}
+
+/* Click to enlarge, around the point clicked. These are dense interface
+   captures shown well under their own size. */
+.dialog__shots figure[data-zoomed] img {
+  transform: scale(2);
+  cursor: zoom-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog__shots img {
+    transition-duration: 220ms;
+  }
 }
 
 .dialog__link {

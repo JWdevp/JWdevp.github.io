@@ -3,11 +3,16 @@
  * Character tuning — everything adjustable lives here
  * ===========================================================================
  *
- * The character is the clip in `public/images/final.mp4`, kept as a sheet of
- * frames in the order they were filmed (`scripts/build-character.py`). The
- * cursor does not pick a picture: it picks a position in the clip, and the
- * runtime walks there one frame at a time, so what plays is the movement that
- * was actually recorded.
+ * The character is one unbroken stretch of `public/images/final.mp4`, kept as a
+ * sheet of frames in filming order (`scripts/build-character.py`). The cursor
+ * does not pick a picture: it picks a position in that stretch, and the runtime
+ * walks there one frame at a time, so what plays is recorded movement.
+ *
+ * The stretch being unbroken is what keeps the character pointing where the
+ * cursor is. Sampled across the whole clip, the same direction recurs several
+ * times and the aim jumps between those recurrences, so the head sets off the
+ * wrong way and comes back — it looked like it was ignoring you. Within one
+ * pass there is nowhere else to go.
  */
 
 /** How far the pointer has to travel for the gaze to reach its extreme, as a
@@ -43,24 +48,14 @@ export const MAX_GAZE = 1
 export const FOLLOW = 6
 
 /**
- * Ceiling on how fast the clip is allowed to run, in sheet frames per second.
- * This is the single most important number for how the movement reads.
+ * Ceiling on how fast the clip is allowed to run, in frames per second.
  *
- * The sheet holds 120 frames of a 10-second clip, so 12 is the speed it was
- * filmed at. Above roughly 60 the walk starts skipping frames on a 60 Hz
- * screen and the point of all this is lost; well below 12 it feels underwater.
- * 48 is a brisk four times life speed — quick to answer, still every frame.
+ * The sheet holds one unbroken stretch of the recording at its own frame rate,
+ * so 24 is life speed. Above about 60 the walk starts skipping frames on a
+ * 60 Hz screen and the point of all this is lost; well below 24 it feels
+ * underwater. 48 is twice life speed — quick to answer, still every frame.
  */
 export const MAX_TRAVEL = 48
-
-/**
- * Mild preference for a frame near where we already are, when two parts of the
- * clip look the same direction. Without it the aim flips between distant
- * matches and the head sets off, turns round and comes back; a little of it
- * removes almost all of that hesitation and costs very little accuracy. Raising
- * it much further traps the character short of the direction being asked for.
- */
-export const LOCALITY = 0.6
 
 /** Size and placement inside the hero, straight into CSS. Nothing here moves at
  *  runtime — the character is physically fixed and only the frame changes. */

@@ -53,11 +53,19 @@ D_WEAK = 11.0          # hysteresis floor; the border residual peaks near 8.5
 D_EDGE = 6.0
 
 # --- output ---------------------------------------------------------------
-# Frames kept, evenly spaced through the 240 the clip has. More frames means
-# smaller visual steps but a bigger sheet, and the sheet has to stay inside what
-# a browser will hold decoded: 120 x 400px is ~20 megapixels (~80 MB decoded),
-# which desktop handles comfortably. Touch devices never load it at all.
-FRAMES = 120
+# One CONTIGUOUS stretch of the clip is kept, at full frame rate.
+#
+# Contiguous is the whole point. The cursor picks the frame that looks nearest
+# to it, and two frames that look in similar directions have to be similar
+# pictures or the change between them reads as a cut. Within one unbroken pass
+# of the recording they are: neighbouring cursor positions land on frames a few
+# hundredths of a second apart. Sampled across the whole clip they are not —
+# the same direction recurs several times with the body in a different place,
+# and crossing between those recurrences is what pops.
+#
+# The window is chosen below by how well it covers the nine directions, not by
+# hand. SEGMENT is its length in source frames; the search picks where it goes.
+SEGMENT = 72
 SPRITE_WIDTH = 400     # px per frame in the sheet
 QUALITY = 72
 GUTTER = 8
@@ -203,18 +211,42 @@ def gaze(path):
     return (lx + rx) / 2 + x0, (ly + ry) / 2 + y0
 
 
-def pick_frames(total, n):
-    """Evenly spaced frames, in the order they were filmed.
+# The nine directions the window has to be able to answer, in normalised gaze.
+DIRECTIONS = [(-1, 1), (0, 1), (1, 1), (-1, 0), (0, 0), (1, 0), (-1, -1), (0, -1), (1, -1)]
 
-    Deliberately not a selection by appearance: neighbours in this list are
-    neighbours in the recording, so stepping from one to the next replays real
-    movement. That is what stops the character reading as a set of stills."""
-    return [round(i * (total - 1) / (n - 1)) for i in range(n)]
+
+def pick_frames(norm, length):
+    """The contiguous run of `length` frames that answers the nine directions
+    best, as a list of source frame indices.
+
+    Contiguous, so every frame in it belongs to one unbroken pass of the
+    recording and any two are a plausible pair to cut between. Chosen by
+    coverage rather than by hand, so re-running this on a different take still
+    picks a sensible window.
+
+    The clip revisits every direction several times, so a window this short
+    loses almost nothing: the corner the subject never looks at is missing from
+    the whole recording, not from the window."""
+    total = len(norm)
+    length = min(length, total)
+    best, where = None, 0
+    for start in range(total - length + 1):
+        win = norm[start:start + length]
+        errs = [
+            np.sqrt(np.min(GAZE_WEIGHT_X * (win[:, 0] - dx) ** 2 + (win[:, 1] - dy) ** 2))
+            for dx, dy in DIRECTIONS
+        ]
+        # Mean keeps the window broadly useful, max stops it abandoning one
+        # direction entirely to be slightly better at the rest.
+        cost = float(np.mean(errs)) + float(np.max(errs))
+        if best is None or cost < best:
+            best, where = cost, start
+    return list(range(where, where + length))
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--frames', type=int, default=FRAMES)
+    ap.add_argument('--segment', type=int, default=SEGMENT)
     ap.add_argument('--width', type=int, default=SPRITE_WIDTH)
     ap.add_argument('--quality', type=int, default=QUALITY)
     args = ap.parse_args()
@@ -230,8 +262,22 @@ def main():
         print('reading gaze…')
         g = np.array([gaze(f) for f in frames])
 
-        idx = pick_frames(len(frames), args.frames)
-        print(f'keeping {len(idx)} of {len(frames)} frames, in order')
+        # Normalise to -1..1 across the WHOLE clip, before choosing the window,
+        # so the window is judged against the full range the subject ever
+        # reaches rather than against its own.
+        lo, hi = g.min(0), g.max(0)
+        mid, half = (lo + hi) / 2, (hi - lo) / 2
+        norm_all = (g - mid) / half
+        norm_all[:, 1] *= -1      # image y grows downward; up should be +1
+
+        idx = pick_frames(norm_all, args.segment)
+        print(f'window: source frames {idx[0]}..{idx[-1]} of {len(frames)}')
+        for (dx, dy), name in zip(DIRECTIONS, (
+                'TOP-LEFT', 'TOP-CENTER', 'TOP-RIGHT', 'CENTER-LEFT', 'CENTER',
+                'CENTER-RIGHT', 'BOTTOM-LEFT', 'BOTTOM-CENTER', 'BOTTOM-RIGHT')):
+            win = norm_all[idx]
+            k = int(np.argmin(GAZE_WEIGHT_X * (win[:, 0] - dx) ** 2 + (win[:, 1] - dy) ** 2))
+            print(f'  {name:<14} {win[k][0]:+.2f} {win[k][1]:+.2f}')
 
         print('matting…')
         mattes = {i: matte(frames[i]) for i in sorted(set(idx))}
@@ -266,12 +312,7 @@ def main():
         sprite = OUT_DIR / 'frames.webp'
         sheet.save(sprite, 'WEBP', quality=args.quality, method=6)
 
-        # Normalise gaze to -1..1 so the runtime never sees pixel coordinates.
-        sel = g[idx]
-        lo, hi = g.min(0), g.max(0)
-        mid, half = (lo + hi) / 2, (hi - lo) / 2
-        norm = (sel - mid) / half
-        norm[:, 1] *= -1          # image y grows downward; up should be +1
+        norm = norm_all[idx]
 
         # The frame closest to looking straight ahead. Where the character rests,
         # and the only frame a touch device ever needs.

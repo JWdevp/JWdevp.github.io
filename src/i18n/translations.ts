@@ -53,28 +53,10 @@ const es = {
     title: 'Técnica con estilo.',
     lead: 'Anwendungsentwickler certificado por la IHK desde julio de 2026, con tres años previos de formación en Ingeniería de Diseño Industrial y Desarrollo del Producto.',
     paragraphs: [
-      'Vivo y trabajo en Nürnberg (Bayern). Mi formación como Anwendungsentwickler me dio la base técnica: estructura, lógica, arquitectura y un método claro para construir software que se mantiene en el tiempo.',
-      'Antes de eso pasé tres años estudiando Ingeniería de Diseño Industrial y Desarrollo del Producto. De ahí viene la otra mitad: la manera de mirar un problema, de iterar una idea y de cuidar el detalle hasta que el resultado se siente bien usado.',
+      'Soy español y vivo en Alemania desde 2012. Vivo y trabajo en Nürnberg (Bayern), y mi formación como Anwendungsentwickler me dio la base técnica: estructura, lógica, arquitectura y un método claro para construir software que se mantiene en el tiempo.',
+      'Antes de eso estudié tres años Ingeniería de Diseño Industrial y Desarrollo del Producto en la Universidad de Málaga (UMA), sin llegar a obtener la titulación. De ahí viene la otra mitad: la manera de mirar un problema, de iterar una idea y de cuidar el detalle hasta que el resultado se siente bien usado.',
+      'Después vinieron seis años en la gastronomía y otros seis como kaufmännischer Angestellter. Con esa experiencia detrás decidí reorientarme siguiendo una de mis pasiones: la programación.',
       'Esa combinación es lo que ofrezco. Entiendo cómo se construye el software y también cómo se piensa y se diseña un producto — dos conversaciones que normalmente ocurren en mesas distintas.',
-    ],
-    pillarsTitle: 'Lo que aporta el background creativo',
-    pillars: [
-      {
-        title: 'Creatividad aplicada',
-        text: 'Buscar la solución que nadie había puesto sobre la mesa, y saber defenderla.',
-      },
-      {
-        title: 'Pensamiento de diseño',
-        text: 'Empezar por la persona que va a usarlo y trabajar hacia atrás hasta el código.',
-      },
-      {
-        title: 'Resolución de problemas',
-        text: 'Descomponer lo complejo en piezas manejables y ordenarlas por impacto.',
-      },
-      {
-        title: 'Visión de producto',
-        text: 'Entender por qué existe lo que estoy construyendo, no solo cómo funciona.',
-      },
     ],
     closing:
       'Desarrollo aplicaciones con una mirada de diseñador: pienso el producto entero, no solo el código que lo sostiene.',
@@ -88,6 +70,12 @@ const es = {
         value: 'Fachinformatiker für Anwendungsentwicklung (IHK)',
       },
     ],
+    languagesTitle: 'Idiomas',
+    languages: [
+      { name: 'Español', level: 'Nativo' },
+      { name: 'Inglés', level: 'Nativo' },
+      { name: 'Alemán', level: 'C1 · Verhandlungssicher' },
+    ],
   },
   skills: {
     eyebrow: 'Stack',
@@ -99,12 +87,6 @@ const es = {
       tools: 'Herramientas',
       design: 'Diseño',
     },
-    languagesTitle: 'Idiomas',
-    languages: [
-      { name: 'Español', level: 'Nativo' },
-      { name: 'Inglés', level: 'Nativo' },
-      { name: 'Alemán', level: 'C1 · Verhandlungssicher' },
-    ],
   },
   projects: {
     eyebrow: 'Trabajo',
@@ -195,28 +177,10 @@ const en: Translation = {
     title: 'Engineering with style.',
     lead: 'IHK-certified Anwendungsentwickler since July 2026, with three prior years of study in Industrial Design Engineering and Product Development.',
     paragraphs: [
-      'I live and work in Nürnberg, Bavaria. Training as an Anwendungsentwickler gave me the technical foundation: structure, logic, architecture and a clear method for building software that keeps working over time.',
-      'Before that I spent three years studying Industrial Design Engineering and Product Development. That is where the other half comes from — how to look at a problem, iterate an idea and stay with the details until the result actually feels good to use.',
+      'I am Spanish and have lived in Germany since 2012. I live and work in Nürnberg, Bavaria, and training as an Anwendungsentwickler gave me the technical foundation: structure, logic, architecture and a clear method for building software that keeps working over time.',
+      'Before that I spent three years studying Industrial Design Engineering and Product Development at the Universidad de Málaga (UMA), without completing the degree. That is where the other half comes from — how to look at a problem, iterate an idea and stay with the details until the result actually feels good to use.',
+      'Then came six years in hospitality and another six as a kaufmännischer Angestellter. With that behind me I decided to change direction and follow one of my passions: programming.',
       'That combination is what I bring. I understand how software is built and also how a product is thought through and designed — two conversations that usually happen at separate tables.',
-    ],
-    pillarsTitle: 'What the creative background adds',
-    pillars: [
-      {
-        title: 'Applied creativity',
-        text: 'Finding the option nobody had put on the table, and being able to argue for it.',
-      },
-      {
-        title: 'Design thinking',
-        text: 'Starting from the person who will use it and working backwards to the code.',
-      },
-      {
-        title: 'Problem solving',
-        text: 'Breaking complexity into workable pieces and ordering them by impact.',
-      },
-      {
-        title: 'Product vision',
-        text: 'Understanding why the thing I am building exists, not only how it works.',
-      },
     ],
     closing:
       'I build applications with a designer’s eye: I think about the whole product, not only the code holding it up.',
@@ -230,6 +194,12 @@ const en: Translation = {
         value: 'Fachinformatiker für Anwendungsentwicklung (IHK)',
       },
     ],
+    languagesTitle: 'Languages',
+    languages: [
+      { name: 'Spanish', level: 'Native' },
+      { name: 'English', level: 'Native' },
+      { name: 'German', level: 'C1 · Verhandlungssicher' },
+    ],
   },
   skills: {
     eyebrow: 'Stack',
@@ -241,12 +211,6 @@ const en: Translation = {
       tools: 'Tools',
       design: 'Design',
     },
-    languagesTitle: 'Languages',
-    languages: [
-      { name: 'Spanish', level: 'Native' },
-      { name: 'English', level: 'Native' },
-      { name: 'German', level: 'C1 · Verhandlungssicher' },
-    ],
   },
   projects: {
     eyebrow: 'Work',
@@ -329,28 +293,10 @@ const de: Translation = {
     title: 'Technik mit Style.',
     lead: 'Anwendungsentwickler, IHK-zertifiziert seit Juli 2026, davor drei Jahre Studium im Bereich Industriedesign-Ingenieurwesen und Produktentwicklung.',
     paragraphs: [
-      'Ich lebe und arbeite in Nürnberg, Bayern. Die Ausbildung zum Anwendungsentwickler hat mir das technische Fundament gegeben: Struktur, Logik, Architektur und eine klare Methode, um Software zu bauen, die auch später noch trägt.',
-      'Davor habe ich drei Jahre Industriedesign-Ingenieurwesen und Produktentwicklung studiert. Daher kommt die andere Hälfte: wie man ein Problem betrachtet, eine Idee iteriert und am Detail bleibt, bis sich das Ergebnis im Gebrauch richtig anfühlt.',
+      'Ich bin Spanier und lebe seit 2012 in Deutschland. Ich lebe und arbeite in Nürnberg, Bayern, und die Ausbildung zum Anwendungsentwickler hat mir das technische Fundament gegeben: Struktur, Logik, Architektur und eine klare Methode, um Software zu bauen, die auch später noch trägt.',
+      'Davor habe ich drei Jahre Industriedesign-Ingenieurwesen und Produktentwicklung an der Universidad de Málaga (UMA) studiert, ohne den Abschluss zu erwerben. Daher kommt die andere Hälfte: wie man ein Problem betrachtet, eine Idee iteriert und am Detail bleibt, bis sich das Ergebnis im Gebrauch richtig anfühlt.',
+      'Danach kamen sechs Jahre in der Gastronomie und weitere sechs als kaufmännischer Angestellter. Mit dieser Erfahrung im Rücken habe ich mich neu orientiert und bin einer meiner Leidenschaften gefolgt: dem Programmieren.',
       'Genau diese Kombination bringe ich mit. Ich verstehe, wie Software gebaut wird — und ebenso, wie ein Produkt gedacht und gestaltet wird. Zwei Gespräche, die sonst an getrennten Tischen stattfinden.',
-    ],
-    pillarsTitle: 'Was der gestalterische Hintergrund beiträgt',
-    pillars: [
-      {
-        title: 'Angewandte Kreativität',
-        text: 'Die Lösung finden, die noch niemand vorgeschlagen hat — und sie begründen können.',
-      },
-      {
-        title: 'Design Thinking',
-        text: 'Bei der Person anfangen, die es benutzt, und von dort zurück zum Code arbeiten.',
-      },
-      {
-        title: 'Problemlösung',
-        text: 'Komplexes in handhabbare Teile zerlegen und nach Wirkung sortieren.',
-      },
-      {
-        title: 'Produktdenken',
-        text: 'Verstehen, warum das Ding existiert, das ich baue — nicht nur, wie es funktioniert.',
-      },
     ],
     closing:
       'Ich entwickle Anwendungen mit dem Blick eines Gestalters: Ich denke das ganze Produkt, nicht nur den Code darunter.',
@@ -364,6 +310,12 @@ const de: Translation = {
         value: 'Fachinformatiker für Anwendungsentwicklung (IHK)',
       },
     ],
+    languagesTitle: 'Sprachen',
+    languages: [
+      { name: 'Spanisch', level: 'Muttersprache' },
+      { name: 'Englisch', level: 'Muttersprache' },
+      { name: 'Deutsch', level: 'C1 · Verhandlungssicher' },
+    ],
   },
   skills: {
     eyebrow: 'Stack',
@@ -375,12 +327,6 @@ const de: Translation = {
       tools: 'Werkzeuge',
       design: 'Design',
     },
-    languagesTitle: 'Sprachen',
-    languages: [
-      { name: 'Spanisch', level: 'Muttersprache' },
-      { name: 'Englisch', level: 'Muttersprache' },
-      { name: 'Deutsch', level: 'C1 · Verhandlungssicher' },
-    ],
   },
   projects: {
     eyebrow: 'Work',

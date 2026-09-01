@@ -30,10 +30,6 @@
   line-height: var(--leading-relaxed);
 }
 
-.about__prose p:first-child {
-  color: var(--muted-strong);
-}
-
 /* --- Facts panel --------------------------------------------------------- */
 
 /* The portrait now has the column to itself and runs the full height of the
@@ -63,11 +59,11 @@
   object-position: center 18%;
 }
 
-.about__facts {
+.about__facts-block {
   margin-block-start: clamp(2rem, 5vw, 4rem);
-  padding: var(--space-5);
 }
 
+/* Outside the panel now, so the panel holds nothing but the values. */
 .about__facts-title {
   font-family: var(--font-mono);
   font-size: var(--text-micro);
@@ -75,15 +71,28 @@
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--faint);
-  margin-block-end: var(--space-4);
+  margin-block-end: var(--space-3);
 }
 
-/* One row of values across the whole width. auto-fit rather than a fixed three
-   columns so a longer translation can drop to two rows instead of squeezing. */
+.about__facts {
+  display: grid;
+  place-items: center;
+  padding: var(--space-6) var(--space-5);
+}
+
+/* One row of values across the whole width, centred in the panel on both axes.
+   auto-fit rather than fixed columns so a longer translation wraps instead of
+   squeezing. */
 .about__facts-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(11rem, max-content));
+  justify-content: center;
+  /* Stretch, not centre: it lines the labels up with each other and gives the
+     rules between the values one consistent height. The row as a whole is
+     still centred in the panel — that is `place-items` on .about__facts. */
+  align-items: stretch;
   gap: var(--space-4) clamp(1.5rem, 4vw, 3.5rem);
+  width: 100%;
   margin: 0;
 }
 
@@ -95,11 +104,27 @@
   gap: 2px;
   padding-inline-start: clamp(1rem, 2.5vw, 2rem);
   border-inline-start: 1px solid var(--border);
+  text-align: center;
 }
 
 .about__fact:first-child {
   padding-inline-start: 0;
   border-inline-start: none;
+}
+
+/* Three languages in one cell: name over level, so the cell stays the same
+   shape as the others beside it. */
+.about__language {
+  display: block;
+}
+
+.about__language-level {
+  color: var(--faint);
+  font-size: var(--text-xs);
+}
+
+.about__language-level::before {
+  content: ' · ';
 }
 
 .about__fact dt {
@@ -114,66 +139,7 @@
   color: var(--foreground);
 }
 
-/* --- Pillars ------------------------------------------------------------- */
-
-.about__pillars {
-  margin-block-start: clamp(3rem, 8vh, 5.5rem);
-}
-
-.about__pillars-title {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  font-weight: 500;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--faint);
-  margin-block-end: var(--space-5);
-}
-
-.about__pillar-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 1px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.about__pillar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-5);
-  background: var(--background);
-  transition: background-color var(--dur-base) var(--ease-out);
-}
-
-.about__pillar:hover {
-  background: var(--background-elevated);
-}
-
-.about__pillar-index {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  letter-spacing: var(--tracking-wide);
-  color: var(--accent);
-}
-
-.about__pillar-heading {
-  font-size: var(--text-base);
-  font-weight: 540;
-  letter-spacing: var(--tracking-snug);
-}
-
-.about__pillar-text {
-  font-size: var(--text-sm);
-  line-height: var(--leading-relaxed);
-  color: var(--muted);
-}
+/* --- Responsive ---------------------------------------------------------- */
 
 @media (max-width: 900px) {
   .about__grid {
@@ -184,10 +150,14 @@
     height: auto;
   }
 
+  /* Centred once the grid is a single column — left-aligned it read as an
+     orphan against the full-width text above it. */
   .about__portrait {
     flex: 0 0 auto;
+    width: 100%;
     max-width: 22rem;
     aspect-ratio: 4 / 5;
+    margin-inline: auto;
   }
 }
 
@@ -196,6 +166,7 @@
 @media (max-width: 40rem) {
   .about__facts-list {
     grid-template-columns: 1fr;
+    justify-content: stretch;
     gap: var(--space-3);
   }
 

@@ -37,19 +37,6 @@ export function Skills() {
             </section>
           ))}
         </div>
-
-        <section className="skills__languages" data-reveal>
-          <h3 className="skills__group-title">{t.skills.languagesTitle}</h3>
-          <ul className="skills__language-list">
-            {t.skills.languages.map((entry) => (
-              <li className="skills__language" key={entry.name}>
-                <span className="skills__language-name">{entry.name}</span>
-                <span className="skills__language-rule" aria-hidden="true" />
-                <span className="skills__language-level">{entry.level}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
       </div>
     </div>
   )

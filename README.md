@@ -40,6 +40,7 @@ src/
 
 public/
 ├── character/         frames.webp · still.webp — built, do not edit by hand
+│                      wave.mp4 — optional, played once on touch devices
 └── images/            final.mp4 (character source) · portrait · project shots
 
 scripts/
@@ -60,20 +61,33 @@ frames in order — and the cursor decides where in the clip to be.
 
 ### The idea
 
-The cursor does not pick a picture. It picks a **position in the clip**, and the
-runtime walks there **one frame at a time**. Every step is therefore two frames
-that were filmed next to each other, so what plays is movement that was actually
+The sheet holds **one unbroken stretch of the recording**, at its own frame
+rate. The cursor picks a **position in that stretch**, and the runtime walks
+there **one frame at a time**. Every step is therefore two frames that were
+filmed next to each other, so what plays is movement that was actually
 recorded: the head turning, not a cut between two stills.
 
-That is the whole difference from the first attempt, which kept 36 poses chosen
-for how different they looked and jumped to the best match. Measured on the
-frames themselves:
+Both halves matter, and each fixes a different failure:
+
+**One frame at a time** is what stops it looking like a slideshow. An earlier
+version kept 36 frames chosen for how *different* they looked and jumped
+straight to the best match:
 
 | | mean pixel difference per step | p99 |
 | --- | --- | --- |
 | adjacent recorded frames | 1.6 / 255 | 24 |
-| every 2nd frame (what ships) | 2.7 | 42 |
-| 36 poses chosen by appearance | 10.0 | 132 |
+| 36 frames chosen by appearance | 10.0 | 132 |
+
+**Unbroken** is what stops it looking like it is ignoring the cursor. Sampled
+across the whole clip, every direction recurs several times with the body in a
+different place, so the frame it aims for flips between those recurrences and
+the head sets off the wrong way before coming back. Measured on a cursor jump
+from the far left to the far right, as gaze travelled in x:
+
+| | backtracking | net travel |
+| --- | --- | --- |
+| frames sampled across the clip | 2.98 | 1.92 |
+| one unbroken stretch | 0.01 | 1.61 |
 
 Nothing crossfades — two frames are never mixed, so there is no ghosting. The
 smoothness comes from the steps being small, not from blending.
@@ -96,8 +110,8 @@ src/components/Character/manifest.json    # sheet geometry + per-frame gaze
 ```
 
 ```bash
-python3 scripts/build-character.py                    # 120 frames, 400px
-python3 scripts/build-character.py --frames 240 --width 400   # smoother, ~4 MB
+python3 scripts/build-character.py                  # 72 frames, 400px
+python3 scripts/build-character.py --segment 96     # a longer stretch
 ```
 
 It needs `ffmpeg` on `PATH` and `pillow`, `numpy`, `scipy`. The video is never
@@ -106,10 +120,13 @@ shipped to the browser and never played — it is the reference original.
 What the script does:
 
 1. **Extract** all 240 frames (1280×720, 24 fps, 10 s).
-2. **Keep N of them evenly spaced, in filming order.** Not a selection by
-   appearance — that is the point.
-3. **Measure gaze** per frame from the pupils, so the runtime knows where each
+2. **Measure gaze** per frame from the pupils, so the runtime knows where each
    frame is looking.
+3. **Choose the window**: the contiguous run of `--segment` frames that answers
+   the nine directions best. Contiguous, and chosen by coverage rather than by
+   hand. The clip revisits every direction several times, so a window this
+   short loses almost nothing — the run it picks (source frames 63–134) reaches
+   every direction as well as all 240 do.
 4. **Matte** each one. The backdrop is a warm grey gradient, not white, and the
    sweater is brighter than it in places and darker in others, so no brightness
    threshold works. A degree-3 polynomial is fitted per channel to the frame
@@ -121,18 +138,19 @@ What the script does:
 6. **Compose** the sheet, each frame in a cell with an 8 px transparent gutter
    so compression and sub-pixel sampling cannot bleed one frame into the next.
 
-### Size, and why touch devices do not pay it
+### Size, and what touch devices get instead
 
-120 frames at 400 px is a 4576×4620 sheet — 2.0 MB, 21 megapixels, about 80 MB
-decoded. Desktop handles that comfortably; a phone would not, and iOS silently
+72 frames at 400 px is a 3744×3368 sheet — 1.2 MB, 12.6 megapixels, about 50 MB
+decoded. Desktop handles that easily; a phone would struggle, and iOS silently
 downsamples very large images, which would break the sheet's alignment.
 
 It never has to. Tracking needs a cursor, so on a coarse pointer the sheet is
-never fetched and `still.webp` (21 KB) is shown instead.
+never fetched. Those devices get `still.webp` (21 KB), with
+`public/character/wave.mp4` played once over the top of it if that file exists.
 
-Raising `--frames` improves smoothness and costs roughly linearly: 240 frames at
-400 px is about 4 MB and 41 MP, which is past what is comfortable to hold
-decoded. 120 is the balance point.
+The wave is not built by the pipeline — drop the file in and it is used. It is
+layered over the still and stays invisible until it can actually play, so a
+missing or unplayable file costs nothing but the wave.
 
 ### Cursor tracking
 
@@ -164,9 +182,8 @@ place:
 | `DEAD_ZONE` | the still area around centre |
 | `SMOOTHING` | how fast the aimed-at gaze follows the pointer |
 | `FOLLOW`, `MAX_TRAVEL` | how fast the character walks there |
-| `LOCALITY` | preference for a nearby frame over a distant equal match |
 
-Frame count, size and quality are arguments to the build script.
+Window length, size and quality are arguments to the build script.
 
 ### What the source video can and cannot do
 
@@ -177,10 +194,9 @@ left/right reads as an error while a shallow nod does not.
 
 There are no blinks in the clip, so there are none on the page.
 
-One pair of kept frames spans a fast head movement and steps further than the
-rest (0.61 of gaze against a 0.14 average). It is real recorded motion, and even
-that step changes fewer pixels than the *average* step of the old pose-based
-build.
+The window reaches every direction the whole clip does, but two of them are
+weak in the source itself: straight up resolves to +0.60 of gaze rather than
++1.00, and up-and-right to +0.23. The subject never looks there.
 
 ---
 

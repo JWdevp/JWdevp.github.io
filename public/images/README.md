@@ -33,6 +33,7 @@ visitor. If that ever matters, move the file out of `public/` and point
 input, not a site asset.
 
 `scripts/build-character.py` reads it and writes `public/character/frames.webp`,
-`public/character/still.webp` and `src/components/Character/manifest.json`. Keep it here unmodified so the
+`public/character/still.webp` and `src/components/Character/manifest.json`.
+(`public/character/wave.mp4`, the touch-device wave, is not built from it.) Keep it here unmodified so the
 character can be rebuilt — at a different frame count, size or quality — without
 having to source the video again.
