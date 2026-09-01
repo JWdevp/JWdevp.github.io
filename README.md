@@ -41,6 +41,7 @@ src/
 public/
 ├── character/         frames.webp · still.webp — built, do not edit by hand
 │                      wave.mp4 — optional, played once on touch devices
+├── cv/                the CV offered for download in About
 └── images/            final.mp4 (character source) · portrait · project shots
 
 scripts/
@@ -342,6 +343,11 @@ BASE_PATH=/my-repo/ npm run build
 Nothing below is invented or filled in with placeholder facts — these are yours
 to supply:
 
+- [ ] `public/cv/jason-wiersum-lebenslauf.pdf` — the CV the About section
+      offers for download (see `public/cv/README.md`)
+- [ ] `public/character/wave.mp4` — the wave played once on touch devices
+- [ ] `public/images/projects/landesamt-logo.png` — the mark on the
+      Bürgermeisterverzeichnis card
 - [ ] Real projects in `src/data/projects.ts`
 - [ ] Project cover images in `public/images/`
 - [ ] A public email address, if you want one shown next to the form

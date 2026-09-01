@@ -29,8 +29,13 @@
       content="Anwendungsentwickler (IHK) aus Nürnberg mit Hintergrund im Industriedesign. Software · Design · Kreativität."
     />
 
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="apple-touch-icon" href="./favicon.svg" />
+    <!-- An ICO as well as the SVG: Chromium-based browsers (Brave among them)
+         fall back to favicon.ico in contexts that never take an SVG, which is
+         why the tab came up blank there. %BASE_URL% rather than "./" so the
+         path is absolute but still correct when BASE_PATH moves the site. -->
+    <link rel="icon" href="%BASE_URL%favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -1,8 +1,47 @@
-import { useRef, useState } from 'react'
+import { Download } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useReveal } from '../../hooks/useReveal'
 import './about.css'
+
+/**
+ * Download button for the CV, shown only once the file is actually served.
+ *
+ * A link is checked rather than assumed: the rest of the section already
+ * removes a missing portrait and a missing project shot rather than leaving
+ * something broken on the page, and a download that 404s is worse than no
+ * button at all.
+ */
+function CvButton({ label, hint }: { label: string; hint: string }) {
+  const [available, setAvailable] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(SITE.cv, { method: 'HEAD' })
+      .then((response) => {
+        // The status alone is not enough: a dev server (and any host with an
+        // SPA fallback) answers an unknown path with index.html and a 200, so
+        // a missing PDF would still look present. Ask what came back.
+        const type = response.headers.get('content-type') ?? ''
+        if (!cancelled && response.ok && type.includes('pdf')) setAvailable(true)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (!available) return null
+
+  return (
+    <a className="btn about__cv" href={SITE.cv} download>
+      <Download size={16} strokeWidth={1.9} aria-hidden="true" />
+      {label}
+      <span className="about__cv-hint">{hint}</span>
+    </a>
+  )
+}
 
 /**
  * Portrait. The filename lives in `SITE.portrait`.
@@ -57,6 +96,10 @@ export function About() {
                   {paragraph}
                 </p>
               ))}
+            </div>
+
+            <div data-reveal>
+              <CvButton label={t.about.cv} hint={t.about.cvHint} />
             </div>
           </div>
 

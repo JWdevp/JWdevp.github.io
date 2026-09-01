@@ -30,7 +30,7 @@ export function Contact() {
                   href={SITE.links.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="contact__link"
+                  className="contact__link contact__link--linkedin"
                 >
                   <Linkedin size={16} strokeWidth={1.9} aria-hidden="true" />
                   {t.contact.linkedin}
@@ -42,7 +42,7 @@ export function Contact() {
                   href={SITE.links.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="contact__link"
+                  className="contact__link contact__link--github"
                 >
                   <Github size={16} strokeWidth={1.9} aria-hidden="true" />
                   {t.contact.github}

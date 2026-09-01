@@ -53,14 +53,16 @@ const es = {
     title: 'Técnica con estilo.',
     lead: 'Anwendungsentwickler certificado por la IHK desde julio de 2026, con tres años previos de formación en Ingeniería de Diseño Industrial y Desarrollo del Producto.',
     paragraphs: [
-      'Soy español y vivo en Alemania desde 2012. Vivo y trabajo en Nürnberg (Bayern), y mi formación como Anwendungsentwickler me dio la base técnica: estructura, lógica, arquitectura y un método claro para construir software que se mantiene en el tiempo.',
+      'Soy malagueño y vivo en Nürnberg, Alemania, desde 2012, donde me he formado como programador de aplicaciones. Eso me ha dado una base técnica sobre estructura, lógica y arquitectura, y sobre todo una metodología clara para construir software que se mantiene en el tiempo.',
       'Antes de eso estudié tres años Ingeniería de Diseño Industrial y Desarrollo del Producto en la Universidad de Málaga (UMA), sin llegar a obtener la titulación. De ahí viene la otra mitad: la manera de mirar un problema, de iterar una idea y de cuidar el detalle hasta que el resultado se siente bien usado.',
-      'Después vinieron seis años en la gastronomía y otros seis como kaufmännischer Angestellter. Con esa experiencia detrás decidí reorientarme siguiendo una de mis pasiones: la programación.',
-      'Esa combinación es lo que ofrezco. Entiendo cómo se construye el software y también cómo se piensa y se diseña un producto — dos conversaciones que normalmente ocurren en mesas distintas.',
+      'Después vinieron seis años en la gastronomía y otros seis como kaufmännischer Angestellter. Tras esa gran experiencia, decidí reorientarme laboralmente siguiendo una de mis pasiones: la programación.',
+      'Esa combinación es lo que ofrezco. Entiendo cómo se construye el software y también cómo se piensa y se diseña un producto, dos conversaciones que normalmente ocurren en mesas distintas.',
     ],
     closing:
       'Desarrollo aplicaciones con una mirada de diseñador: pienso el producto entero, no solo el código que lo sostiene.',
     portraitAlt: 'Jason Wiersum',
+    cv: 'Descargar CV',
+    cvHint: 'PDF',
     factsTitle: 'En breve',
     facts: [
       { label: 'Nombre', value: 'Jason Wiersum' },
@@ -177,14 +179,16 @@ const en: Translation = {
     title: 'Engineering with style.',
     lead: 'IHK-certified Anwendungsentwickler since July 2026, with three prior years of study in Industrial Design Engineering and Product Development.',
     paragraphs: [
-      'I am Spanish and have lived in Germany since 2012. I live and work in Nürnberg, Bavaria, and training as an Anwendungsentwickler gave me the technical foundation: structure, logic, architecture and a clear method for building software that keeps working over time.',
+      'I am from Málaga and have lived in Nürnberg, Germany, since 2012, where I trained as an application developer. That gave me a technical foundation in structure, logic and architecture, and above all a clear method for building software that keeps working over time.',
       'Before that I spent three years studying Industrial Design Engineering and Product Development at the Universidad de Málaga (UMA), without completing the degree. That is where the other half comes from — how to look at a problem, iterate an idea and stay with the details until the result actually feels good to use.',
-      'Then came six years in hospitality and another six as a kaufmännischer Angestellter. With that behind me I decided to change direction and follow one of my passions: programming.',
-      'That combination is what I bring. I understand how software is built and also how a product is thought through and designed — two conversations that usually happen at separate tables.',
+      'Then came six years in hospitality and another six as a kaufmännischer Angestellter. After that great experience I decided to change direction professionally and follow one of my passions: programming.',
+      'That combination is what I bring. I understand how software is built and also how a product is thought through and designed, two conversations that usually happen at separate tables.',
     ],
     closing:
       'I build applications with a designer’s eye: I think about the whole product, not only the code holding it up.',
     portraitAlt: 'Jason Wiersum',
+    cv: 'Download CV',
+    cvHint: 'PDF',
     factsTitle: 'At a glance',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },
@@ -293,14 +297,16 @@ const de: Translation = {
     title: 'Technik mit Style.',
     lead: 'Anwendungsentwickler, IHK-zertifiziert seit Juli 2026, davor drei Jahre Studium im Bereich Industriedesign-Ingenieurwesen und Produktentwicklung.',
     paragraphs: [
-      'Ich bin Spanier und lebe seit 2012 in Deutschland. Ich lebe und arbeite in Nürnberg, Bayern, und die Ausbildung zum Anwendungsentwickler hat mir das technische Fundament gegeben: Struktur, Logik, Architektur und eine klare Methode, um Software zu bauen, die auch später noch trägt.',
+      'Ich komme aus Málaga und lebe seit 2012 in Nürnberg, wo ich mich zum Anwendungsentwickler ausgebildet habe. Das hat mir ein technisches Fundament in Struktur, Logik und Architektur gegeben und vor allem eine klare Methodik, um Software zu bauen, die auch später noch trägt.',
       'Davor habe ich drei Jahre Industriedesign-Ingenieurwesen und Produktentwicklung an der Universidad de Málaga (UMA) studiert, ohne den Abschluss zu erwerben. Daher kommt die andere Hälfte: wie man ein Problem betrachtet, eine Idee iteriert und am Detail bleibt, bis sich das Ergebnis im Gebrauch richtig anfühlt.',
-      'Danach kamen sechs Jahre in der Gastronomie und weitere sechs als kaufmännischer Angestellter. Mit dieser Erfahrung im Rücken habe ich mich neu orientiert und bin einer meiner Leidenschaften gefolgt: dem Programmieren.',
-      'Genau diese Kombination bringe ich mit. Ich verstehe, wie Software gebaut wird — und ebenso, wie ein Produkt gedacht und gestaltet wird. Zwei Gespräche, die sonst an getrennten Tischen stattfinden.',
+      'Danach kamen sechs Jahre in der Gastronomie und weitere sechs als kaufmännischer Angestellter. Nach dieser großartigen Erfahrung habe ich mich beruflich neu orientiert und bin einer meiner Leidenschaften gefolgt: dem Programmieren.',
+      'Genau diese Kombination bringe ich mit. Ich verstehe, wie Software gebaut wird, und ebenso, wie ein Produkt gedacht und gestaltet wird. Zwei Gespräche, die sonst an getrennten Tischen stattfinden.',
     ],
     closing:
       'Ich entwickle Anwendungen mit dem Blick eines Gestalters: Ich denke das ganze Produkt, nicht nur den Code darunter.',
     portraitAlt: 'Jason Wiersum',
+    cv: 'Lebenslauf herunterladen',
+    cvHint: 'PDF',
     factsTitle: 'Kurz gefasst',
     facts: [
       { label: 'Name', value: 'Jason Wiersum' },
