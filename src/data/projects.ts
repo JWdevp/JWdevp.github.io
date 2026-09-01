@@ -81,19 +81,25 @@ export const projects: Project[] = [
       ],
       body: {
         es: [
-          'Para el Bayerisches Landesamt für Statistik de Fürth construí una tabla dentro de la aplicación web interna del organismo. Renderiza los resultados de las elecciones municipales —Bürgermeister y Oberbürgermeister— y permite editarlos en la propia fila mediante AJAX, sin recargar ni salir de la página.',
+          'Para el Bayerisches Landesamt für Statistik de Fürth construí una tabla dentro de la aplicación web interna del organismo. Renderiza los resultados de las elecciones municipales, Bürgermeister y Oberbürgermeister, y permite editarlos en la propia fila mediante AJAX, sin recargar ni salir de la página.',
           'Los resultados los envía cada municipio por separado. Tras la importación manual había que revisarlos en busca de erratas, problemas de formato y datos que faltaban: una pasada que antes ocupaba a dos Sachbearbeiter durante más de dos meses.',
           'La tabla separa las elecciones principales de las segundas vueltas y las ordena por fecha. Al elegir una fecha aparece cada Landkreis y cada ciudad independiente que votó ese día. Todas las columnas se pueden filtrar y ordenar, y un botón aparte deja a la vista solo los registros marcados como incompletos, de modo que la revisión empieza justo donde falta algo.',
+          'La función «Bewerber suchen» busca en la base de datos y compara con los nombres de los candidatos presentados a ese Wahltermin, así que las coincidencias aparecen sin salir de la fila.',
+          'El control y la corrección de datos pasó de una media de 55 a 60 minutos por Landkreis o kreisfreie Stadt a una media de 15.',
         ],
         en: [
-          'For the Bayerisches Landesamt für Statistik in Fürth I built a table into the office’s internal web application. It renders the results of the municipal elections — Bürgermeister and Oberbürgermeister — and lets them be edited in place over AJAX, without a reload and without leaving the page.',
+          'For the Bayerisches Landesamt für Statistik in Fürth I built a table into the office’s internal web application. It renders the results of the municipal elections, Bürgermeister and Oberbürgermeister, and lets them be edited in place over AJAX, without a reload and without leaving the page.',
           'The results are submitted by each municipality separately, so after the manual import they had to be checked for typos, formatting problems and missing values: a pass that had previously occupied two case workers for more than two months.',
           'The table separates main elections from run-offs and orders them by polling day. Pick a date and every Landkreis and every kreisfreie Stadt that voted on it appears. Every column filters and sorts, and a separate button leaves only the records flagged incomplete on screen, so the review starts exactly where something is missing.',
+          '“Bewerber suchen” queries the database and matches against the names of the candidates standing at that Wahltermin, so the matches come back without leaving the row.',
+          'Checking and correcting the data went from an average of 55 to 60 minutes per Landkreis or kreisfreie Stadt to an average of 15.',
         ],
         de: [
-          'Für das Bayerische Landesamt für Statistik in Fürth habe ich eine Tabelle in die interne Webanwendung des Hauses gebaut. Sie rendert die Ergebnisse der Kommunalwahlen — Bürgermeister und Oberbürgermeister — und macht sie direkt in der Zeile per AJAX editierbar, ohne Reload und ohne die Seite zu verlassen.',
+          'Für das Bayerische Landesamt für Statistik in Fürth habe ich eine Tabelle in die interne Webanwendung des Hauses gebaut. Sie rendert die Ergebnisse der Kommunalwahlen, Bürgermeister und Oberbürgermeister, und macht sie direkt in der Zeile per AJAX editierbar, ohne Reload und ohne die Seite zu verlassen.',
           'Die Ergebnisse melden die Gemeinden einzeln. Nach dem manuellen Import mussten sie deshalb auf Tippfehler, Formatprobleme und fehlende Angaben durchgesehen werden — eine Nachbearbeitung, die zuvor zwei Sachbearbeiter über zwei Monate beschäftigt hat.',
           'Die Tabelle trennt Hauptwahlen und Stichwahlen und sortiert sie nach Wahltag. Ist ein Datum gewählt, erscheint jeder Landkreis und jede kreisfreie Stadt, in der an diesem Tag gewählt wurde. Jede Spalte lässt sich filtern und sortieren, und ein eigener Schalter zeigt ausschließlich die als unvollständig markierten Datensätze — die Durchsicht beginnt damit genau dort, wo etwas fehlt.',
+          '„Bewerber suchen“ durchsucht die Datenbank und gleicht sie mit den Namen der Bewerber ab, die zu diesem Wahltermin angetreten sind, sodass die Treffer ohne Verlassen der Zeile zurückkommen.',
+          'Die Kontrolle und Korrektur der Daten ging von durchschnittlich 55 bis 60 Minuten je Landkreis oder kreisfreier Stadt auf durchschnittlich 15 Minuten zurück.',
         ],
       },
       highlights: {
@@ -103,6 +109,8 @@ export const projects: Project[] = [
           'Desglose por Landkreis y ciudad independiente',
           'Filtrado y ordenación en todas las columnas',
           'Un botón para aislar los registros incompletos',
+          '«Bewerber suchen»: búsqueda en base de datos contra los candidatos del Wahltermin',
+          'De 55-60 minutos de control por Landkreis a una media de 15',
         ],
         en: [
           'Inline editing over AJAX, without leaving the page',
@@ -110,6 +118,8 @@ export const projects: Project[] = [
           'Breakdown by Landkreis and kreisfreie Stadt',
           'Filtering and sorting on every column',
           'One button to isolate the records flagged incomplete',
+          '“Bewerber suchen”: a database search against that Wahltermin’s candidates',
+          'From 55-60 minutes of checking per Landkreis to an average of 15',
         ],
         de: [
           'Inline-Bearbeitung per AJAX, ohne die Seite zu verlassen',
@@ -117,6 +127,8 @@ export const projects: Project[] = [
           'Aufschlüsselung nach Landkreis und kreisfreier Stadt',
           'Filtern und Sortieren in jeder Spalte',
           'Ein Schalter für die als unvollständig markierten Datensätze',
+          '„Bewerber suchen“: Datenbanksuche gegen die Bewerber des Wahltermins',
+          'Von 55-60 Minuten Kontrolle je Landkreis auf durchschnittlich 15',
         ],
       },
     },

@@ -1,11 +1,9 @@
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
 import { ArrowLeft, ArrowUpRight, MapPin } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Project } from '../../data/projects'
+import { useDialogTransition } from '../../hooks/useDialogTransition'
 import { useLanguage } from '../../hooks/useLanguage'
-import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 
 interface Props {
   project: Project
@@ -14,9 +12,6 @@ interface Props {
   onClose: () => void
 }
 
-/** Blurred while the dialog is open, so the panel is the only thing in focus. */
-const BACKDROP_SELECTOR = '.page, .footer, .back-to-top, .island--nav, .settings'
-
 export function ProjectDialog({ project, origin, onClose }: Props) {
   const { t, language } = useLanguage()
   const panel = useRef<HTMLDivElement>(null)
@@ -24,118 +19,13 @@ export function ProjectDialog({ project, origin, onClose }: Props) {
   const closeButton = useRef<HTMLButtonElement>(null)
   const detail = project.detail
 
-  // --- Open: grow out of the card, blur everything behind ------------------
-  useGSAP(() => {
-    const node = panel.current
-    const veil = scrim.current
-    if (!node || !veil) return
-
-    const budget = motionBudget()
-    const behind = gsap.utils.toArray<HTMLElement>(BACKDROP_SELECTOR)
-    const duration = budget.duration(0.55)
-
-    gsap.to(veil, { autoAlpha: 1, duration, ease: 'power2.inOut' })
-    gsap.to(behind, {
-      filter: 'blur(9px)',
-      duration,
-      ease: 'power2.inOut',
-      overwrite: 'auto',
-    })
-
-    if (budget.reduced || !origin) {
-      gsap.fromTo(
-        node,
-        { autoAlpha: 0, scale: budget.reduced ? 1 : 0.96 },
-        { autoAlpha: 1, scale: 1, duration, ease: 'power2.inOut' },
-      )
-      return
-    }
-
-    // Measure where the panel has landed, then start it back at the card.
-    const target = node.getBoundingClientRect()
-    const scale = Math.max(0.2, origin.width / target.width)
-
-    gsap.fromTo(
-      node,
-      {
-        autoAlpha: 0,
-        x: origin.left - target.left,
-        y: origin.top - target.top,
-        scale,
-        transformOrigin: 'top left',
-      },
-      {
-        autoAlpha: 1,
-        x: 0,
-        y: 0,
-        scale: 1,
-        duration,
-        ease: 'power2.inOut',
-      },
-    )
-    gsap.from(node.querySelector('.dialog__body'), {
-      autoAlpha: 0,
-      duration: budget.duration(0.4),
-      delay: budget.duration(0.16),
-      ease: 'power2.out',
-    })
-  }, [])
-
-  // --- Close: reverse it, then hand control back ---------------------------
-  const dismiss = () => {
-    const node = panel.current
-    const veil = scrim.current
-    const budget = motionBudget()
-    const behind = gsap.utils.toArray<HTMLElement>(BACKDROP_SELECTOR)
-    const duration = budget.duration(0.4)
-
-    gsap.to(behind, {
-      filter: 'blur(0px)',
-      duration,
-      ease: 'power2.inOut',
-      overwrite: 'auto',
-      onComplete: () => gsap.set(behind, { clearProps: 'filter' }),
-    })
-    if (veil) gsap.to(veil, { autoAlpha: 0, duration, ease: 'power2.inOut' })
-    if (!node) return onClose()
-
-    const shrink =
-      !budget.reduced && origin
-        ? (() => {
-            const target = node.getBoundingClientRect()
-            return {
-              x: origin.left - target.left,
-              y: origin.top - target.top,
-              scale: Math.max(0.2, origin.width / target.width),
-              transformOrigin: 'top left',
-            }
-          })()
-        : { scale: budget.reduced ? 1 : 0.97 }
-
-    gsap.to(node, {
-      ...shrink,
-      autoAlpha: 0,
-      duration,
-      ease: 'power2.inOut',
-      onComplete: onClose,
-    })
-  }
-
-  // Escape closes it, the page behind stays put, and focus starts on the way out.
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') dismiss()
-    }
-    const { overflow } = document.body.style
-    document.body.style.overflow = 'hidden'
-    document.addEventListener('keydown', onKey)
-    closeButton.current?.focus()
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = overflow
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const dismiss = useDialogTransition({
+    panel,
+    scrim,
+    origin,
+    initialFocus: closeButton,
+    onClose,
+  })
 
   const titleId = `${project.id}-title`
 

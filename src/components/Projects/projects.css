@@ -102,7 +102,7 @@
   text-align: center;
   text-wrap: balance;
   color: var(--muted);
-  transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out);
+  transition: opacity 1400ms var(--ease-out), transform 1400ms var(--ease-out);
 }
 
 .project__logo {
@@ -110,7 +110,7 @@
   max-width: 62%;
   max-height: 58%;
   object-fit: contain;
-  transition: opacity 900ms var(--ease-out), transform 900ms var(--ease-out);
+  transition: opacity 1400ms var(--ease-out), transform 1400ms var(--ease-out);
 }
 
 /* Screenshot underneath, revealed on hover. Anchored to the top-left: these are
@@ -124,11 +124,11 @@
   object-fit: cover;
   object-position: left top;
   opacity: 0;
-  transform: scale(1.06);
+  transform: scale(1.08);
   /* Deliberately slow: the screenshot should surface, not snap. The scale runs
      longer than the fade so the image is still settling once it is fully
      opaque, which reads as a drift rather than a switch. */
-  transition: opacity 1100ms var(--ease-out), transform 1500ms var(--ease-out);
+  transition: opacity 1700ms var(--ease-out), transform 2400ms var(--ease-out);
 }
 
 .project:hover .project__preview,
@@ -145,15 +145,11 @@
   transform: scale(0.96);
 }
 
-/* Shortened, and the drift dropped, but the cross-fade stays: it is what tells
-   you the screenshot replaced the mark. */
+/* The drift is dropped, but the cross-fade keeps its full length: a fade is not
+   what the preference guards against, and cutting it to a few hundred
+   milliseconds made the card look like it was switching images rather than
+   dissolving between them. */
 @media (prefers-reduced-motion: reduce) {
-  .project__preview,
-  .project__client,
-  .project__logo {
-    transition-duration: 320ms;
-  }
-
   .project__preview {
     transform: none;
   }
@@ -269,6 +265,55 @@
 .dialog__body {
   max-width: 46rem;
   margin-inline: auto;
+}
+
+/* --- CV viewer ---------------------------------------------------------- */
+
+/* Taller and narrower than a project panel: it is holding a page, so it takes
+   the shape of one. */
+.dialog__panel--cv {
+  width: min(56rem, 100%);
+  height: min(90vh, 60rem);
+  overflow: hidden;
+}
+
+.dialog__body--cv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: none;
+  height: 100%;
+}
+
+.cv__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.cv__bar .dialog__back {
+  margin-block-end: 0;
+}
+
+.cv__doc {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+/* Shown where the browser has no PDF viewer of its own — most phones. An empty
+   frame would be worse than an honest offer of the file. */
+.cv__fallback {
+  display: grid;
+  place-items: center;
+  gap: var(--space-4);
+  height: 100%;
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--muted);
 }
 
 .dialog__back {
