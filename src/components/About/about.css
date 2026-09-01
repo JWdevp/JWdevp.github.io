@@ -36,13 +36,11 @@
 
 /* --- Facts panel --------------------------------------------------------- */
 
-/* Portrait and facts share the column: the portrait absorbs whatever height is
-   left over, which pins its top to the title and the facts panel to the bottom
-   of the prose. */
+/* The portrait now has the column to itself and runs the full height of the
+   text beside it. */
 .about__aside {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
   height: 100%;
 }
 
@@ -66,7 +64,7 @@
 }
 
 .about__facts {
-  flex: 0 0 auto;
+  margin-block-start: clamp(2rem, 5vw, 4rem);
   padding: var(--space-5);
 }
 
@@ -80,24 +78,28 @@
   margin-block-end: var(--space-4);
 }
 
+/* One row of values across the whole width. auto-fit rather than a fixed three
+   columns so a longer translation can drop to two rows instead of squeezing. */
 .about__facts-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-4) clamp(1.5rem, 4vw, 3.5rem);
   margin: 0;
 }
 
+/* Separated by a rule down the left rather than one underneath: the values now
+   sit side by side, so the divider has to run between them. */
 .about__fact {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding-block-end: var(--space-3);
-  border-bottom: 1px solid var(--border);
+  padding-inline-start: clamp(1rem, 2.5vw, 2rem);
+  border-inline-start: 1px solid var(--border);
 }
 
-.about__fact:last-child {
-  padding-block-end: 0;
-  border-bottom: none;
+.about__fact:first-child {
+  padding-inline-start: 0;
+  border-inline-start: none;
 }
 
 .about__fact dt {
@@ -186,6 +188,27 @@
     flex: 0 0 auto;
     max-width: 22rem;
     aspect-ratio: 4 / 5;
+  }
+}
+
+/* Too narrow for a row: back to a stack, with the rule underneath each value
+   where it belongs rather than a stray one down the side of a wrapped item. */
+@media (max-width: 40rem) {
+  .about__facts-list {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .about__fact {
+    padding-inline-start: 0;
+    padding-block-end: var(--space-3);
+    border-inline-start: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .about__fact:last-child {
+    padding-block-end: 0;
+    border-bottom: none;
   }
 }
 

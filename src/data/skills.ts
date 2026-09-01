@@ -8,8 +8,6 @@ export interface SkillGroup {
 
 export interface SkillItem {
   name: string
-  /** Optional translated note, e.g. Photoshop's 15 years of experience. */
-  note?: (t: Translation) => string
 }
 
 /**
@@ -42,7 +40,7 @@ export const skillGroups: SkillGroup[] = [
   {
     category: 'design',
     items: [
-      { name: 'Photoshop', note: (t) => t.skills.photoshopNote },
+      { name: 'Photoshop' },
     ],
   },
 ]

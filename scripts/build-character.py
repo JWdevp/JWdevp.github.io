@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Turn public/images/final.mp4 into the hero character's sprite sheet.
+"""Turn public/images/final.mp4 into the hero character's frame sheet.
 
 Run this only to regenerate the assets; the output is committed, so a normal
 checkout needs none of these tools.
@@ -8,14 +8,21 @@ checkout needs none of these tools.
     python3 scripts/build-character.py            # needs ffmpeg on PATH
 
 Output:
-    public/character/sprite.webp                     one sheet with every pose
-    src/components/Character/manifest.json           sheet geometry, per-pose
-                                                     gaze, cursor lookup grid
+    public/character/frames.webp                 the clip, in order, one sheet
+    public/character/still.webp                  one frame, for touch devices
+    src/components/Character/manifest.json       sheet geometry + per-frame gaze
 
-Why a sprite sheet of poses rather than the video itself: the character has to
-answer the cursor, which means random access to a pose, and `video.currentTime`
-seeking stutters badly under that. Poses also let the background be removed
-properly — see `matte()` below.
+The frames are kept IN THE ORDER THEY WERE FILMED, evenly spaced through the
+clip. That is the whole point: the runtime walks the sheet one frame at a time,
+so what it shows is the movement that was actually recorded, not a cut between
+two unrelated poses. Picking N spread-out "poses" by how they look, as an
+earlier version did, made every change of direction a visible jump — adjacent
+recorded frames differ by ~1.6/255 mean, poses chosen that way by ~10.
+
+Why a sheet rather than the video itself: driving `video.currentTime` from an
+animation frame does not work. Seeks are asynchronous and coalesce, so the
+element presents a fraction of the frames asked for; a sheet is one decode and
+then a transform per frame, which is exact and costs nothing.
 """
 import argparse
 import json
@@ -46,9 +53,13 @@ D_WEAK = 11.0          # hysteresis floor; the border residual peaks near 8.5
 D_EDGE = 6.0
 
 # --- output ---------------------------------------------------------------
-POSES = 48             # distinct head poses kept
-SPRITE_WIDTH = 520     # px per pose in the sheet
-QUALITY = 78
+# Frames kept, evenly spaced through the 240 the clip has. More frames means
+# smaller visual steps but a bigger sheet, and the sheet has to stay inside what
+# a browser will hold decoded: 120 x 400px is ~20 megapixels (~80 MB decoded),
+# which desktop handles comfortably. Touch devices never load it at all.
+FRAMES = 120
+SPRITE_WIDTH = 400     # px per frame in the sheet
+QUALITY = 72
 GUTTER = 8
 PAD = 16               # source rows replicated below the crop, so the resize
                        # samples the bust instead of the empty gutter
@@ -58,12 +69,11 @@ BOTTOM_PAD = 12        # rows added under the frame while matting, so the
                        # drag a sliver of the neighbouring pose into the window,
                        # which reads as a lit rectangle around the character on
                        # a dark page.
-GRID = 33              # cursor lookup grid resolution, per axis
-# The pose cloud is L-shaped: the subject never looks up-and-right, so that
-# corner of the cursor plane has to be approximated. Plain nearest-neighbour
-# trades horizontal error for vertical one-for-one and lands on an up-LEFT
-# pose there, which reads as looking the wrong way. Horizontal gaze is much
-# more legible than vertical, so weight x harder and let the vertical give.
+# The gaze cloud is L-shaped: the subject never looks up-and-right, so that
+# corner of the cursor plane has to be approximated. Weighing both axes equally
+# lands on an up-LEFT frame there, which reads as looking the wrong way.
+# Horizontal gaze is much more legible than vertical, so the runtime weights x
+# harder and lets the vertical give. Shipped in the manifest, applied there.
 GAZE_WEIGHT_X = 2.5
 
 # --- gaze tracking --------------------------------------------------------
@@ -193,22 +203,18 @@ def gaze(path):
     return (lx + rx) / 2 + x0, (ly + ry) / 2 + y0
 
 
-def pick_poses(g, n):
-    """Farthest-point sampling over the gaze cloud: an even spread of directions
-    rather than n consecutive frames, which would all look the same."""
-    pts = (g - g.mean(0)) / g.std(0)
-    chosen = [int(np.argmin(np.linalg.norm(pts, axis=1)))]   # the neutral pose first
-    dist = np.linalg.norm(pts - pts[chosen[0]], axis=1)
-    while len(chosen) < n:
-        k = int(np.argmax(dist))
-        chosen.append(k)
-        dist = np.minimum(dist, np.linalg.norm(pts - pts[k], axis=1))
-    return chosen
+def pick_frames(total, n):
+    """Evenly spaced frames, in the order they were filmed.
+
+    Deliberately not a selection by appearance: neighbours in this list are
+    neighbours in the recording, so stepping from one to the next replays real
+    movement. That is what stops the character reading as a set of stills."""
+    return [round(i * (total - 1) / (n - 1)) for i in range(n)]
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--poses', type=int, default=POSES)
+    ap.add_argument('--frames', type=int, default=FRAMES)
     ap.add_argument('--width', type=int, default=SPRITE_WIDTH)
     ap.add_argument('--quality', type=int, default=QUALITY)
     args = ap.parse_args()
@@ -224,13 +230,13 @@ def main():
         print('reading gaze…')
         g = np.array([gaze(f) for f in frames])
 
-        idx = pick_poses(g, args.poses)
-        print(f'selected {len(idx)} poses')
+        idx = pick_frames(len(frames), args.frames)
+        print(f'keeping {len(idx)} of {len(frames)} frames, in order')
 
         print('matting…')
         mattes = {i: matte(frames[i]) for i in sorted(set(idx))}
 
-        # One crop for every pose, so nothing shifts between them.
+        # One crop for every frame, so nothing shifts between them.
         x0 = y0 = 10 ** 9
         x1 = y1 = -1
         for _, al in mattes.values():
@@ -239,10 +245,12 @@ def main():
             y0, y1 = min(y0, ys.min()), max(y1, ys.max())
         print(f'  crop x {x0}..{x1}  y {y0}..{y1}')
 
-        pw = args.width                                   # pose, before the gutter
+        pw = args.width                                   # frame, before the gutter
         ph = round((y1 - y0 + 1) * pw / (x1 - x0 + 1))
         cw, ch = pw + GUTTER * 2, ph + GUTTER * 2         # cell, what CSS shows
-        cols = 8
+        # Roughly square sheet: a long thin one wastes more of the browser's
+        # maximum texture dimension than it needs to.
+        cols = max(1, round((len(idx) * ch / cw) ** 0.5))
         rows = (len(idx) + cols - 1) // cols
         sheet = Image.new('RGBA', (cols * cw, rows * ch), (0, 0, 0, 0))
         pad_h = round(PAD * pw / (x1 - x0 + 1))
@@ -255,7 +263,7 @@ def main():
                         .crop((0, 0, pw, ph))
             sheet.paste(tile, ((n % cols) * cw + GUTTER, (n // cols) * ch + GUTTER))
 
-        sprite = OUT_DIR / 'sprite.webp'
+        sprite = OUT_DIR / 'frames.webp'
         sheet.save(sprite, 'WEBP', quality=args.quality, method=6)
 
         # Normalise gaze to -1..1 so the runtime never sees pixel coordinates.
@@ -265,38 +273,39 @@ def main():
         norm = (sel - mid) / half
         norm[:, 1] *= -1          # image y grows downward; up should be +1
 
-        # Bake the cursor lookup: for each cell of the cursor plane, the pose
-        # whose gaze matches best. Done here so the runtime is one array read.
-        ax = np.linspace(-1, 1, GRID)
-        # Rows run top-down, like screen rows: row 0 is the cursor at the top of
-        # its range (gaze y = +1, looking up). The runtime reads it the same way.
-        lookup = []
-        for gy in ax[::-1]:
-            row = []
-            for gx in ax:
-                d2 = GAZE_WEIGHT_X * (norm[:, 0] - gx) ** 2 + (norm[:, 1] - gy) ** 2
-                row.append(int(np.argmin(d2)))
-            lookup.append(row)
+        # The frame closest to looking straight ahead. Where the character rests,
+        # and the only frame a touch device ever needs.
+        neutral = int(np.argmin(GAZE_WEIGHT_X * norm[:, 0] ** 2 + norm[:, 1] ** 2))
+
+        # A touch device cannot track a cursor, so it never loads the sheet —
+        # which is also what keeps the sheet's size off the mobile budget.
+        still = OUT_DIR / 'still.webp'
+        n = neutral
+        sheet.crop(((n % cols) * cw, (n // cols) * ch,
+                    (n % cols) * cw + cw, (n // cols) * ch + ch)) \
+             .save(still, 'WEBP', quality=args.quality + 8, method=6)
 
         manifest = {
-            'sprite': 'sprite.webp',
+            'sprite': 'frames.webp',
+            'still': 'still.webp',
             'frameWidth': cw,
             'frameHeight': ch,
             'columns': cols,
             'rows': rows,
             'count': len(idx),
-            'neutral': 0,
+            'neutral': neutral,
+            'gazeWeightX': GAZE_WEIGHT_X,
             'gaze': [[round(float(a), 4), round(float(b), 4)] for a, b in norm],
-            'lookupSize': GRID,
-            'lookup': lookup,
             'source': 'images/final.mp4',
         }
         MANIFEST.parent.mkdir(parents=True, exist_ok=True)
         MANIFEST.write_text(json.dumps(manifest))
 
-        kb = sprite.stat().st_size / 1024
-        print(f'wrote {sprite.relative_to(ROOT)}  {kb:.0f} KB  '
-              f'({cols}x{rows} cells of {cw}x{ch}, pose {pw}x{ph})')
+        mp = cols * cw * rows * ch / 1e6
+        print(f'wrote {sprite.relative_to(ROOT)}  {sprite.stat().st_size / 1024:.0f} KB  '
+              f'({cols}x{rows} cells of {cw}x{ch}, frame {pw}x{ph}, {mp:.1f} MP)')
+        print(f'wrote {still.relative_to(ROOT)}  {still.stat().st_size / 1024:.0f} KB  '
+              f'(frame {neutral})')
         print(f'wrote {MANIFEST.relative_to(ROOT)}')
 
 

@@ -32,7 +32,7 @@ visitor. If that ever matters, move the file out of `public/` and point
 `SOURCE` in `scripts/build-character.py` at the new location; it is a build
 input, not a site asset.
 
-`scripts/build-character.py` reads it and writes `public/character/sprite.webp`
-plus `src/components/Character/manifest.json`. Keep it here unmodified so the
-character can be rebuilt — at a different pose count, size or quality — without
+`scripts/build-character.py` reads it and writes `public/character/frames.webp`,
+`public/character/still.webp` and `src/components/Character/manifest.json`. Keep it here unmodified so the
+character can be rebuilt — at a different frame count, size or quality — without
 having to source the video again.

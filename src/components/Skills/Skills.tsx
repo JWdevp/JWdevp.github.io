@@ -31,9 +31,6 @@ export function Skills() {
                 {group.items.map((item) => (
                   <li className="skills__item" key={item.name}>
                     <span className="skills__name">{item.name}</span>
-                    {item.note ? (
-                      <span className="skills__note">{item.note(t)}</span>
-                    ) : null}
                   </li>
                 ))}
               </ul>

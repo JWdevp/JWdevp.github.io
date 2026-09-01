@@ -70,6 +70,7 @@ export const projects: Project[] = [
     },
     technologies: ['Grails', 'Groovy', 'AJAX', 'Git'],
     image: null,
+    logo: 'images/projects/landesamt-logo.png',
     url: null,
     detail: {
       client: 'Bayerisches Landesamt für Statistik, Fürth',
