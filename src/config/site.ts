@@ -11,6 +11,12 @@ export const SITE = {
    * `public/images/` is called; if it is missing the figure removes itself.
    */
   portrait: `${import.meta.env.BASE_URL}images/sanfran.grey.wide.jpg`,
+  /**
+   * CV offered for download in the About section. The button only appears once
+   * the file is actually there, so this can point at a file that has not been
+   * added yet without leaving a dead link on the page.
+   */
+  cv: `${import.meta.env.BASE_URL}cv/jason-wiersum-lebenslauf.pdf`,
   links: {
     linkedin: 'https://www.linkedin.com/in/jason-wiersum',
     github: 'https://github.com/jasonwiersum',

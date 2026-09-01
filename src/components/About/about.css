@@ -57,6 +57,20 @@
   height: 100%;
   object-fit: cover;
   object-position: center 18%;
+  /* A slow, small push in on hover — enough to feel alive, not enough to read
+     as a zoom. The figure clips it, so nothing moves outside its frame. */
+  transform: scale(1);
+  transition: transform 2.4s var(--ease-out);
+}
+
+.about__portrait:hover img {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about__portrait:hover img {
+    transform: scale(1.02);
+  }
 }
 
 .about__facts-block {
@@ -137,6 +151,20 @@
   font-size: var(--text-sm);
   font-weight: 500;
   color: var(--foreground);
+}
+
+/* --- CV ------------------------------------------------------------------ */
+
+.about__cv {
+  margin-block-start: var(--space-5);
+  gap: 0.6rem;
+}
+
+.about__cv-hint {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  opacity: 0.6;
 }
 
 /* --- Responsive ---------------------------------------------------------- */

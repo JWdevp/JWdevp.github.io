@@ -45,6 +45,8 @@
 }
 
 .contact__link {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -66,6 +68,85 @@
   color: var(--foreground);
   border-color: var(--border-strong);
   background: var(--surface-sunken);
+}
+
+/* --- Turning gradient on the two social buttons --------------------------
+
+   A conic gradient whose start angle is animated. `--angle` has to be a
+   registered custom property for that: an unregistered one is a string, and
+   strings do not interpolate, so the gradient would jump from 0 to 360 rather
+   than turn.
+
+   It is drawn as a ring, not a fill — the pseudo-element is padded by the
+   border width and then masked so only that padding survives, which leaves the
+   button's own surface untouched and the label readable. Kept faint on
+   purpose: it should register at the edge of vision, not compete with the
+   form beside it. Where @property is unsupported the angle simply stays at
+   0deg and the ring is a static gradient. */
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes contact-link-spin {
+  to {
+    --angle: 360deg;
+  }
+}
+
+.contact__link--linkedin {
+  --tint-a: #0a66c2;
+  --tint-b: #38bdf8;
+}
+
+.contact__link--github {
+  --tint-a: #8957e5;
+  --tint-b: #c084fc;
+}
+
+.contact__link--linkedin::before,
+.contact__link--github::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0deg,
+    var(--tint-a) 70deg,
+    var(--tint-b) 130deg,
+    transparent 210deg,
+    transparent 360deg
+  );
+  opacity: 0.75;
+  /* Ring, not disc: keep the padding band and cut the middle out. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: contact-link-spin 6s linear infinite;
+}
+
+.contact__link--linkedin:hover::before,
+.contact__link--github:hover::before {
+  opacity: 1;
+}
+
+/* An endlessly repeating animation is exactly what the preference is about, so
+   this one stops outright rather than shortening; the ring stays as a still
+   gradient. */
+@media (prefers-reduced-motion: reduce) {
+  .contact__link--linkedin::before,
+  .contact__link--github::before {
+    animation: none;
+  }
 }
 
 /* --- Form ---------------------------------------------------------------- */
