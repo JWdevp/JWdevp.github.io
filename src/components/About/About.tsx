@@ -47,21 +47,26 @@ function Cv() {
       <div className="about__cv-actions">
         <button
           type="button"
-          className="btn"
+          className="reveal-btn"
           ref={viewButton}
           onClick={() => {
             setOrigin(viewButton.current?.getBoundingClientRect() ?? null)
             setOpen(true)
           }}
         >
-          <Eye size={16} strokeWidth={1.9} aria-hidden="true" />
-          {t.about.cvView}
+          <span className="reveal-btn__badge" aria-hidden="true" />
+          <span className="reveal-btn__icon" aria-hidden="true">
+            <Eye size={17} strokeWidth={1.9} />
+          </span>
+          <span className="reveal-btn__label">{t.about.cvView}</span>
         </button>
 
-        <a className="btn btn--ghost" href={SITE.cv} download>
-          <Download size={16} strokeWidth={1.9} aria-hidden="true" />
-          {t.about.cv}
-          <span className="about__cv-hint">{t.about.cvHint}</span>
+        <a className="reveal-btn" href={SITE.cv} download>
+          <span className="reveal-btn__badge" aria-hidden="true" />
+          <span className="reveal-btn__icon" aria-hidden="true">
+            <Download size={17} strokeWidth={1.9} />
+          </span>
+          <span className="reveal-btn__label">{t.about.cv}</span>
         </a>
       </div>
 

@@ -56,6 +56,25 @@ export function CharacterStage() {
   const [ready, setReady] = useState(false)
   const [wavePlaying, setWavePlaying] = useState(false)
   const [waveBroken, setWaveBroken] = useState(false)
+
+  /**
+   * Reveal the wave once it has a frame to show.
+   *
+   * Not an `onCanPlay` prop: with `autoPlay` and `preload="auto"` a small file
+   * can be ready before React has finished attaching listeners, and the event
+   * is then simply missed — the video played through to the end while still at
+   * opacity 0. Reading `readyState` catches that case, and the listener covers
+   * the ordinary one.
+   */
+  const attachWave = useCallback((node: HTMLVideoElement | null) => {
+    if (!node) return
+    if (node.readyState >= 2) {
+      setWavePlaying(true)
+      return
+    }
+    const onReady = () => setWavePlaying(true)
+    node.addEventListener('loadeddata', onReady, { once: true })
+  }, [])
   const tracks = useMemo(hasFinePointer, [])
 
   const render = useCallback(
@@ -103,11 +122,17 @@ export function CharacterStage() {
 
   // Without a cursor there is nothing to follow, so the sheet is never fetched
   // — which is also what keeps a megabyte off a phone's budget. A single frame
-  // is shown instead, with a wave played once over the top of it.
+  // stands in, and the wave plays over it once.
   //
-  // The frame is the layer that counts: it decides the element's size and marks
-  // the character ready. The video sits on top and is pure addition, so a
-  // missing or unplayable wave.mp4 costs nothing but the wave.
+  // The wave keeps its own backdrop and sits in a frame, rather than being cut
+  // out like the sheet is. It was shot with a pool of light in the middle that
+  // the backdrop fit — which reads the borders, and they are vignetted — comes
+  // in about 20 levels under, so the matte swallowed the gap between the raised
+  // arm and the body and pasted a slab of backdrop onto the character. A frame
+  // is the honest answer: it looks chosen, and it cannot fail.
+  //
+  // The still stays underneath as the layer that holds the size and marks the
+  // character ready, and it is what shows if the video is missing.
   const src = tracks ? SHEET : STILL
   const neutral = manifest.neutral
   const wave = !tracks && !waveBroken
@@ -127,9 +152,13 @@ export function CharacterStage() {
         ['--character-mobile-max' as string]: LAYOUT.mobileMaxWidth,
       }}
       data-ready={ready || undefined}
+      data-wave={wavePlaying || undefined}
     >
       <img
         className="character__sheet"
+        // Hidden, not unmounted: it still carries the size, and it comes back
+        // if the video turns out to be unplayable.
+        data-covered={wavePlaying || undefined}
         ref={sheet}
         src={src}
         alt=""
@@ -161,8 +190,8 @@ export function CharacterStage() {
           // Hidden until it can actually play. A missing file does not reliably
           // raise `error` on a media element, and an empty <video> paints as a
           // black box in some browsers — this way it simply never appears.
+          ref={attachWave}
           data-playing={wavePlaying || undefined}
-          onCanPlay={() => setWavePlaying(true)}
           onError={() => setWaveBroken(true)}
         />
       ) : null}

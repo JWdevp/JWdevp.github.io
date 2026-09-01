@@ -166,17 +166,131 @@
   line-height: var(--leading-relaxed);
 }
 
+/* Both buttons the same width, set by the wider label — they sit together and
+   one being longer than the other read as an accident.
+
+   `grid-auto-columns: 1fr` in a shrink-to-fit grid is what makes them equal:
+   the tracks are all one fraction of the same space, and the grid takes its
+   width from the widest of them. A flex row with `flex: 1` only shares what is
+   left over, and `max-content` columns size each to its own label — neither
+   gives two equal buttons. */
 .about__cv-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: var(--space-3);
 }
 
-.about__cv-hint {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  letter-spacing: var(--tracking-label);
-  opacity: 0.6;
+@media (max-width: 32rem) {
+  .about__cv-actions {
+    grid-auto-flow: row;
+  }
+}
+
+/* --- Reveal button -------------------------------------------------------
+   A pill with a round badge at its left edge. On hover the badge swells until
+   it has flooded the whole pill and the icon rides out to the middle, so the
+   button turns solid under the pointer rather than merely tinting.
+
+   The icon travels by animating `left` from the badge's centre to 50%, which
+   is the button's own middle whatever the label says in whichever language.
+   `cqw` looked like the tidier way to express that, but `container-type:
+   inline-size` brings inline-size containment with it: the button stopped
+   sizing to its label and collapsed to 80px. A length-to-percentage
+   interpolation costs one element a layout per frame and needs no measuring. */
+.reveal-btn {
+  --rb-pad: 0.4rem;
+  --rb-badge: 2.25rem;
+  --rb-gap: 0.85rem;
+  --rb-ease: cubic-bezier(0.44, 0, 0.56, 1);
+  --rb-dur: 460ms;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  min-height: 3.05rem;
+  padding-block: var(--rb-pad);
+  padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap)) 1.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-solid);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  font-weight: 520;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.reveal-btn__label {
+  position: relative;
+  z-index: 1;
+  transition: transform var(--rb-dur) var(--rb-ease);
+}
+
+/* The flood. Scaled from a real 2.25rem disc rather than held shrunk from a
+   huge one, so at rest it is drawn at its own size and stays crisp. */
+.reveal-btn__badge {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: var(--rb-pad);
+  width: var(--rb-badge);
+  height: var(--rb-badge);
+  margin-top: calc(var(--rb-badge) / -2);
+  border-radius: 50%;
+  background: var(--accent);
+  transform: scale(1);
+  transition: transform var(--rb-dur) var(--rb-ease);
+  pointer-events: none;
+}
+
+.reveal-btn__icon {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: calc(var(--rb-pad) + var(--rb-badge) / 2);
+  display: grid;
+  place-items: center;
+  color: var(--accent-contrast);
+  transform: translate(-50%, -50%);
+  transition: left var(--rb-dur) var(--rb-ease);
+  pointer-events: none;
+}
+
+.reveal-btn:hover,
+.reveal-btn:focus-visible {
+  color: var(--accent-contrast);
+}
+
+.reveal-btn:hover .reveal-btn__badge,
+.reveal-btn:focus-visible .reveal-btn__badge {
+  /* Enough to clear the far corner from where the disc sits, at any label
+     length this button will ever hold. */
+  transform: scale(24);
+}
+
+.reveal-btn:hover .reveal-btn__icon,
+.reveal-btn:focus-visible .reveal-btn__icon {
+  left: 50%;
+}
+
+.reveal-btn:hover .reveal-btn__label,
+.reveal-btn:focus-visible .reveal-btn__label {
+  transform: translateX(0.5rem);
+}
+
+.reveal-btn:active {
+  transform: scale(0.975);
+}
+
+/* The travel and the flood are the point, so they stay; only their length is
+   trimmed. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-btn {
+    --rb-dur: 300ms;
+  }
 }
 
 /* --- Responsive ---------------------------------------------------------- */

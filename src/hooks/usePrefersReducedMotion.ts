@@ -47,8 +47,16 @@ export function motionBudget() {
     reduced,
     /** Pixels of travel, or none when motion is reduced. */
     travel: (px: number) => (reduced ? 0 : px),
-    /** Seconds, capped when motion is reduced. */
-    duration: (seconds: number) => (reduced ? Math.min(seconds, 0.2) : seconds),
+    /**
+     * Seconds, capped when motion is reduced.
+     *
+     * The cap used to be 0.2s, which is short enough that a fade reads as a
+     * hard cut — on a machine with the preference set the whole interface
+     * looked inert, and every "it animates on my phone but not in the browser"
+     * report traced back here. Travel is already zero by then; what is left is
+     * a cross-fade, which is not what the preference guards against.
+     */
+    duration: (seconds: number) => (reduced ? Math.min(seconds, 0.45) : seconds),
     /** Stagger between siblings, tightened when motion is reduced. */
     stagger: (seconds: number) => (reduced ? Math.min(seconds, 0.04) : seconds),
   }

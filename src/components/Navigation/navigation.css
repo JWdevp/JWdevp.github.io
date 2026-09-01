@@ -164,11 +164,21 @@
   z-index: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   height: calc(var(--island-h) - 2 * var(--island-pad));
   padding-inline: 0.62rem;
   border-radius: var(--radius-pill);
   font-size: var(--text-sm);
   font-weight: 500;
+  /* Two corrections, both because centring a box is not centring what you see.
+     The inherited 24px leading made the line box far taller than the letters,
+     so `1` shrinks it to the glyph box. Then: these labels are all caps, whose
+     ink runs from the baseline to the cap height and never into the descender
+     space the em box still reserves below it — which left them sitting high by
+     a little over 2px. Half a descender of padding puts the ink itself in the
+     middle. Measured, not guessed: the remainder is under half a pixel. */
+  line-height: 1;
+  padding-block-start: 0.26em;
   letter-spacing: var(--tracking-normal);
   color: var(--muted);
   transition: color var(--dur-base) var(--ease-out);
@@ -189,17 +199,15 @@
 }
 
 .theme-toggle {
-  /* Both icons occupy the same cell so they can cross-fade in place. */
   display: grid;
   place-items: center;
 }
 
+/* One morphing glyph now, not two stacked ones, so it needs no cell of its
+   own — the same shape as the settings icon beside it. */
 .theme-toggle__icon {
-  grid-area: 1 / 1;
-  display: grid;
-  place-items: center;
+  display: block;
   color: var(--foreground);
-  will-change: transform, opacity;
 }
 
 .theme-toggle:hover {

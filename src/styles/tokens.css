@@ -79,44 +79,48 @@
   --z-island: 60;
   --z-skip: 90;
 
-  /* --- Colour: light ----------------------------------------------------- */
-  --background: #f4f4f2;
-  --background-elevated: #fbfbfa;
-  --foreground: #12131a;
-  --muted: #61636e;
-  --muted-strong: #43454f;
-  --faint: #8d8f99;
+  /* --- Colour: light -----------------------------------------------------
+     The ground is a pale blue and the accent a saturated one, so the greys
+     between them carry a little of the same hue: a neutral grey next to this
+     much blue reads as dirty rather than quiet. Every pair below clears AA on
+     the ground it sits on — accent 5.4:1, muted 5.9:1, foreground 14.2:1. */
+  --background: #d6e3ff;
+  --background-elevated: #e6eeff;
+  --foreground: #0f1424;
+  --muted: #4b5468;
+  --muted-strong: #2e3547;
+  --faint: #6a7490;
 
   --surface: rgba(255, 255, 255, 0.72);
   --surface-solid: #ffffff;
   --surface-glass: rgba(255, 255, 255, 0.55);
   --surface-glass-strong: rgba(255, 255, 255, 0.71);
-  --surface-sunken: rgba(18, 19, 26, 0.035);
+  --surface-sunken: rgba(15, 20, 36, 0.045);
 
-  --border: rgba(18, 19, 26, 0.1);
-  --border-strong: rgba(18, 19, 26, 0.18);
+  --border: rgba(15, 20, 36, 0.12);
+  --border-strong: rgba(15, 20, 36, 0.22);
   --border-glass: rgba(255, 255, 255, 0.7);
 
-  --accent: #2a55f0;
-  --accent-hover: #1f45d6;
+  --accent: #0038ff;
+  --accent-hover: #0030e0;
   --accent-contrast: #ffffff;
-  --accent-soft: rgba(42, 85, 240, 0.1);
-  --accent-ring: rgba(42, 85, 240, 0.35);
+  --accent-soft: rgba(0, 56, 255, 0.1);
+  --accent-ring: rgba(0, 56, 255, 0.35);
 
   --success: #17795b;
   --success-soft: rgba(23, 121, 91, 0.1);
   --danger: #b32b2b;
   --danger-soft: rgba(179, 43, 43, 0.09);
 
-  --shadow-xs: 0 1px 2px rgba(18, 19, 26, 0.05);
-  --shadow-sm: 0 2px 8px rgba(18, 19, 26, 0.06);
-  --shadow-md: 0 8px 24px -8px rgba(18, 19, 26, 0.14);
-  --shadow-lg: 0 22px 48px -18px rgba(18, 19, 26, 0.24);
+  --shadow-xs: 0 1px 2px rgba(15, 20, 36, 0.06);
+  --shadow-sm: 0 2px 8px rgba(15, 20, 36, 0.07);
+  --shadow-md: 0 8px 24px -8px rgba(15, 20, 36, 0.16);
+  --shadow-lg: 0 22px 48px -18px rgba(15, 20, 36, 0.26);
   --shadow-island: 0 1px 1px rgba(255, 255, 255, 0.6) inset,
-    0 8px 30px -10px rgba(18, 19, 26, 0.22), 0 2px 6px rgba(18, 19, 26, 0.06);
+    0 8px 30px -10px rgba(15, 20, 36, 0.24), 0 2px 6px rgba(15, 20, 36, 0.07);
 
   --grain-opacity: 0.035;
-  --glow-a: rgba(42, 85, 240, 0.14);
+  --glow-a: rgba(0, 56, 255, 0.14);
   --glow-b: rgba(255, 138, 76, 0.1);
 
   color-scheme: light;
@@ -148,11 +152,13 @@
   --border-strong: rgba(255, 255, 255, 0.2);
   --border-glass: rgba(255, 255, 255, 0.12);
 
-  --accent: #6f8cff;
-  --accent-hover: #8ba2ff;
+  /* #0038ff itself only reaches 2.8:1 on this ground, so dark mode takes the
+     same hue lifted until it is readable — 5.8:1 here. */
+  --accent: #5b84ff;
+  --accent-hover: #7c9bff;
   --accent-contrast: #0b0c10;
-  --accent-soft: rgba(111, 140, 255, 0.14);
-  --accent-ring: rgba(111, 140, 255, 0.45);
+  --accent-soft: rgba(91, 132, 255, 0.14);
+  --accent-ring: rgba(91, 132, 255, 0.45);
 
   --success: #4bd0a0;
   --success-soft: rgba(75, 208, 160, 0.12);
@@ -167,7 +173,7 @@
     0 12px 34px -12px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.4);
 
   --grain-opacity: 0.05;
-  --glow-a: rgba(111, 140, 255, 0.16);
+  --glow-a: rgba(91, 132, 255, 0.16);
   --glow-b: rgba(255, 138, 76, 0.08);
 
   color-scheme: dark;
