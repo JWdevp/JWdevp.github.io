@@ -46,9 +46,9 @@
   border-radius: var(--radius-lg);
   background: #f2f2f0;
   object-fit: cover;
-  /* Left of centre: the subject sits at x 146..917 of 1280, so a centred crop
-     takes the hand off before it takes anything on the right. */
-  object-position: 34% center;
+  /* 46%, not 50%: it puts the crop's centre on the head at x=630 rather than on
+     the frame's at 640, so the head is the thing that is centred. */
+  object-position: 46% center;
   opacity: 0;
   transition: opacity 300ms var(--ease-out);
   pointer-events: none;

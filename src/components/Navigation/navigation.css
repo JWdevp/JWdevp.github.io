@@ -112,18 +112,38 @@
 
 /* Sits to the left of the gear and out of the flow, so opening and closing
    never shifts the button it came from. */
+/* Under the gear, not beside it: the islands slide out from behind the button,
+   so the panel paints below it and clips them on the way.
+
+   The clip is what makes this a slide rather than an appearance, and it is also
+   what keeps the page from growing: parked, the islands sit a whole panel-width
+   to the right, which put them 83px past the edge of a phone screen and gave
+   the document a horizontal scroll.
+
+   Padding plus an equal negative margin is how it clips without eating the
+   islands' shadows: the box grows 16px on every side and shifts back by the
+   same amount, so the content lands exactly where it did and the clip boundary
+   sits 16px clear of it. Sixteen is also enough overhang for an island to be
+   under the gear before it is cut, rather than appearing out of the gap. */
 .settings__panel {
   position: absolute;
   top: 0;
   right: calc(var(--island-h) + var(--space-2));
+  z-index: 0;
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  padding: 16px;
+  margin: -16px;
+  overflow: hidden;
 }
 
 .settings__panel > * {
-  transform-origin: right center;
   will-change: transform, opacity;
+}
+
+.island--settings {
+  z-index: 1;
 }
 
 .island--settings {
@@ -180,18 +200,41 @@
   border-radius: var(--radius-pill);
   font-size: var(--text-sm);
   font-weight: 500;
-  /* Two corrections, both because centring a box is not centring what you see.
-     The inherited 24px leading made the line box far taller than the letters,
-     so `1` shrinks it to the glyph box. Then: these labels are all caps, whose
-     ink runs from the baseline to the cap height and never into the descender
-     space the em box still reserves below it — which left them sitting high by
-     a little over 2px. Half a descender of padding puts the ink itself in the
-     middle. Measured, not guessed: the remainder is under half a pixel. */
+  /* Centring a box is not centring what you see. The inherited 24px leading
+     made the line box far taller than the letters, so `1` shrinks it to the
+     glyph box; and these labels are all caps, whose ink stops at the cap
+     height and never reaches into the descender space the em box still
+     reserves below it.
+
+     `text-box-trim` cuts the line box down to exactly that ink, so centring it
+     centres the letters — and it does so from the font's own metrics, which
+     means it holds whichever face actually resolves. The padding below is the
+     fallback for browsers without it, and it is tuned to Inter: if Inter fails
+     to load and the stack falls through to the system face, that fallback is
+     approximate where the trim is exact. */
   line-height: 1;
   padding-block-start: 0.14em;
   letter-spacing: var(--tracking-normal);
   color: var(--muted);
   transition: color var(--dur-base) var(--ease-out);
+}
+
+/* Trimmed to the ink itself — cap height above, baseline below — so centring
+   the label centres what you see, taken from whichever font actually resolved.
+   Where this is unsupported the padding above stands in, tuned to Inter. */
+.lang__label {
+  display: block;
+}
+
+@supports (text-box-trim: trim-both) {
+  .lang__item {
+    padding-block-start: 0;
+  }
+
+  .lang__label {
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+  }
 }
 
 .lang__item:hover {

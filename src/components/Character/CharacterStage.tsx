@@ -150,12 +150,15 @@ export function CharacterStage() {
   const src = tracks ? SHEET : STILL
   const neutral = manifest.neutral
   const wave = !tracks && !waveBroken
-  // The wave is a 16:9 shot and the hand reaches out to x=146 of 1280. Cropped
-  // to the sheet's near-square frame the visible strip is 711px of source and
-  // the hand falls outside it, so the box widens for the wave: at 1.3 the strip
-  // is 937px, and shifted left of centre it holds the whole gesture. The still
-  // is contained inside the same box if the video never arrives.
-  const aspect = tracks ? `${manifest.frameWidth} / ${manifest.frameHeight}` : '1.3'
+  // The wave is a 16:9 shot. The head sits at x=630 of 1280 and the raised hand
+  // reaches out to x=146, so the furthest the subject gets from the head is
+  // 484px — a crop centred on the head has to be at least 968 wide to hold the
+  // whole gesture, and 1048 leaves it room to breathe. Against the full 720 of
+  // height that is an aspect of 1.46, and `object-position` puts the crop's
+  // centre on the head rather than on the frame's, so the head lands in the
+  // middle of the box and the distance to either side of it is the same.
+  // The still is contained inside the same box if the video never arrives.
+  const aspect = tracks ? `${manifest.frameWidth} / ${manifest.frameHeight}` : '1.46'
   const visible = tracks || waveSettled
 
   return (
