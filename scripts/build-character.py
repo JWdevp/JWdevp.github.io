@@ -65,7 +65,15 @@ D_EDGE = 6.0
 #
 # The window is chosen below by how well it covers the nine directions, not by
 # hand. SEGMENT is its length in source frames; the search picks where it goes.
-SEGMENT = 72
+#
+# 110 rather than 72. Sweeping the length against the coverage cost, everything
+# up to about 110 buys a real improvement and nothing past it does: cost 1.29 at
+# 72, 0.99 at 110, 0.97 at the full 240, while the amount the chosen frame
+# doubles back as the cursor sweeps keeps climbing, 1.3 -> 1.5 -> 2.5. The two
+# directions that gain are the two that were visibly weak, up-left (0.92 -> 0.65)
+# and down-left (0.29 -> 0.15); at 72 no window can hold them and the horizontal
+# extremes at once, because they are 140 frames apart in the recording.
+SEGMENT = 110
 SPRITE_WIDTH = 400     # px per frame in the sheet
 QUALITY = 72
 GUTTER = 8
@@ -85,9 +93,39 @@ BOTTOM_PAD = 12        # rows added under the frame while matting, so the
 GAZE_WEIGHT_X = 2.5
 
 # --- gaze tracking --------------------------------------------------------
-EYE_ROI = (215, 272, 592, 790)   # y0, y1, x0, x1 in the 1280x720 source
-EYE_SPLIT = 690
-PUPIL_DARK = 110
+# Measured out from the EYEBROWS, not at fixed pixel coordinates.
+#
+# The earlier version read a fixed box and called the darkest mass in it the
+# pupil. Two things were wrong with that. The head drifts and changes scale
+# through the take, so the box slides off the eyes and the slide is read as
+# gaze; and the brow is both darker and larger than the iris, so what the box
+# actually measured, in most frames, was the eyebrow. Overlaying the detections
+# on the source shows the markers sitting on the brows, not the eyes.
+#
+# Anchoring on the brow pair fixes both. The brows are the most reliable dark
+# landmark on this face, they move with the head, and the distance between them
+# gives the scale, so the eye boxes follow the head and every measurement can be
+# expressed in units of that distance instead of pixels.
+FACE_BOX = (120, 360, 480, 900)  # y0, y1, x0, x1: holds the face in every frame
+BROW_SIGMAS = (7, 9, 11)         # blob widths tried when hunting for the brows
+BROW_LEVEL = 14                  # px a brow pair may sit out of level
+BROW_GAP = (55, 130)             # px: any plausible distance between the brows
+BROW_TOLERANCE = 0.18            # how far a frame may sit from the take's median
+EYE_TOP = 0.10                   # eye box top, below the brow, in gap units
+EYE_SIZE = 0.62                  # eye box side, in gap units
+IRIS_DARK = 120                  # luminance below which a pixel counts as iris
+IRIS_FILL = (0.12, 0.62)         # share of the eye box that may be dark; outside
+                                 # it the eye is shut or the box has slipped off
+# How far a frame may sit from what its neighbours say, in eye-box fractions.
+# Eyes cannot cross the whole socket and come back inside one 24fps frame, so a
+# reading that disagrees with the frames either side is a misdetection, not a
+# movement. Worth doing even though the checks above catch most of it: two
+# frames slipped through into the first build and one of them, measured off a
+# brow the search had lost, became the sheet's furthest-UP frame — so every
+# cursor at the top of the page chose a frame picked by a bad measurement.
+# 0.05 sits between the 90th and 97th percentile of the deviation, and throws
+# out 19 of 240, the half-blinks among them.
+GAZE_JUMP = 0.05
 
 
 def run_ffmpeg(dst: Path) -> None:
@@ -190,25 +228,123 @@ def matte(path):
     return fg[:-BOTTOM_PAD].astype(np.uint8), (alpha[:-BOTTOM_PAD] * 255).astype(np.uint8)
 
 
-def _pupil(lum, x0, x1):
-    sub = lum[:, x0:x1]
-    m = sub < PUPIL_DARK
-    if m.sum() < 12:
-        m = sub < np.percentile(sub, 4)
+def _blobs(lum):
+    """Dark blobs in the face box, over a few sizes."""
+    y0, y1, x0, x1 = FACE_BOX
+    sub = lum[y0:y1, x0:x1]
+    found = []
+    for sigma in BROW_SIGMAS:
+        # Scale-normalised Laplacian of Gaussian: peaks on dark blobs about
+        # sigma wide, whatever the surrounding skin happens to be lit to.
+        resp = ndi.gaussian_laplace(sub, sigma) * sigma ** 2
+        lab, n = ndi.label(resp > np.percentile(resp, 99.3))
+        for k in range(1, n + 1):
+            m = lab == k
+            if m.sum() < 25:
+                continue
+            cy, cx = ndi.center_of_mass(m)
+            found.append((cx + x0, cy + y0))
+    return found
+
+
+def _brows(blobs, gap_lo, gap_hi):
+    """The brow pair: the HIGHEST two blobs sitting level and a face apart.
+    Highest, because the only other pair that fits the description is the eyes,
+    and they are always lower."""
+    best = None
+    for i in range(len(blobs)):
+        for j in range(i + 1, len(blobs)):
+            (xi, yi), (xj, yj) = blobs[i], blobs[j]
+            if abs(yi - yj) > BROW_LEVEL or not gap_lo < abs(xi - xj) < gap_hi:
+                continue
+            height = (yi + yj) / 2
+            if best is None or height < best[0]:
+                left, right = sorted((blobs[i], blobs[j]))
+                best = (height, left, right)
+    return None if best is None else (best[1], best[2])
+
+
+def _iris(lum, brow, gap):
+    """Where the iris sits inside its own eye box, as a fraction of that box.
+
+    The box hangs off the brow and is sized by the brow gap, so this says where
+    the eye points within the head — which is the signal — rather than where the
+    head happens to be in frame, which is not."""
+    side = gap * EYE_SIZE
+    x0 = int(brow[0] - side / 2)
+    y0 = int(brow[1] + gap * EYE_TOP)
+    sub = lum[y0:int(y0 + side), x0:int(x0 + side)]
+    if sub.size == 0:
+        return None
+    m = sub < IRIS_DARK
+    fill = m.sum() / sub.size
+    if not IRIS_FILL[0] < fill < IRIS_FILL[1]:
+        return None            # blinked, or the box has slid off the eye
     ys, xs = np.nonzero(m)
-    w = (PUPIL_DARK - sub[ys, xs]).clip(1)
-    return (xs * w).sum() / w.sum() + x0, (ys * w).sum() / w.sum()
+    w = (IRIS_DARK - sub[ys, xs]).clip(1)
+    return (xs * w).sum() / w.sum() / side, (ys * w).sum() / w.sum() / side
 
 
-def gaze(path):
-    """Where this frame is looking, read off the pupils. Their position in frame
-    carries the head turn and the eye turn together, which is the whole signal."""
-    a = np.asarray(Image.open(path).convert('L')).astype(np.float32)
-    y0, y1, x0, x1 = EYE_ROI
-    lum = a[y0:y1, x0:x1]
-    lx, ly = _pupil(lum, 0, EYE_SPLIT - x0)
-    rx, ry = _pupil(lum, EYE_SPLIT - x0, x1 - x0)
-    return (lx + rx) / 2 + x0, (ly + ry) / 2 + y0
+def read_gaze(paths):
+    """Where each frame looks, in units of the distance between the brows.
+
+    Two passes over the clip. The first learns how far apart the brows sit in
+    this take; the second measures again holding the gap near that, which is
+    what keeps the search off the hair and the glasses. Blinks are filled in
+    from the frames either side rather than dropped, so the result stays one
+    reading per source frame."""
+    lums = [np.asarray(Image.open(p).convert('L')).astype(np.float32) for p in paths]
+    blobs = [_blobs(l) for l in lums]
+
+    loose = [_brows(b, *BROW_GAP) for b in blobs]
+    spans = [r[1][0] - r[0][0] for r in loose if r]
+    if not spans:
+        sys.exit('no eyebrows found — check FACE_BOX against the source.')
+    median = float(np.median(spans))
+    lo, hi = median * (1 - BROW_TOLERANCE), median * (1 + BROW_TOLERANCE)
+    print(f'  brows sit {median:.0f}px apart; holding the gap to {lo:.0f}..{hi:.0f}')
+
+    pairs = [_brows(b, lo, hi) or loose[i] for i, b in enumerate(blobs)]
+    anchors = np.array([[np.nan] * 4 if p is None
+                        else [p[0][0], p[0][1], p[1][0], p[1][1]] for p in pairs])
+    where = np.arange(len(paths))
+    for axis in range(4):
+        col = anchors[:, axis]
+        seen = np.nonzero(~np.isnan(col))[0]
+        if not len(seen):
+            sys.exit('no eyebrows found — check FACE_BOX against the source.')
+        col = np.interp(where, seen, col[seen])
+        # The head moves smoothly, so a frame that disagrees with its
+        # neighbours is a misdetection rather than a movement.
+        anchors[:, axis] = ndi.median_filter(col, size=5, mode='nearest')
+
+    out = np.full((len(paths), 2), np.nan)
+    for i, lum in enumerate(lums):
+        lx, ly, rx, ry = anchors[i]
+        gap = rx - lx
+        eyes = [e for e in (_iris(lum, (lx, ly), gap), _iris(lum, (rx, ry), gap)) if e]
+        if eyes:
+            out[i] = np.mean(eyes, axis=0) - 0.5      # centre of the box is 0
+
+    blind = np.isnan(out[:, 0])
+    if blind.all():
+        sys.exit('no eyes found — check FACE_BOX against the source.')
+
+    def fill(mask):
+        seen = np.nonzero(~mask)[0]
+        for axis in range(2):
+            out[:, axis] = np.interp(where, seen, out[seen, axis])
+
+    fill(blind)
+    # Now that there is a reading for every frame, throw out the ones the rest
+    # of the clip disagrees with, and fill those in the same way.
+    smooth = np.stack([ndi.median_filter(out[:, k], size=5, mode='nearest')
+                       for k in range(2)], axis=1)
+    stray = np.hypot(*(out - smooth).T) > GAZE_JUMP
+    fill(blind | stray)
+    print(f'  {int(blind.sum())} unreadable and {int(stray.sum())} stray frame(s), '
+          'filled from their neighbours')
+    return out
 
 
 # The nine directions the window has to be able to answer, in normalised gaze.
@@ -260,7 +396,7 @@ def main():
         print(f'  {len(frames)} frames')
 
         print('reading gaze…')
-        g = np.array([gaze(f) for f in frames])
+        g = read_gaze(frames)
 
         # Normalise to -1..1 across the WHOLE clip, before choosing the window,
         # so the window is judged against the full range the subject ever
