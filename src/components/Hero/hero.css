@@ -74,10 +74,10 @@
   );
 }
 
-/* With a cursor the light appears under it and follows. */
+/* With a cursor the light appears under it and follows. Quick to arrive. */
 .hero__greeting[data-follow]:hover::after {
   opacity: 1;
-  transition-duration: 200ms;
+  transition-duration: 220ms;
 }
 
 /* Without one, a tap lights the whole line for two seconds — no mask, so the
@@ -88,8 +88,12 @@
   mask-image: none;
 }
 
+/* Slow to leave. `ease-out` on its own still drops most of the opacity in the
+   first moments, which is what made it read as a snap however long it ran, so
+   the curve is one that barely moves at first and trails away at the end. */
 .hero__greeting:not([data-lit])::after {
-  transition-duration: 800ms;
+  transition-duration: 1500ms;
+  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -37,33 +37,59 @@ export function SettingsIsland() {
       if (!items) return
 
       // Reduced motion keeps the disclosure legible as a cross-fade: the slide
-      // distance and the overshoot go, the fade stays.
+      // distance goes, the fade stays.
       const budget = motionBudget()
-      const slide = budget.travel(26)
-      const shrink = budget.reduced ? 1 : 0.88
+      // How far each island has to travel to sit behind the gear: the distance
+      // from its own left edge to the panel's right edge, plus the gap between
+      // panel and button. Measured per island, so they genuinely slide out from
+      // under the gear rather than nudging into place.
+      //
+      // From `offsetLeft`, not `getBoundingClientRect`: the rect includes the
+      // transform these are already carrying, so when they are parked it
+      // reports the parked position and the distance comes out as zero — which
+      // is exactly what stopped them moving at all.
+      const box = panel.current
+      const gap = parseFloat(getComputedStyle(root.current as Element).gap) || 8
+      const parked = new Map<Element, number>()
+      if (box) {
+        for (const item of items) {
+          const el = item as HTMLElement
+          parked.set(item, budget.travel(box.offsetWidth - el.offsetLeft + gap))
+        }
+      }
+      const park = (_i: number, el: Element) => parked.get(el) ?? budget.travel(26)
 
       const first = !started.current
       started.current = true
 
       if (first) {
-        gsap.set(items, { autoAlpha: open ? 1 : 0, x: open ? 0 : slide, scale: open ? 1 : shrink })
+        gsap.set(items, { autoAlpha: open ? 1 : 0, x: open ? 0 : park, scale: 1 })
         return
       }
 
       const tl = gsap.timeline()
 
       if (open) {
-        // Emerge from behind the gear, nearest island first.
+        // Slide out from behind the gear, nearest island first. The fade runs
+        // well ahead of the movement so what you read is the travel, not an
+        // appearance: by a third of the way out they are already solid.
         tl.fromTo(
           items,
-          { autoAlpha: 0, x: slide, scale: shrink },
+          { autoAlpha: 0, x: park },
+          {
+            x: 0,
+            duration: budget.duration(0.52),
+            ease: 'power3.out',
+            stagger: { each: budget.stagger(0.08), from: 'end' },
+          },
+          0,
+        ).to(
+          items,
           {
             autoAlpha: 1,
-            x: 0,
-            scale: 1,
-            duration: budget.duration(0.42),
-            ease: budget.reduced ? 'power2.out' : 'back.out(1.6)',
-            stagger: { each: budget.stagger(0.07), from: 'end' },
+            duration: budget.duration(0.18),
+            ease: 'none',
+            stagger: { each: budget.stagger(0.08), from: 'end' },
           },
           0,
         )
@@ -71,14 +97,21 @@ export function SettingsIsland() {
         tl.to(
           items,
           {
-            autoAlpha: 0,
-            x: slide,
-            scale: shrink,
-            duration: budget.duration(0.26),
+            x: park,
+            duration: budget.duration(0.34),
             ease: 'power2.in',
-            stagger: { each: budget.stagger(0.05), from: 'start' },
+            stagger: { each: budget.stagger(0.06), from: 'start' },
           },
           0,
+        ).to(
+          items,
+          {
+            autoAlpha: 0,
+            duration: budget.duration(0.16),
+            ease: 'none',
+            stagger: { each: budget.stagger(0.06), from: 'start' },
+          },
+          budget.duration(0.18),
         )
       }
     },

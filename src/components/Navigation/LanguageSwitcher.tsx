@@ -62,7 +62,11 @@ export function LanguageSwitcher() {
           lang={code}
           onClick={() => setLanguage(code)}
         >
-          {LANGUAGE_LABELS[code]}
+          {/* The label is its own block so `text-box-trim` has something to
+              act on: on a flex container it has no effect, and this is what
+              makes the centring come from the font's metrics rather than a
+              hand-tuned nudge. */}
+          <span className="lang__label">{LANGUAGE_LABELS[code]}</span>
         </button>
       ))}
     </div>
