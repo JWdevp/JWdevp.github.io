@@ -343,7 +343,7 @@ BASE_PATH=/my-repo/ npm run build
 Nothing below is invented or filled in with placeholder facts — these are yours
 to supply:
 
-- [ ] `public/cv/jason-wiersum-lebenslauf.pdf` — the CV the About section
+- [ ] `public/cv/JasonWiersum-Lebenslauf.pdf` — the CV the About section
       offers for download (see `public/cv/README.md`)
 - [ ] `public/character/wave.mp4` — the wave played once on touch devices
 - [ ] `public/images/projects/landesamt-logo.png` — the mark on the

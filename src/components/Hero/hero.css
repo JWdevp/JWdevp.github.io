@@ -30,19 +30,70 @@
   letter-spacing: -0.045em;
   line-height: 0.98;
   margin-block-start: var(--space-1);
-  /* `fit-content`, so the hover area is the words themselves rather than the
+  /* `fit-content`, so the lit area is the words themselves rather than the
      full width of the column they sit in. */
   width: fit-content;
   color: var(--foreground);
-  transition: color 420ms var(--ease-out);
 }
 
-.hero__greeting:hover {
+/* --- The accent light on the greeting ------------------------------------
+
+   A pool of accent colour painted over the glyphs and nowhere else. The text
+   is drawn twice, stacked: the plain colour underneath and an accent copy on
+   top whose alpha is a radial gradient, so the accent shows only where the
+   gradient is opaque. Clipping to the text rather than tinting `color` is what
+   lets the light have a shape at all.
+
+   `--lx`/`--ly` are written by the pointer handler, which is why this is a
+   style write and not a re-render. */
+.hero__greeting {
+  --lx: 50%;
+  --ly: 50%;
+  position: relative;
+}
+
+.hero__greeting::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   color: var(--accent);
+  opacity: 0;
+  transition: opacity 420ms var(--ease-out);
+  -webkit-mask-image: radial-gradient(
+    12rem circle at var(--lx) var(--ly),
+    #000 0%,
+    rgba(0, 0, 0, 0.55) 38%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    12rem circle at var(--lx) var(--ly),
+    #000 0%,
+    rgba(0, 0, 0, 0.55) 38%,
+    transparent 72%
+  );
+}
+
+/* With a cursor the light appears under it and follows. */
+.hero__greeting[data-follow]:hover::after {
+  opacity: 1;
+  transition-duration: 200ms;
+}
+
+/* Without one, a tap lights the whole line for two seconds — no mask, so the
+   accent covers all of it — and then fades out over most of a second. */
+.hero__greeting[data-lit]::after {
+  opacity: 1;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.hero__greeting:not([data-lit])::after {
+  transition-duration: 800ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero__greeting {
+  .hero__greeting::after {
     transition-duration: 260ms;
   }
 }

@@ -7,7 +7,18 @@
    =========================================================================== */
 
 :root {
-  /* --- Type families ---------------------------------------------------- */
+  /* --- Type families ----------------------------------------------------
+     Two faces: SF Pro Display sets the headings and the buttons, Inter sets
+     the reading text.
+
+     SF Pro cannot be shipped. Apple's licence does not allow serving it as a
+     webfont and it is on no font CDN, so it is asked for by name — which finds
+     it on anyone who has it installed — and `-apple-system` picks it up on
+     every Apple device, where the system resolves the optical size itself.
+     Everywhere else the stack lands on Inter, which is loaded anyway, so the
+     page stays one typeface rather than falling through to Arial. */
+  --font-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter',
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas,

@@ -181,12 +181,6 @@
   gap: var(--space-3);
 }
 
-@media (max-width: 32rem) {
-  .about__cv-actions {
-    grid-auto-flow: row;
-  }
-}
-
 /* --- Reveal button -------------------------------------------------------
    A pill with a round badge at its left edge. On hover the badge swells until
    it has flooded the whole pill and the icon rides out to the middle, so the
@@ -215,6 +209,7 @@
   border-radius: var(--radius-pill);
   background: var(--surface-solid);
   color: var(--foreground);
+  font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 520;
   white-space: nowrap;
@@ -290,6 +285,33 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal-btn {
     --rb-dur: 300ms;
+  }
+}
+
+/* Side by side on a phone too. "Lebenslauf herunterladen" does not fit on one
+   line at half of 390px, so below this width the pair keeps its two columns
+   and the labels wrap instead — the badge shrinks, the pill grows taller.
+   That reads better than one button above the other.
+
+   After the rules above, not before them: these carry the same specificity, so
+   whichever comes last wins and a media query placed earlier in the file loses
+   silently. */
+@media (max-width: 32rem) {
+  .about__cv-actions {
+    width: 100%;
+  }
+
+  .reveal-btn {
+    --rb-badge: 1.9rem;
+    --rb-gap: 0.55rem;
+    padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap)) 0.7rem;
+    font-size: var(--text-xs);
+    white-space: normal;
+    text-align: left;
+  }
+
+  .reveal-btn__label {
+    min-width: 0;
   }
 }
 

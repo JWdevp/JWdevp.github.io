@@ -3,11 +3,15 @@
 The About section offers a download button for the CV. It points at:
 
 ```
-public/cv/jason-wiersum-lebenslauf.pdf
+public/cv/JasonWiersum-Lebenslauf.pdf
 ```
 
 Put the PDF here under exactly that name and the button appears. The path is
 `SITE.cv` in `src/config/site.ts` if you would rather call it something else.
+
+The filename is what the browser saves it as, which is why it is capitalised
+the way a document should be rather than lowercased like the rest of the
+assets.
 
 **Avoid spaces in the filename.** They have to be percent-encoded in a URL and
 are easy to get wrong; `src/data/` is also the wrong place for it — anything the

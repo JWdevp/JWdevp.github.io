@@ -35,18 +35,38 @@
   margin-block-end: var(--space-3);
 }
 
+/* Both the same width and the pair centred in the column. `grid-auto-columns:
+   1fr` is what makes the two equal — a flex row shares only the leftover space
+   — and the grid is shrink-to-fit so `justify-self` can centre the whole pair
+   rather than stretching it across. */
 .contact__links ul {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.contact__links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* The equal-width tracks belong to the list items; without this the link
+   inside sizes to its own label and the two pills come out different widths
+   inside two equal cells. */
+.contact__links li {
+  display: flex;
+}
+
 .contact__link {
   position: relative;
   isolation: isolate;
+  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -56,6 +76,7 @@
   padding: 0.85rem 1.3rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
+  font-family: var(--font-display);
   font-size: var(--text-base);
   font-weight: 500;
   color: var(--muted-strong);
@@ -97,12 +118,12 @@
 
 .contact__link--linkedin {
   --tint-a: #0a66c2;
-  --tint-b: #7fd0ff;
+  --tint-b: #38bdf8;
 }
 
 .contact__link--github {
   --tint-a: #8957e5;
-  --tint-b: #d8b4fe;
+  --tint-b: #c084fc;
 }
 
 .contact__link--linkedin::before,
@@ -113,18 +134,17 @@
   z-index: -1;
   padding: 1px;
   border-radius: inherit;
-  /* A full sweep rather than one lit arc: colour all the way round, so the
-     turn reads as the ring rotating instead of a highlight sliding along a
-     mostly empty circle. */
+  /* One lit arc travelling round an otherwise clear ring, rather than colour
+     all the way round: quieter, and it reads as a highlight going past. */
   background: conic-gradient(
     from var(--angle),
-    var(--tint-a),
-    var(--tint-b),
-    var(--tint-a),
-    var(--tint-b),
-    var(--tint-a)
+    transparent 0deg,
+    var(--tint-a) 70deg,
+    var(--tint-b) 130deg,
+    transparent 210deg,
+    transparent 360deg
   );
-  opacity: 0.85;
+  opacity: 0.75;
   /* Ring, not disc: keep the padding band and cut the middle out. */
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -329,13 +349,7 @@ textarea.field__control {
     position: static;
   }
 
-  /* Side by side rather than stacked: two pills at half width each still hold
-     their label, and stacking them pushed the form off the first screenful. */
-  .contact__links ul {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
+  /* The pair still fits side by side on a phone, but not at 12rem each. */
   .contact__link {
     min-width: 0;
   }
