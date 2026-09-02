@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { FOLLOW, LAYOUT, MAX_TRAVEL } from './characterConfig'
 import manifest from './manifest.json'
@@ -56,6 +56,7 @@ export function CharacterStage() {
   const [ready, setReady] = useState(false)
   const [wavePlaying, setWavePlaying] = useState(false)
   const [waveBroken, setWaveBroken] = useState(false)
+  const [waveSettled, setWaveSettled] = useState(false)
 
   /**
    * Reveal the wave once it has a frame to show.
@@ -75,6 +76,19 @@ export function CharacterStage() {
     const onReady = () => setWavePlaying(true)
     node.addEventListener('loadeddata', onReady, { once: true })
   }, [])
+
+  // On a touch device nothing is shown until the wave has had its say, so the
+  // cut-out still does not flash up behind it for a moment first. The timeout
+  // is the escape hatch: a video that stalls without erroring must not leave
+  // the hero empty, so after it the still is shown regardless.
+  useEffect(() => {
+    if (wavePlaying || waveBroken) {
+      setWaveSettled(true)
+      return
+    }
+    const timer = setTimeout(() => setWaveSettled(true), 2500)
+    return () => clearTimeout(timer)
+  }, [wavePlaying, waveBroken])
   const tracks = useMemo(hasFinePointer, [])
 
   const render = useCallback(
@@ -136,6 +150,13 @@ export function CharacterStage() {
   const src = tracks ? SHEET : STILL
   const neutral = manifest.neutral
   const wave = !tracks && !waveBroken
+  // The wave is a 16:9 shot and the hand reaches out to x=146 of 1280. Cropped
+  // to the sheet's near-square frame the visible strip is 711px of source and
+  // the hand falls outside it, so the box widens for the wave: at 1.3 the strip
+  // is 937px, and shifted left of centre it holds the whole gesture. The still
+  // is contained inside the same box if the video never arrives.
+  const aspect = tracks ? `${manifest.frameWidth} / ${manifest.frameHeight}` : '1.3'
+  const visible = tracks || waveSettled
 
   return (
     <div
@@ -145,14 +166,15 @@ export function CharacterStage() {
         // Every size and offset comes from characterConfig.
         width: LAYOUT.width,
         maxWidth: LAYOUT.maxWidth,
-        aspectRatio: `${manifest.frameWidth} / ${manifest.frameHeight}`,
+        aspectRatio: aspect,
         translate: `${LAYOUT.offsetX} ${LAYOUT.offsetY}`,
         ['--character-cols' as string]: tracks ? manifest.columns : 1,
         ['--character-rows' as string]: tracks ? manifest.rows : 1,
         ['--character-mobile-max' as string]: LAYOUT.mobileMaxWidth,
       }}
-      data-ready={ready || undefined}
+      data-ready={(ready && visible) || undefined}
       data-wave={wavePlaying || undefined}
+      data-still={!tracks || undefined}
     >
       <img
         className="character__sheet"

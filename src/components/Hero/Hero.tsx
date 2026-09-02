@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { Suspense, lazy, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../../hooks/useLanguage'
 import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 
@@ -20,7 +20,7 @@ export function Hero() {
   // Which line greets you is drawn once per load, not per render — picking it
   // inline would hand you a different one on every re-render, including the
   // one that happens when you switch language.
-  const [pick] = useState(() => Math.floor(Math.random() * 6))
+  const [pick] = useState(() => Math.floor(Math.random() * 1000))
   const taglines = t.hero.taglines
   const tagline = taglines[pick % taglines.length]
 
@@ -78,7 +78,7 @@ export function Hero() {
     <section id="home" className="section hero" ref={root}>
       <div className="container hero__grid">
         <div className="hero__copy">
-          <h1 className="hero__greeting">{t.hero.greeting}</h1>
+          <Greeting text={t.hero.greeting} />
 
           <p className="hero__tagline" data-hero-item>
             {tagline}
@@ -94,5 +94,55 @@ export function Hero() {
       </div>
 
     </section>
+  )
+}
+
+/**
+ * The greeting, lit by the accent colour.
+ *
+ * With a cursor the light follows it: a small accent-coloured pool clipped to
+ * the glyphs, written to CSS custom properties from the pointer handler so it
+ * costs a style write and no React render. Without one there is nothing to
+ * follow, so a tap lights the whole line for two seconds and it fades back.
+ */
+function Greeting({ text }: { text: string }) {
+  const node = useRef<HTMLHeadingElement>(null)
+  const [lit, setLit] = useState(false)
+
+  const fine =
+    typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches
+
+  const track = useCallback(
+    (event: React.PointerEvent<HTMLHeadingElement>) => {
+      const el = node.current
+      if (!el || !fine) return
+      const rect = el.getBoundingClientRect()
+      el.style.setProperty('--lx', `${((event.clientX - rect.left) / rect.width) * 100}%`)
+      el.style.setProperty('--ly', `${((event.clientY - rect.top) / rect.height) * 100}%`)
+    },
+    [fine],
+  )
+
+  // Touch: hold the tint, then let it go.
+  useEffect(() => {
+    if (!lit) return
+    const timer = setTimeout(() => setLit(false), 2000)
+    return () => clearTimeout(timer)
+  }, [lit])
+
+  return (
+    <h1
+      className="hero__greeting"
+      ref={node}
+      data-text={text}
+      data-follow={fine || undefined}
+      data-lit={lit || undefined}
+      onPointerMove={track}
+      onPointerDown={() => {
+        if (!fine) setLit(true)
+      }}
+    >
+      {text}
+    </h1>
   )
 }

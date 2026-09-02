@@ -153,9 +153,15 @@
   padding-inline: var(--island-pad);
 }
 
+/* Inset from both edges rather than given a height. `--island-h` is the
+   island's BORDER box, so subtracting only the padding from it left the pill a
+   border's width too tall: 6px of room above it and 4px below. Pinning top and
+   bottom to the same padding puts it symmetrically inside whatever the island
+   turns out to be. */
 .island--lang .island__pill--sm {
   top: var(--island-pad);
-  height: calc(var(--island-h) - 2 * var(--island-pad));
+  bottom: var(--island-pad);
+  height: auto;
 }
 
 /* Same type as the navigation island, so the two read as one system. */
@@ -165,7 +171,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(var(--island-h) - 2 * var(--island-pad));
+  /* Stretched to the same band as the pill and inset by the same padding, so
+     the label's box and the pill it sits on are the one shape. Given its own
+     height it came out a pixel above the pill. */
+  align-self: stretch;
+  margin-block: var(--island-pad);
   padding-inline: 0.62rem;
   border-radius: var(--radius-pill);
   font-size: var(--text-sm);
@@ -178,7 +188,7 @@
      a little over 2px. Half a descender of padding puts the ink itself in the
      middle. Measured, not guessed: the remainder is under half a pixel. */
   line-height: 1;
-  padding-block-start: 0.26em;
+  padding-block-start: 0.14em;
   letter-spacing: var(--tracking-normal);
   color: var(--muted);
   transition: color var(--dur-base) var(--ease-out);

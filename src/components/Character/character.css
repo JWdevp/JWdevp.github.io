@@ -46,7 +46,9 @@
   border-radius: var(--radius-lg);
   background: #f2f2f0;
   object-fit: cover;
-  object-position: center 32%;
+  /* Left of centre: the subject sits at x 146..917 of 1280, so a centred crop
+     takes the hand off before it takes anything on the right. */
+  object-position: 34% center;
   opacity: 0;
   transition: opacity 300ms var(--ease-out);
   pointer-events: none;
@@ -59,6 +61,11 @@
 /* The wave has taken over; the still underneath would otherwise show around it. */
 .character__sheet[data-covered] {
   opacity: 0;
+}
+
+/* Standing in for a wave that never arrived, inside the wave's wider box. */
+.character[data-still] .character__sheet {
+  object-fit: contain;
 }
 
 .character__sheet {
