@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { announceGreetingDone } from '../../hooks/useGreeting'
 import { useLanguage } from '../../hooks/useLanguage'
 import { FOLLOW, LAYOUT, MAX_TRAVEL } from './characterConfig'
 import manifest from './manifest.json'
@@ -69,12 +70,24 @@ export function CharacterStage() {
    */
   const attachWave = useCallback((node: HTMLVideoElement | null) => {
     if (!node) return
+    // Failure races the listener in exactly the same way readiness does, and
+    // loses in the same place: an unsupported codec or a missing file is
+    // settled before React attaches `onError`, so the element sits there
+    // already broken with nobody told. Read the state rather than wait to be
+    // informed of it — otherwise the page spends the full backstop waiting for
+    // a greeting that was never going to happen.
+    if (node.error || node.networkState === node.NETWORK_NO_SOURCE) {
+      setWaveBroken(true)
+      return
+    }
     if (node.readyState >= 2) {
       setWavePlaying(true)
       return
     }
     const onReady = () => setWavePlaying(true)
+    const onFail = () => setWaveBroken(true)
     node.addEventListener('loadeddata', onReady, { once: true })
+    node.addEventListener('error', onFail, { once: true })
   }, [])
 
   // On a touch device nothing is shown until the wave has had its say, so the
@@ -90,6 +103,26 @@ export function CharacterStage() {
     return () => clearTimeout(timer)
   }, [wavePlaying, waveBroken])
   const tracks = useMemo(hasFinePointer, [])
+
+  /**
+   * Tell the rest of the page when the greeting is over — the settings island
+   * waits for it before showing itself on a phone.
+   *
+   * A pointer device never gets the wave, and neither does one where the file
+   * is missing, so in both cases there is nothing to wait for and the signal
+   * goes immediately. Otherwise the video's own `ended` announces it, and this
+   * timer is the backstop: a stalled video must not leave the corner waiting
+   * for ever. Eight seconds against a four-second clip, so it only ever fires
+   * when something has genuinely gone wrong.
+   */
+  useEffect(() => {
+    if (tracks || waveBroken) {
+      announceGreetingDone()
+      return
+    }
+    const timer = setTimeout(announceGreetingDone, 8000)
+    return () => clearTimeout(timer)
+  }, [tracks, waveBroken])
 
   const render = useCallback(
     (gaze: Gaze, delta: number) => {
@@ -217,6 +250,7 @@ export function CharacterStage() {
           // black box in some browsers — this way it simply never appears.
           ref={attachWave}
           data-playing={wavePlaying || undefined}
+          onEnded={announceGreetingDone}
           onError={() => setWaveBroken(true)}
         />
       ) : null}

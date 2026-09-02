@@ -2,7 +2,8 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ChevronRight, Settings } from 'lucide' // icon data, not components
 import { MorphIcon } from 'morphicons/react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useGreetingDone } from '../../hooks/useGreeting'
 import { useLanguage } from '../../hooks/useLanguage'
 import { motionBudget } from '../../hooks/usePrefersReducedMotion'
 import { LanguageSwitcher } from './LanguageSwitcher'
@@ -24,12 +25,57 @@ import { ThemeToggle } from './ThemeToggle'
  * and the chevron, so the two states are one shape changing rather than two
  * icons trading places.
  */
+/** The width at which navigation moves to the bottom and this becomes the only
+ *  control in the corner. Matches the breakpoint in navigation.css. */
+const MOBILE = 720
+/** Downward travel that counts as "done reading", in px. */
+const SCROLL_TO_DISMISS = 24
+
 export function SettingsIsland() {
   const { t } = useLanguage()
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const started = useRef(false)
+  const greeted = useGreetingDone()
+
+  /**
+   * On a phone the panel shows itself once the greeting has finished, using the
+   * same slide it uses when the gear is tapped — so the languages are offered
+   * rather than hidden behind an icon, and offered after the wave has had the
+   * screen to itself rather than competing with it.
+   *
+   * Only on the narrow layout, and only once: reopening it every time the query
+   * matches would fight the person who has just closed it.
+   */
+  const invited = useRef(false)
+  useEffect(() => {
+    if (!greeted || invited.current) return
+    if (!window.matchMedia(`(max-width: ${MOBILE}px)`).matches) return
+    invited.current = true
+    setOpen(true)
+  }, [greeted])
+
+  /**
+   * ...and puts itself away again on the way down the page. It sits over the
+   * top of the content, so the first thing you do after reading it is the
+   * signal that you are finished with it.
+   *
+   * Downward only, and past a threshold: a phone reports small scroll jitters
+   * on its own, and closing on those would look like a glitch rather than a
+   * response. Upward scrolling leaves it alone — you may be coming back to it.
+   */
+  useEffect(() => {
+    if (!open) return
+    let last = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      if (y > last + SCROLL_TO_DISMISS) setOpen(false)
+      else if (y < last) last = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [open])
 
   useGSAP(
     () => {
