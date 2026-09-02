@@ -90,7 +90,6 @@ const es = {
     ],
   },
   skills: {
-    eyebrow: 'Stack',
     title: 'Herramientas con las que trabajo.',
     categories: {
       programming: 'Programación',
@@ -101,8 +100,7 @@ const es = {
     },
   },
   projects: {
-    eyebrow: 'Trabajo',
-    title: 'Trabajo seleccionado.',
+    title: 'Trabajos recientes',
     viewProject: 'Ver proyecto',
     openDetail: 'Abrir proyecto',
     back: 'Volver al índice',
@@ -225,7 +223,6 @@ const en: Translation = {
     ],
   },
   skills: {
-    eyebrow: 'Stack',
     title: 'Tools I work with.',
     categories: {
       programming: 'Programming',
@@ -236,8 +233,7 @@ const en: Translation = {
     },
   },
   projects: {
-    eyebrow: 'Work',
-    title: 'Selected work.',
+    title: 'Recent work',
     viewProject: 'View project',
     openDetail: 'Open project',
     back: 'Back to the overview',
@@ -352,7 +348,6 @@ const de: Translation = {
     ],
   },
   skills: {
-    eyebrow: 'Stack',
     title: 'Womit ich arbeite.',
     categories: {
       programming: 'Programmierung',
@@ -363,8 +358,7 @@ const de: Translation = {
     },
   },
   projects: {
-    eyebrow: 'Work',
-    title: 'Ausgewählte Arbeiten.',
+    title: 'Aktuelle Arbeiten',
     viewProject: 'Projekt ansehen',
     openDetail: 'Projekt öffnen',
     back: 'Zurück zur Übersicht',

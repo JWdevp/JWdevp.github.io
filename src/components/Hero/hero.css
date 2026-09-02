@@ -30,8 +30,12 @@
   letter-spacing: -0.045em;
   line-height: 0.98;
   margin-block-start: var(--space-1);
-  /* `fit-content`, so the lit area is the words themselves rather than the
-     full width of the column they sit in. */
+  /* `fit-content` keeps the box off the full width of the column. It does not
+     hug the glyphs, though the earlier comment here claimed it did: once the
+     greeting wraps, fit-content resolves to the space available, so the box
+     stays 106px wider than the words on a wide screen and 152px on a phone.
+     Harmless for the light — a tap opens a pool far larger than the box, and
+     one that lands beside the words simply draws back that way. */
   width: fit-content;
   color: var(--foreground);
 }
@@ -46,10 +50,29 @@
 
    `--lx`/`--ly` are written by the pointer handler, which is why this is a
    style write and not a re-render. */
+/* The pool's radius, registered so it can be animated: an unregistered custom
+   property jumps from one value to the next, and the retreat below depends on
+   it interpolating. Inherited, because the light is painted by `::after` and an
+   uninherited property would leave the pseudo-element reading the initial value
+   rather than whatever the heading is currently set to. */
+@property --glow {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 .hero__greeting {
   --lx: 50%;
   --ly: 50%;
+  /* Nothing by default. A cursor gets a pool to carry around (below); a tap
+     opens one and then closes it again. */
+  --glow: 0px;
   position: relative;
+}
+
+/* With a cursor the pool is a fixed size and only its position changes. */
+.hero__greeting[data-follow] {
+  --glow: 12rem;
 }
 
 .hero__greeting::after {
@@ -59,15 +82,17 @@
   pointer-events: none;
   color: var(--accent);
   opacity: 0;
-  transition: opacity 420ms var(--ease-out);
+  transition:
+    opacity 420ms var(--ease-out),
+    --glow 420ms var(--ease-out);
   -webkit-mask-image: radial-gradient(
-    12rem circle at var(--lx) var(--ly),
+    var(--glow) circle at var(--lx) var(--ly),
     #000 0%,
     rgba(0, 0, 0, 0.55) 38%,
     transparent 72%
   );
   mask-image: radial-gradient(
-    12rem circle at var(--lx) var(--ly),
+    var(--glow) circle at var(--lx) var(--ly),
     #000 0%,
     rgba(0, 0, 0, 0.55) 38%,
     transparent 72%
@@ -80,25 +105,32 @@
   transition-duration: 220ms;
 }
 
-/* Without one, a tap lights the whole line for two seconds — no mask, so the
-   accent covers all of it — and then fades out over most of a second. */
+/* Without one, a tap opens the pool wide enough to cover the whole line — from
+   the point you touched, not from the middle — holds it for two seconds, and
+   then lets it go. Wide rather than unmasked, because a mask that is switched
+   off cannot be drawn back in afterwards. */
 .hero__greeting[data-lit]::after {
   opacity: 1;
-  -webkit-mask-image: none;
-  mask-image: none;
+  --glow: 60rem;
 }
 
-/* Slow to leave. `ease-out` on its own still drops most of the opacity in the
-   first moments, which is what made it read as a snap however long it ran, so
-   the curve is one that barely moves at first and trails away at the end. */
+/* Slow to leave, and it leaves by RETREATING to the point that was touched
+   rather than dimming where it stands: the radius closes on `--lx`/`--ly` as
+   the opacity goes, so the light is last seen at the fingertip that called it.
+   Fading alone read as a snap from the middle of the word however long it ran,
+   because with no cursor the pool had never been anywhere else.
+
+   `ease-out` on its own still drops most of the opacity in the first moments,
+   so the curve is one that barely moves at first and trails away at the end. */
 .hero__greeting:not([data-lit])::after {
   transition-duration: 1500ms;
   transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
+/* Shortened, not stopped — the retreat still happens, it just takes less time. */
 @media (prefers-reduced-motion: reduce) {
   .hero__greeting::after {
-    transition-duration: 260ms;
+    transition-duration: 400ms;
   }
 }
 

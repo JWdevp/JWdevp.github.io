@@ -112,15 +112,22 @@ function Greeting({ text }: { text: string }) {
   const fine =
     typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches
 
+  /** Put the light where the pointer is. Shared by the cursor, which moves it
+   *  continuously, and by a tap, which sets it once and leaves it there. */
+  const aim = useCallback((event: React.PointerEvent<HTMLHeadingElement>) => {
+    const el = node.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    el.style.setProperty('--lx', `${((event.clientX - rect.left) / rect.width) * 100}%`)
+    el.style.setProperty('--ly', `${((event.clientY - rect.top) / rect.height) * 100}%`)
+  }, [])
+
   const track = useCallback(
     (event: React.PointerEvent<HTMLHeadingElement>) => {
-      const el = node.current
-      if (!el || !fine) return
-      const rect = el.getBoundingClientRect()
-      el.style.setProperty('--lx', `${((event.clientX - rect.left) / rect.width) * 100}%`)
-      el.style.setProperty('--ly', `${((event.clientY - rect.top) / rect.height) * 100}%`)
+      if (!fine) return
+      aim(event)
     },
-    [fine],
+    [aim, fine],
   )
 
   // Touch: hold the tint, then let it go.
@@ -138,8 +145,12 @@ function Greeting({ text }: { text: string }) {
       data-follow={fine || undefined}
       data-lit={lit || undefined}
       onPointerMove={track}
-      onPointerDown={() => {
-        if (!fine) setLit(true)
+      onPointerDown={(event) => {
+        if (fine) return
+        // Where you touched, before it lights: the light is anchored here and
+        // this is the point it draws back to when it goes.
+        aim(event)
+        setLit(true)
       }}
     >
       {text}

@@ -12,10 +12,7 @@ export function Skills() {
   return (
     <div className="skills" ref={root}>
       <div className="container">
-        <header className="section__head">
-          <p className="eyebrow" data-reveal>
-            {t.skills.eyebrow}
-          </p>
+        <header className="section__head section__head--bare">
           <h2 className="section__title" data-reveal>
             {t.skills.title}
           </h2>
