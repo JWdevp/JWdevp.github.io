@@ -202,9 +202,15 @@
   isolation: isolate;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 3.05rem;
   padding-block: var(--rb-pad);
-  padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap)) 1.4rem;
+  /* Symmetric, and the same reserve on both sides. The left one has to clear
+     the badge; the right one is dead space that exists only to balance it, so
+     the label reads as centred in the pill instead of shoved off to one side.
+     Centring the label against the pill alone would not do: the longer of the
+     two labels would then start underneath the badge. */
+  padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap));
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   background: var(--surface-solid);
@@ -304,10 +310,17 @@
   .reveal-btn {
     --rb-badge: 1.9rem;
     --rb-gap: 0.55rem;
+    /* Back to a narrow reserve on the right, unlike the wide screen. Balancing
+       the badge here costs 45px of a 169px button, which is enough to break
+       "Download CV" and "Descargar CV" onto two lines — a worse read than a
+       label sitting slightly right of centre. So the label is centred in the
+       room it has rather than in the pill. */
     padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap)) 0.7rem;
     font-size: var(--text-xs);
     white-space: normal;
-    text-align: left;
+    /* justify-content centres the block; this centres the lines within it once
+       the longer German labels wrap. */
+    text-align: center;
   }
 
   .reveal-btn__label {
