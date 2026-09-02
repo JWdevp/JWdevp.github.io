@@ -197,7 +197,8 @@
   --rb-badge: 2.25rem;
   --rb-gap: 0.85rem;
   --rb-ease: cubic-bezier(0.44, 0, 0.56, 1);
-  --rb-dur: 460ms;
+  /* 80% speed: the flood and the icon's travel read better a shade slower. */
+  --rb-dur: 575ms;
   position: relative;
   isolation: isolate;
   display: inline-flex;
@@ -290,7 +291,7 @@
    trimmed. */
 @media (prefers-reduced-motion: reduce) {
   .reveal-btn {
-    --rb-dur: 300ms;
+    --rb-dur: 375ms;
   }
 }
 
@@ -372,14 +373,11 @@
   }
 }
 
-/* Closing statement: the last thing said in the section, so it carries more
-   weight than the body copy above it. */
-.about__closing {
-  margin-block-start: clamp(2.5rem, 6vh, 4rem);
-  font-size: var(--text-lg);
-  font-weight: 400;
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-snug);
-  color: var(--muted-strong);
+/* The line the section lands on. It carries `section__lead` for the type — the
+   same treatment the opening paragraph used to have — and only needs the space
+   around it setting here: enough above to part it from the body copy, and
+   `balance` so three short sentences do not break one word onto its own line. */
+.about__tagline {
+  margin-block-start: var(--space-5);
   text-wrap: balance;
 }
