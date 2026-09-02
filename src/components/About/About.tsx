@@ -118,9 +118,6 @@ export function About() {
             <h2 className="section__title" data-reveal>
               {t.about.title}
             </h2>
-            <p className="section__lead" data-reveal>
-              {t.about.lead}
-            </p>
 
             <div className="about__prose">
               {t.about.paragraphs.map((paragraph, index) => (
@@ -129,6 +126,12 @@ export function About() {
                 </p>
               ))}
             </div>
+
+            {/* The line the section lands on, in the lead's voice — hence
+                `section__lead`, which is exactly the treatment asked for. */}
+            <p className="section__lead about__tagline" data-reveal>
+              {t.about.tagline}
+            </p>
 
             <Cv />
           </div>
@@ -166,10 +169,6 @@ export function About() {
             </dl>
           </div>
         </section>
-
-        <p className="about__closing" data-reveal>
-          {t.about.closing}
-        </p>
       </div>
     </div>
   )
