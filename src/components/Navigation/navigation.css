@@ -142,6 +142,30 @@
   will-change: transform, opacity;
 }
 
+/* Holds the gear while it is parked off the right-hand edge waiting to arrive.
+   Same trick as the panel above, and for the same reason: an element sitting
+   past the viewport lengthens the document, and `body`'s `overflow-x: hidden`
+   cannot stop it because `.settings` is positioned against the initial
+   containing block rather than against body. Measured at 42px before this.
+   `clip-path` does not help — it clips painting, not scrollable overflow.
+
+   Overflow clips at the PADDING edge, so the right padding is exactly the gap
+   to the screen edge and the gear appears from the edge itself rather than from
+   somewhere short of it. The other three sides are padded well clear so the
+   glass shadow is not cut off. */
+.settings__pocket {
+  overflow: hidden;
+  padding: 24px var(--space-4) 24px 24px;
+  margin: -24px calc(-1 * var(--space-4)) -24px -24px;
+}
+
+@media (max-width: 720px) {
+  .settings__pocket {
+    padding-right: var(--space-3);
+    margin-right: calc(-1 * var(--space-3));
+  }
+}
+
 .island--settings {
   z-index: 1;
 }
