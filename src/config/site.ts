@@ -16,7 +16,7 @@ export const SITE = {
    * the file is actually there, so this can point at a file that has not been
    * added yet without leaving a dead link on the page.
    */
-  cv: `${import.meta.env.BASE_URL}cv/jason-wiersum-lebenslauf.pdf`,
+  cv: `${import.meta.env.BASE_URL}cv/JasonWiersum-Lebenslauf.pdf`,
   links: {
     linkedin: 'https://www.linkedin.com/in/jason-wiersum',
     github: 'https://github.com/jasonwiersum',

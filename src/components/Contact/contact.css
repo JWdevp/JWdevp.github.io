@@ -76,6 +76,7 @@
   padding: 0.85rem 1.3rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
+  font-family: var(--font-display);
   font-size: var(--text-base);
   font-weight: 500;
   color: var(--muted-strong);
