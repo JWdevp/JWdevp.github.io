@@ -130,6 +130,18 @@ p {
   max-width: 46rem;
 }
 
+/* Work and Stack lost their eyebrows, but not the space those held. Taking the
+   line out outright lifted everything below it by 34px, which on a phone pulled
+   the Work heading up into the first screenful — and the heading appearing
+   before you have scrolled is the thing the eyebrow was removed to stop. So the
+   heading stays exactly where it was and the line above it is simply empty.
+
+   17.6px is that line measured: `--text-micro` at the inherited line height.
+   The gap is the one `.section__head` already puts between its children. */
+.section__head--bare {
+  padding-block-start: calc(17.6px + var(--space-4));
+}
+
 .eyebrow {
   display: inline-flex;
   align-items: center;

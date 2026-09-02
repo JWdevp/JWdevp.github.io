@@ -20,10 +20,7 @@ export function Projects() {
   return (
     <div className="projects" ref={root}>
       <div className="container">
-        <header className="section__head">
-          <p className="eyebrow" data-reveal>
-            {t.projects.eyebrow}
-          </p>
+        <header className="section__head section__head--bare">
           <h2 className="section__title" data-reveal>
             {t.projects.title}
           </h2>
