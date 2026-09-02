@@ -274,6 +274,14 @@ textarea.field__control {
   animation: form-spin 0.9s linear infinite;
 }
 
+/* Slowed, never stopped: this one is a loading indicator, and a spinner that
+   holds still says the request died. */
+@media (prefers-reduced-motion: reduce) {
+  .form__spinner {
+    animation-duration: 1.6s;
+  }
+}
+
 @keyframes form-spin {
   to {
     transform: rotate(360deg);

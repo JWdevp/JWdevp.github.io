@@ -173,6 +173,13 @@
   animation: hero-nudge 2.4s var(--ease-in-out) infinite;
 }
 
+/* Reduces itself, like every other loop — nothing global does it any more. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll svg {
+    animation-duration: 6s;
+  }
+}
+
 @keyframes hero-nudge {
   0%,
   70%,

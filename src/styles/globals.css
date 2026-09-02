@@ -299,15 +299,22 @@ p {
    discomfort; a fade or a cross-fade carries meaning (this replaced that) and
    costs nothing, so it survives, shortened.
 
-   The blanket `transition-duration: 0.001ms !important` that used to live here
-   was the reason the interface looked inert on a machine with the preference
-   set: it overrode every component, including ones that had already reduced
-   themselves deliberately. */
+   NOTHING GLOBAL OVERRIDES A COMPONENT'S OWN ANIMATION HERE, and the two
+   attempts to do so are why. The first was a blanket
+   `transition-duration: 0.001ms !important`, which made the whole interface
+   look inert on a machine with the preference set. The second was
+   `animation-iteration-count: 1 !important` on every element and pseudo,
+   which replaced it: it stopped the LinkedIn and GitHub ring dead after one
+   turn, and would have frozen the submit spinner mid-request, because
+   `!important` on the universal selector beats the deliberately slowed
+   duration each of them already declares. A loop that has been slowed on
+   purpose is not the thing this preference is asking to stop.
+
+   So a looping animation reduces itself where it is defined — see the ring in
+   contact.css and the spinner below it. Only scrolling is settled globally,
+   because there is no component to settle it in. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-iteration-count: 1 !important;
+  html {
     scroll-behavior: auto !important;
   }
 }
