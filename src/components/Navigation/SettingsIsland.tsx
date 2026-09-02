@@ -37,27 +37,55 @@ export function SettingsIsland() {
   const root = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const started = useRef(false)
+  const toggle = useRef<HTMLButtonElement>(null)
   const greeted = useGreetingDone()
 
-  /**
-   * On a phone the panel shows itself once the greeting has finished, using the
-   * same slide it uses when the gear is tapped — so the languages are offered
-   * rather than hidden behind an icon, and offered after the wave has had the
-   * screen to itself rather than competing with it.
-   *
-   * Only on the narrow layout, and only once: reopening it every time the query
-   * matches would fight the person who has just closed it.
-   */
-  const invited = useRef(false)
-  useEffect(() => {
-    if (!greeted || invited.current) return
-    if (!window.matchMedia(`(max-width: ${MOBILE}px)`).matches) return
-    invited.current = true
-    setOpen(true)
-  }, [greeted])
+  /** Whether the gear waits for the greeting before appearing at all. Read once
+   *  and kept, so it cannot change under the animation halfway through. */
+  const [waits] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia(`(max-width: ${MOBILE}px)`).matches,
+  )
 
   /**
-   * ...and puts itself away again on the way down the page. It sits over the
+   * On a phone the gear is not there to begin with. It arrives once the
+   * greeting is over, sliding in from the right, so the wave has the corner to
+   * itself while it plays and the control turns up afterwards.
+   *
+   * Only the button moves, and only its transform. What it does when tapped is
+   * untouched, and the panel behind it measures its parked positions from
+   * `offsetLeft`, which a transform does not disturb.
+   *
+   * Parked right off the edge rather than merely faded, which it can afford to
+   * be: `body` carries `overflow-x: hidden`, so nothing here drags a scrollbar
+   * sideways on the way in.
+   */
+  useGSAP(
+    () => {
+      const el = toggle.current
+      if (!el || !waits) return
+      const budget = motionBudget()
+      const inset = parseFloat(getComputedStyle(root.current as Element).right) || 0
+      const park = budget.travel(el.offsetWidth + inset)
+
+      if (!greeted) {
+        // Set, not animated, and in a layout effect: this lands before the
+        // first paint, so the gear is never seen before it is meant to arrive.
+        gsap.set(el, { autoAlpha: 0, x: park })
+        return
+      }
+      gsap.fromTo(
+        el,
+        { autoAlpha: 0, x: park },
+        { autoAlpha: 1, x: 0, duration: budget.duration(0.55), ease: 'power3.out' },
+      )
+    },
+    { dependencies: [greeted, waits] },
+  )
+
+  /**
+   * An open panel puts itself away on the way down the page. It sits over the
    * top of the content, so the first thing you do after reading it is the
    * signal that you are finished with it.
    *
@@ -171,27 +199,30 @@ export function SettingsIsland() {
         <ThemeToggle />
       </div>
 
-      <button
-        type="button"
-        className="island island--settings glass settings__toggle"
-        onClick={() => setOpen((value) => !value)}
-        aria-expanded={open}
-        aria-label={open ? t.a11y.closeSettings : t.a11y.openSettings}
-      >
-        {/* One icon that morphs between the two shapes rather than two icons
-            cross-fading: the gear unwinds into the chevron and back. */}
-        <MorphIcon
-          className="settings__icon"
-          icon={open ? ChevronRight : Settings}
-          size={17}
-          strokeWidth={1.9}
-          spring="snappy"
-          /* A 17px glyph changing shape in place is not a vestibular trigger,
-             so it keeps animating under prefers-reduced-motion — "user" made it
-             swap instantly on any machine with the OS setting on. */
-          reducedMotion="never"
-        />
-      </button>
+      <div className="settings__pocket">
+        <button
+          type="button"
+          className="island island--settings glass settings__toggle"
+          ref={toggle}
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+          aria-label={open ? t.a11y.closeSettings : t.a11y.openSettings}
+        >
+          {/* One icon that morphs between the two shapes rather than two icons
+              cross-fading: the gear unwinds into the chevron and back. */}
+          <MorphIcon
+            className="settings__icon"
+            icon={open ? ChevronRight : Settings}
+            size={17}
+            strokeWidth={1.9}
+            spring="snappy"
+            /* A 17px glyph changing shape in place is not a vestibular trigger,
+               so it keeps animating under prefers-reduced-motion — "user" made
+               it swap instantly on any machine with the OS setting on. */
+            reducedMotion="never"
+          />
+        </button>
+      </div>
     </div>
   )
 }
