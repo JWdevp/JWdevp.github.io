@@ -154,7 +154,7 @@
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   mask-composite: exclude;
-  animation: contact-link-spin 1.6s linear infinite;
+  animation: contact-link-spin 2s linear infinite;
 }
 
 .contact__link--linkedin:hover::before,
@@ -169,7 +169,7 @@
 @media (prefers-reduced-motion: reduce) {
   .contact__link--linkedin::before,
   .contact__link--github::before {
-    animation-duration: 6s;
+    animation-duration: 7.5s;
   }
 }
 
