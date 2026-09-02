@@ -130,9 +130,9 @@
 .contact__link--github::before {
   content: '';
   position: absolute;
-  inset: -1px;
+  inset: -2px;
   z-index: -1;
-  padding: 1px;
+  padding: 2px;
   border-radius: inherit;
   /* One lit arc travelling round an otherwise clear ring, rather than colour
      all the way round: quieter, and it reads as a highlight going past. */
@@ -154,7 +154,7 @@
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   mask-composite: exclude;
-  animation: contact-link-spin 3s linear infinite;
+  animation: contact-link-spin 1.6s linear infinite;
 }
 
 .contact__link--linkedin:hover::before,
@@ -169,7 +169,7 @@
 @media (prefers-reduced-motion: reduce) {
   .contact__link--linkedin::before,
   .contact__link--github::before {
-    animation-duration: 12s;
+    animation-duration: 6s;
   }
 }
 

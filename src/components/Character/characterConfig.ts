@@ -53,9 +53,16 @@ export const FOLLOW = 6
  * The sheet holds one unbroken stretch of the recording at its own frame rate,
  * so 24 is life speed. Above about 60 the walk starts skipping frames on a
  * 60 Hz screen and the point of all this is lost; well below 24 it feels
- * underwater. 48 is twice life speed — quick to answer, still every frame.
+ * underwater.
+ *
+ * 60, the most that still shows every frame on a 60 Hz screen. The sheet holds
+ * 110 frames rather than 72 now, so crossing the whole of it is a longer walk;
+ * at the old 48 the far corners took about 1.8s to reach, which reads as the
+ * character ignoring you rather than answering slowly. This is the ceiling, so
+ * anything further has to come from the sheet being shorter, not the walk
+ * being faster.
  */
-export const MAX_TRAVEL = 48
+export const MAX_TRAVEL = 60
 
 /** Size and placement inside the hero, straight into CSS. Nothing here moves at
  *  runtime — the character is physically fixed and only the frame changes. */
