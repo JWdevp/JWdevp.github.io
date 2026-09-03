@@ -100,23 +100,24 @@ export const IDLE_REST = {
 }
 
 /**
- * How long one clip takes to dissolve into another, in milliseconds.
+ * How long one clip dissolves into another, in milliseconds.
  *
- * One number, not two, and this is the reason: the clip arriving fades over
- * this, and the clip leaving holds at full opacity for exactly this long before
- * it starts to go. That is what keeps the box covered at every instant — two
- * clips fading in opposite directions do not add up to one in the middle, and
- * measured, the gap that opened let 24.6% of the page through. Tie the two to
- * separate numbers and the flash comes back the moment they drift apart.
+ * One number for every swap, and one number driving both halves of each swap:
+ * the clip arriving fades over this, and the clip leaving holds at full opacity
+ * for exactly this long before it starts to go. That is what keeps the box
+ * covered at every instant — two clips fading in opposite directions do not add
+ * up to one in the middle, and measured, the gap that opened let 24.6% of the
+ * page through. Tie the two halves to separate numbers and the flash comes back
+ * the moment they drift apart.
  *
- * The greeting hands over more slowly than the rest. It is the one transition
- * nobody asked for — it happens on arrival, unprompted — so it can afford to
- * take its time, where a swap the reader triggered by tapping should answer at
- * once.
+ * Two seconds is long for a crossfade, and deliberately so. The two clips were
+ * graded apart — the idle's skin came 7.2% darker than the wave's, and even
+ * corrected, a residue survives that a quick cut hands to the eye all at once.
+ * Stretched this far the change arrives below the threshold of being noticed.
+ *
+ * It costs the first half of a tapped wave, which spends it dissolving in. That
+ * is affordable because of where the gesture sits: the hand is raised from
+ * 0.17s to 3.84s of the 4.01s clip and peaks at 2.51s, so the fade is over
+ * before the moment worth seeing.
  */
-export const CLIP_FADE = {
-  /** Tap-driven swaps: wave to idle and back. */
-  normal: 300,
-  /** The greeting settling into the idle, once per visit. */
-  first: 1400,
-}
+export const CLIP_FADE = 2000
