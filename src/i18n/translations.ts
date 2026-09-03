@@ -373,7 +373,7 @@ const de: Translation = {
   },
   contact: {
     title: 'Reden wir?',
-    lead: 'Ob Projekt, Stelle oder einfach eine Idee, über die du sprechen möchtest — die Nachricht landet direkt in meinem Postfach.',
+    lead: 'Ob Projekt, Stelle oder einfach eine Idee, über die du sprechen möchtest, die Nachricht landet direkt in meinem Postfach.',
     form: {
       name: 'Name',
       email: 'E-Mail',
