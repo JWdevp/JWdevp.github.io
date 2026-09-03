@@ -135,7 +135,10 @@ function Greeting({ text }: { text: string }) {
     if (!el) return
     const rect = el.getBoundingClientRect()
     el.style.setProperty('--lx', `${((event.clientX - rect.left) / rect.width) * 100}%`)
-    el.style.setProperty('--ly', `${((event.clientY - rect.top) / rect.height) * 100}%`)
+    // Down the page in px, not per cent: the box this lands in is taller than
+    // the heading by `--bleed` at each end, and a percentage would be read
+    // against that taller box and put the light above where you touched.
+    el.style.setProperty('--ly', `${event.clientY - rect.top}px`)
   }, [])
 
   const track = useCallback(

@@ -64,6 +64,14 @@
 .hero__greeting {
   --lx: 50%;
   --ly: 50%;
+  /* How far the accent copy reaches past the line box. `line-height: 0.98` is
+     shorter than the glyphs are tall, so the ink overflows its own box — 4px
+     above and 2.8px below, measured on the Spanish greeting at a phone's font
+     size. The mask clips at the border box, which meant the tail of the "¡",
+     the comma and the "y" in "¡Hola, soy Jason!" stayed black however the light
+     was aimed at them. Every language loses its comma this way; Spanish just
+     has three descenders to show for it. */
+  --bleed: 0.3em;
   /* Nothing by default. A cursor gets a pool to carry around (below); a tap
      opens one and then closes it again. */
   --glow: 0px;
@@ -78,7 +86,13 @@
 .hero__greeting::after {
   content: attr(data-text);
   position: absolute;
-  inset: 0;
+  /* Taller than the heading by `--bleed` at each end, so the mask has somewhere
+     to cover the overflowing ink — and padded by the same amount, so the text
+     inside still starts exactly where the real text starts. With `top` and
+     `bottom` both set the height comes from the insets, so the padding takes
+     the box back to its original content height rather than adding to it. */
+  inset: calc(-1 * var(--bleed)) 0;
+  padding-block: var(--bleed);
   pointer-events: none;
   color: var(--accent);
   opacity: 0;
@@ -86,13 +100,13 @@
     opacity 420ms var(--ease-out),
     --glow 420ms var(--ease-out);
   -webkit-mask-image: radial-gradient(
-    var(--glow) circle at var(--lx) var(--ly),
+    var(--glow) circle at var(--lx) calc(var(--ly) + var(--bleed)),
     #000 0%,
     rgba(0, 0, 0, 0.55) 38%,
     transparent 72%
   );
   mask-image: radial-gradient(
-    var(--glow) circle at var(--lx) var(--ly),
+    var(--glow) circle at var(--lx) calc(var(--ly) + var(--bleed)),
     #000 0%,
     rgba(0, 0, 0, 0.55) 38%,
     transparent 72%
