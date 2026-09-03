@@ -198,8 +198,7 @@
   min-height: var(--field-h);
   padding: 0.6rem 0.95rem;
   border: 1px solid var(--border);
-  /* The same pill the buttons everywhere else on the page are cut to. */
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   background: var(--surface-solid);
   color: var(--foreground);
   font-size: var(--text-sm);
@@ -261,15 +260,14 @@ textarea.field__control {
 /* Same height and corner as the fields above it, so the column reads as one
    stack of controls rather than a form with a button bolted on.
    `.btn.form__submit`, not `.form__submit`: `.btn` sets both properties from
-   globals.css later in the bundle, and the height set here would otherwise
-   lose to it. The radius it brings is now the one we want, so it is no longer
-   overridden — the field it sits beside is a pill too. */
+   globals.css later in the bundle and would otherwise keep its pill shape. */
 .btn.form__submit {
   align-self: stretch;
   min-height: var(--field-h);
   height: var(--field-h);
   padding-block: 0;
   padding-inline: 0.95rem;
+  border-radius: var(--radius-md);
 }
 
 .form__spinner {
