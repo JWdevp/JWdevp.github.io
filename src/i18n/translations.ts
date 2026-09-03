@@ -137,6 +137,7 @@ const es = {
     },
     elsewhere: 'También estoy aquí',
     linkedin: 'LinkedIn',
+    xing: 'Xing',
     github: 'GitHub',
   },
   footer: {
@@ -270,6 +271,7 @@ const en: Translation = {
     },
     elsewhere: 'Also here',
     linkedin: 'LinkedIn',
+    xing: 'Xing',
     github: 'GitHub',
   },
   footer: {
@@ -398,6 +400,7 @@ const de: Translation = {
     },
     elsewhere: 'Auch hier',
     linkedin: 'LinkedIn',
+    xing: 'Xing',
     github: 'GitHub',
   },
   footer: {

@@ -19,6 +19,7 @@ export const SITE = {
   cv: `${import.meta.env.BASE_URL}cv/JasonWiersum-Lebenslauf.pdf`,
   links: {
     linkedin: 'https://www.linkedin.com/in/jason-wiersum',
+    xing: 'https://www.xing.com/profile/Jason_Wiersum',
     github: 'https://github.com/jasonwiersum',
   },
 } as const

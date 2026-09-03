@@ -1,5 +1,6 @@
 import { Github, Linkedin } from 'lucide-react'
 import { useRef } from 'react'
+import { XingMark } from './XingMark'
 import { SITE } from '../../config/site'
 import { useLanguage } from '../../hooks/useLanguage'
 import { useReveal } from '../../hooks/useReveal'
@@ -38,6 +39,20 @@ export function Contact() {
                 </a>
               </li>
               <li>
+                <a
+                  href={SITE.links.xing}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contact__link contact__link--xing"
+                >
+                  <XingMark />
+                  {t.contact.xing}
+                  <span className="visually-hidden">{t.a11y.openInNewTab}</span>
+                </a>
+              </li>
+              {/* Third, and on its own row: the CSS puts it across both columns
+                  and pins it to the bottom of the block. */}
+              <li className="contact__links-tail">
                 <a
                   href={SITE.links.github}
                   target="_blank"
