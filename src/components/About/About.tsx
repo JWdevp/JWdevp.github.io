@@ -61,7 +61,7 @@ function Cv() {
           <span className="reveal-btn__label">{t.about.cvView}</span>
         </button>
 
-        <a className="reveal-btn" href={SITE.cv} download>
+        <a className="reveal-btn reveal-btn--download" href={SITE.cv} download>
           <span className="reveal-btn__badge" aria-hidden="true" />
           <span className="reveal-btn__icon" aria-hidden="true">
             <Download size={17} strokeWidth={1.9} />

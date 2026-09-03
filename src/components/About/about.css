@@ -196,12 +196,11 @@
   --rb-pad: 0.4rem;
   --rb-badge: 2.25rem;
   --rb-gap: 0.85rem;
-  /* How far right the label sits from the pill's middle. The badge occupies
-     the left `--rb-pad + --rb-badge` of the pill, so half of that column is
-     what it takes to put the label in the middle of the room that is left.
-     Carried as a variable because the hover nudge has to add to it rather
-     than replace it, and the phone rule has to cancel it. */
-  --rb-shift: calc((var(--rb-pad) + var(--rb-badge)) / 2);
+  /* How far right the label sits from the pill's middle. Nothing by default;
+     the download button below opts in. Carried as a variable rather than
+     written into the transform because the hover nudge has to add to it
+     rather than replace it, and the phone rule has to cancel it. */
+  --rb-shift: 0px;
   --rb-ease: cubic-bezier(0.44, 0, 0.56, 1);
   /* 80% speed: the flood and the icon's travel read better a shade slower. */
   --rb-dur: 575ms;
@@ -232,13 +231,23 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Centred in the room the badge leaves, not in the pill. Dead-centre in the
-   pill is what reads as off-centre: the disc eats the left side, so the label
-   sat with 13.6px of air between it and the disc and 57px on the other side.
+/* The download button alone: its label is centred in the room the badge
+   leaves, not in the pill. Dead-centre in the pill is what read as
+   off-centre — the disc eats the left side, so the label sat with 13.6px of
+   air between it and the disc and 57px on the other side. The badge occupies
+   the left `--rb-pad + --rb-badge` of the pill, so half of that column is the
+   shift that puts the label in the middle of what is actually empty.
 
-   A transform and not a margin or a padding: those three all move the label,
-   but only a transform is outside layout, so the pill keeps the width it
-   sizes itself to from its longest label. */
+   Only this one by choice, not because the other is different: the view
+   button's shorter label reads fine where it is.
+
+   A transform and not a margin or a padding: all three move the label, but
+   only a transform is outside layout, so the pill keeps the width it sizes
+   itself to from its longest label. */
+.reveal-btn--download {
+  --rb-shift: calc((var(--rb-pad) + var(--rb-badge)) / 2);
+}
+
 .reveal-btn__label {
   position: relative;
   z-index: 1;
@@ -334,9 +343,12 @@
        label sitting slightly right of centre. So the label is centred in the
        room it has rather than in the pill. */
     padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap)) 0.7rem;
-    /* The asymmetric padding above already puts the label in the middle of
-       the free room here (measured 1.7px off), so the transform would only
-       overshoot. `0px` and not `0`: it is fed to a calc() on hover. */
+    /* Cancels the download button's shift. The asymmetric padding above
+       already puts the label in the middle of the free room here (measured
+       1.7px off), so the transform would only overshoot. Same specificity as
+       `.reveal-btn--download`, so this works by sitting later in the file —
+       see the note on this media query above. `0px` and not `0`: it is fed
+       to a calc() on hover. */
     --rb-shift: 0px;
     font-size: var(--text-xs);
     white-space: normal;
