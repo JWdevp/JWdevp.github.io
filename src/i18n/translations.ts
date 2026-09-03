@@ -48,7 +48,7 @@ const es = {
     taglines: [
       'Escribo código. Arreglo bugs. A veces finjo que sé lo que hago.',
       'Programo cosas. Rompo cosas. Luego descubro cómo arreglarlas.',
-      'Escribo código. Resuelvo problemas. Creo problemas nuevos sin querer.',
+      'Escribo código. Resuelvo problemas. Creo problemas nuevos sin querer. Resuelvo esos también.',
       'Programo. Debuggeo. Me pregunto quién escribió ese código. Era yo.',
       'Escribo código. Funciona. No lo toco. No preguntes.',
       'Creo productos. Persigo bugs. Pierdo discusiones contra un ;.',
@@ -90,7 +90,7 @@ const es = {
     ],
   },
   skills: {
-    title: 'Herramientas con las que trabajo.',
+    title: 'Herramientas con las que trabajo',
     categories: {
       programming: 'Programación',
       frameworks: 'Frameworks Java',
@@ -181,8 +181,8 @@ const en: Translation = {
     taglines: [
       'I write code. I fix bugs. Sometimes I pretend I know what I am doing.',
       'I build things. I break things. Then I work out how to fix them.',
-      'I write code. I solve problems. I create new ones without meaning to.',
-      'I code. I debug. I wonder who wrote this. It was me.',
+      'I write code. I solve problems. I create new ones without meaning to. I solve those too.',
+      'I code. I debug. I wonder who wrote this. Ups, It was me.',
       'I write code. It works. I do not touch it. Do not ask.',
       'I build products. I chase bugs. I lose arguments with a semicolon.',
       'I build things. I look for errors. I find others I was not looking for.',
@@ -223,7 +223,7 @@ const en: Translation = {
     ],
   },
   skills: {
-    title: 'Tools I work with.',
+    title: 'Tools I work with',
     categories: {
       programming: 'Programming',
       frameworks: 'Java frameworks',
@@ -306,7 +306,7 @@ const de: Translation = {
     taglines: [
       'Ich schreibe Code. Ich behebe Bugs. Manchmal tue ich so, als wüsste ich, was ich tue.',
       'Ich baue Dinge. Ich mache Dinge kaputt. Dann finde ich heraus, wie man sie repariert.',
-      'Ich schreibe Code. Ich löse Probleme. Und schaffe versehentlich neue.',
+      'Ich schreibe Code. Ich löse Probleme. Und schaffe versehentlich neue. Ich löse die auch.',
       'Ich programmiere. Ich debugge. Ich frage mich, wer das geschrieben hat. Ich war es.',
       'Ich schreibe Code. Er läuft. Ich fasse ihn nicht an. Frag nicht.',
       'Ich baue Produkte. Ich jage Bugs. Ich verliere Diskussionen gegen ein Semikolon.',
@@ -348,7 +348,7 @@ const de: Translation = {
     ],
   },
   skills: {
-    title: 'Womit ich arbeite.',
+    title: 'Womit ich arbeite',
     categories: {
       programming: 'Programmierung',
       frameworks: 'Java-Frameworks',
