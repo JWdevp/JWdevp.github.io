@@ -206,12 +206,21 @@
   justify-content: center;
   min-height: 3.05rem;
   padding-block: var(--rb-pad);
-  /* Symmetric, and the same reserve on both sides. The left one has to clear
-     the badge; the right one is dead space that exists only to balance it, so
-     the label reads as centred in the pill instead of shoved off to one side.
-     Centring the label against the pill alone would not do: the longer of the
-     two labels would then start underneath the badge. */
-  padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap));
+  /* The label is centred in the room the badge leaves, not in the pill.
+
+     Centring it in the pill is what the eye reads as off-centre: the disc
+     eats the left side, so a label sitting dead-centre had 13.6px of air
+     between it and the disc and 57px on the other side. Balanced on paper,
+     visibly shoved left.
+
+     The left reserve still has to clear the badge, so it stays; the right one
+     is now just the same gap, which puts the label's middle at the middle of
+     what is actually empty. The difference between the two reserves works out
+     to the badge's own column — exactly the shift needed — and the pill loses
+     the dead space it was carrying to stay symmetric. Same formula on a
+     phone: the custom properties shrink, the relationship holds. */
+  padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap))
+    var(--rb-gap);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   background: var(--surface-solid);
@@ -311,12 +320,6 @@
   .reveal-btn {
     --rb-badge: 1.9rem;
     --rb-gap: 0.55rem;
-    /* Back to a narrow reserve on the right, unlike the wide screen. Balancing
-       the badge here costs 45px of a 169px button, which is enough to break
-       "Download CV" and "Descargar CV" onto two lines — a worse read than a
-       label sitting slightly right of centre. So the label is centred in the
-       room it has rather than in the pill. */
-    padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap)) 0.7rem;
     font-size: var(--text-xs);
     white-space: normal;
     /* justify-content centres the block; this centres the lines within it once
