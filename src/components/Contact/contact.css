@@ -248,10 +248,16 @@
   color: var(--faint);
 }
 
-.field__control:hover:not(:disabled) {
+/* `:not(:focus)` so hovering a field you are already typing in does not take
+   the accent border off it. Pointing at a field and focusing it are the same
+   gesture, and this rule outweighed the focus rule below on specificity —
+   three classes to two — so the accent border never actually appeared: the
+   focused field showed --border-strong and only the soft ring gave it away. */
+.field__control:hover:not(:disabled):not(:focus) {
   border-color: var(--border-strong);
 }
 
+/* The frame of the field you are in, in the page's own accent. */
 .field__control:focus {
   outline: none;
   border-color: var(--accent);
