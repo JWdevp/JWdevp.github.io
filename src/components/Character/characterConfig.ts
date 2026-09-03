@@ -98,3 +98,25 @@ export const IDLE_REST = {
   reducedMin: 30,
   reducedMax: 45,
 }
+
+/**
+ * How long one clip takes to dissolve into another, in milliseconds.
+ *
+ * One number, not two, and this is the reason: the clip arriving fades over
+ * this, and the clip leaving holds at full opacity for exactly this long before
+ * it starts to go. That is what keeps the box covered at every instant — two
+ * clips fading in opposite directions do not add up to one in the middle, and
+ * measured, the gap that opened let 24.6% of the page through. Tie the two to
+ * separate numbers and the flash comes back the moment they drift apart.
+ *
+ * The greeting hands over more slowly than the rest. It is the one transition
+ * nobody asked for — it happens on arrival, unprompted — so it can afford to
+ * take its time, where a swap the reader triggered by tapping should answer at
+ * once.
+ */
+export const CLIP_FADE = {
+  /** Tap-driven swaps: wave to idle and back. */
+  normal: 300,
+  /** The greeting settling into the idle, once per visit. */
+  first: 1400,
+}

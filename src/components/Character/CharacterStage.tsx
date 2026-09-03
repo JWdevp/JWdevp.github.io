@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { announceGreetingDone } from '../../hooks/useGreeting'
 import { useLanguage } from '../../hooks/useLanguage'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
-import { FOLLOW, IDLE_REST, LAYOUT, MAX_TRAVEL } from './characterConfig'
+import { CLIP_FADE, FOLLOW, IDLE_REST, LAYOUT, MAX_TRAVEL } from './characterConfig'
 import manifest from './manifest.json'
 import { useGazeTracking, type Gaze } from './useGazeTracking'
 import './character.css'
@@ -89,6 +89,11 @@ export function CharacterStage() {
    *  frame. A tap during the hold has nothing to wait for. */
   const idleRunning = useRef(false)
   const reduced = usePrefersReducedMotion()
+  /** The greeting is handing over to the idle for the first and only time, and
+   *  gets a longer dissolve for it. */
+  const [settling, setSettling] = useState(false)
+  const firstTake = useRef(true)
+  const settleTimer = useRef<number | undefined>(undefined)
 
   /**
    * Reveal the wave once it has a frame to show.
@@ -157,6 +162,17 @@ export function CharacterStage() {
   const startIdle = useCallback(() => {
     const node = idleNode.current
     if (!node) return
+    // Only the handover from the greeting is slowed, and only while it lasts.
+    // The flag is dropped a fade's length after the leaving clip has finished
+    // its own, so the length is never changed underneath a running transition.
+    if (firstTake.current) {
+      firstTake.current = false
+      setSettling(true)
+      settleTimer.current = window.setTimeout(
+        () => setSettling(false),
+        CLIP_FADE.first * 2 + 200,
+      )
+    }
     setPhase('idle')
     node.currentTime = 0
     idleRunning.current = true
@@ -217,8 +233,14 @@ export function CharacterStage() {
     playWave()
   }, [phase, idleBroken, playWave])
 
-  /** The rest is the one thing here that outlives the component if left. */
-  useEffect(() => () => window.clearTimeout(restTimer.current), [])
+  /** The timers are the things here that outlive the component if left. */
+  useEffect(
+    () => () => {
+      window.clearTimeout(restTimer.current)
+      window.clearTimeout(settleTimer.current)
+    },
+    [],
+  )
 
   // On a touch device nothing is shown until the wave has had its say, so the
   // cut-out still does not flash up behind it for a moment first. The timeout
@@ -357,6 +379,9 @@ export function CharacterStage() {
         ['--character-cols' as string]: tracks ? manifest.columns : 1,
         ['--character-rows' as string]: tracks ? manifest.rows : 1,
         ['--character-mobile-max' as string]: LAYOUT.mobileMaxWidth,
+        // Drives both the arriving clip's fade and the leaving clip's delay,
+        // so the two cannot come apart. See CLIP_FADE.
+        ['--clip-fade' as string]: `${settling ? CLIP_FADE.first : CLIP_FADE.normal}ms`,
       }}
       data-ready={(ready && visible) || undefined}
       data-wave={filmShowing || undefined}

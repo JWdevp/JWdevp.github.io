@@ -74,8 +74,15 @@
      underneath something opaque and nobody sees it move. The delay lives here,
      in the hidden state, and is cancelled in the visible one below — a
      transition takes its timing from the state being entered, so this reads as
-     "fade in at once, fade out later" without either direction being named. */
-  transition: opacity 300ms var(--ease-out) 300ms;
+     "fade in at once, fade out later" without either direction being named.
+
+     The length is one custom property used for both the duration and the
+     delay, set by CharacterStage from CLIP_FADE. They have to be the same
+     number: the moment the delay is shorter than the fade, the clip leaving
+     starts to thin while the one arriving is still on its way, and the gap
+     between them is the flash. Holding them in one place is what stops that
+     being possible to get wrong later. */
+  transition: opacity var(--clip-fade, 300ms) var(--ease-out) var(--clip-fade, 300ms);
   pointer-events: none;
 }
 
@@ -117,7 +124,7 @@
    still arriving. */
 .character__sheet[data-covered] {
   opacity: 0;
-  transition-delay: 300ms;
+  transition-delay: var(--clip-fade, 300ms);
 }
 
 /* Standing in for a wave that never arrived, inside the wave's wider box. */
