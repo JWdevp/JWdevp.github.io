@@ -193,21 +193,16 @@
   opacity: 1;
 }
 
-/* Slowed right down rather than stopped. Turning it off left the ring frozen
-   at one angle, which is not what the button is for; a turn stretched to
-   3.75x keeps it alive without anything that could be called motion. This
-   follows the same rule as motionBudget(): reduce, do not remove.
+/* No reduced-motion slowdown on this one, deliberately, and it is the
+   exception rather than the rule — the spinner below still reduces itself.
 
-   That multiple is held constant, so speeding the ring up speeds up what a
-   reader with the preference set sees too — otherwise the change lands only
-   for everyone else. */
-@media (prefers-reduced-motion: reduce) {
-  .contact__link--linkedin::before,
-  .contact__link--xing::before,
-  .contact__link--github::before {
-    animation-duration: 6s;
-  }
-}
+   The ring used to stretch to 3.75x under the preference. In practice that
+   split the button in two: a desktop with the OS setting on crawled at 7.5s
+   a turn while the same page on a phone turned in 2s, which read as the
+   desktop being broken rather than as a considered accommodation. It is also
+   the quietest motion on the page — a faint arc inside a 1px band, no
+   travel, no flashing, nothing that moves the layout — so one speed for
+   everyone is the honest call here. */
 
 /* --- Form ---------------------------------------------------------------- */
 
