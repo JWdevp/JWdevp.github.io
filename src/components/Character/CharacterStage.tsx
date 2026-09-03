@@ -58,6 +58,9 @@ export function CharacterStage() {
   const [wavePlaying, setWavePlaying] = useState(false)
   const [waveBroken, setWaveBroken] = useState(false)
   const [waveSettled, setWaveSettled] = useState(false)
+  /** The wave has played through. Only then is there anything to replay. */
+  const [waveEnded, setWaveEnded] = useState(false)
+  const waveNode = useRef<HTMLVideoElement | null>(null)
 
   /**
    * Reveal the wave once it has a frame to show.
@@ -69,6 +72,7 @@ export function CharacterStage() {
    * the ordinary one.
    */
   const attachWave = useCallback((node: HTMLVideoElement | null) => {
+    waveNode.current = node
     if (!node) return
     // Failure races the listener in exactly the same way readiness does, and
     // loses in the same place: an unsupported codec or a missing file is
@@ -88,6 +92,24 @@ export function CharacterStage() {
     const onFail = () => setWaveBroken(true)
     node.addEventListener('loadeddata', onReady, { once: true })
     node.addEventListener('error', onFail, { once: true })
+  }, [])
+
+  /**
+   * Wave again, on a tap inside the frame.
+   *
+   * The button only exists once the clip has finished, so there is nothing to
+   * interrupt and no way to restart it half way through. `play()` can be
+   * refused — a phone that has decided this page may not start media, say — and
+   * a refusal puts the button back rather than leaving a control that has
+   * quietly stopped working.
+   */
+  const replayWave = useCallback(() => {
+    const node = waveNode.current
+    if (!node) return
+    setWaveEnded(false)
+    node.currentTime = 0
+    const started = node.play()
+    if (started) started.catch(() => setWaveEnded(true))
   }, [])
 
   // On a touch device nothing is shown until the wave has had its say, so the
@@ -250,8 +272,23 @@ export function CharacterStage() {
           // black box in some browsers — this way it simply never appears.
           ref={attachWave}
           data-playing={wavePlaying || undefined}
-          onEnded={announceGreetingDone}
+          onEnded={() => {
+            setWaveEnded(true)
+            announceGreetingDone()
+          }}
           onError={() => setWaveBroken(true)}
+        />
+      ) : null}
+      {/* Sits over the frame, and only after the wave has run: the greeting is
+          worth a second look and there is nothing else to do with the picture.
+          A button rather than a click handler on the video, so it can be
+          reached by keyboard and says what it does. */}
+      {wave && waveEnded ? (
+        <button
+          type="button"
+          className="character__replay"
+          onClick={replayWave}
+          aria-label={t.a11y.replayGreeting}
         />
       ) : null}
       <p className="visually-hidden">{t.a11y.character}</p>

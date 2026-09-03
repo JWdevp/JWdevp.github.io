@@ -35,6 +35,7 @@ const es = {
     openSettings: 'Abrir ajustes',
     closeSettings: 'Cerrar ajustes',
     character: 'Ilustración decorativa: un personaje que sigue el cursor con la mirada.',
+    replayGreeting: 'Repetir el saludo',
   },
   nav: {
     home: 'Inicio',
@@ -169,6 +170,7 @@ const en: Translation = {
     openSettings: 'Open settings',
     closeSettings: 'Close settings',
     character: 'Decorative illustration: a character whose gaze follows the cursor.',
+    replayGreeting: 'Play the greeting again',
   },
   nav: {
     home: 'Home',
@@ -294,6 +296,7 @@ const de: Translation = {
     openSettings: 'Einstellungen öffnen',
     closeSettings: 'Einstellungen schließen',
     character: 'Dekorative Illustration: eine Figur, deren Blick dem Mauszeiger folgt.',
+    replayGreeting: 'Begrüßung noch einmal abspielen',
   },
   nav: {
     home: 'Home',
