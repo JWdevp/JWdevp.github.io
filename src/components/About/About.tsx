@@ -107,12 +107,6 @@ export function About() {
   return (
     <div className="about" ref={root}>
       <div className="container">
-        <p className="eyebrow about__eyebrow" data-reveal>
-          {t.about.eyebrow}
-        </p>
-
-        {/* The eyebrow sits above the grid so that the first row starts at the
-            title — which is where the portrait's top edge has to line up. */}
         <div className="about__grid">
           <div className="about__main">
             <h2 className="section__title" data-reveal>

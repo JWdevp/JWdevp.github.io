@@ -7,23 +7,31 @@
   padding-block-end: clamp(2rem, 5.5vh, 3.25rem);
 }
 
+/* Both columns stretch to the taller of the two, which is what lets the last
+   social button line up with the foot of the form: the card grows to the row's
+   height, the intro fills it, and the button is pinned to the bottom of that.
+   Whichever side is naturally taller, the two ends stay level.
+
+   The intro used to be `position: sticky` and hold still while the form scrolled
+   past. That cannot survive this: a column that floats independently is level
+   with the form at exactly one scroll position, so being pinned to it and
+   sticking are the same thing asked for twice, differently. */
 .contact__grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   gap: clamp(2rem, 5vw, 4.5rem);
-  align-items: start;
+  align-items: stretch;
 }
 
 .contact__intro {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  position: sticky;
-  top: 7rem;
 }
 
 .contact__links {
   margin-block-start: var(--space-4);
+  flex: 1;
 }
 
 .contact__links-title {
@@ -35,18 +43,33 @@
   margin-block-end: var(--space-3);
 }
 
-/* Both the same width and the pair centred in the column. `grid-auto-columns:
-   1fr` is what makes the two equal — a flex row shares only the leftover space
-   — and the grid is shrink-to-fit so `justify-self` can centre the whole pair
-   rather than stretching it across. */
+/* Two on the top row and one under them. `1fr` tracks are what make the pair
+   equal — a flex row shares only the leftover space — and the grid is
+   shrink-to-fit, so it is no wider than the two pills need.
+
+   The second row takes the remaining height rather than hugging its content:
+   that is what lets the last button sit at the BOTTOM of the block instead of
+   directly under the pair, which on a wide screen puts it level with the foot
+   of the form beside it. With nothing to stretch into — a phone — the row
+   collapses to the button's own height and it simply follows the pair. */
 .contact__links ul {
   display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto 1fr;
   gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
+  flex: 1;
+}
+
+/* Across both columns, its own width one track wide so all three pills match,
+   centred over the pair and pushed to the foot of the row. */
+.contact__links-tail {
+  grid-column: 1 / -1;
+  width: calc((100% - var(--space-3)) / 2);
+  justify-self: center;
+  align-self: end;
 }
 
 .contact__links {
@@ -126,7 +149,14 @@
   --tint-b: #c084fc;
 }
 
+/* Xing's two greens, dark to light, the same way the other two run. */
+.contact__link--xing {
+  --tint-a: #006567;
+  --tint-b: #b7df4b;
+}
+
 .contact__link--linkedin::before,
+.contact__link--xing::before,
 .contact__link--github::before {
   content: '';
   position: absolute;
@@ -158,6 +188,7 @@
 }
 
 .contact__link--linkedin:hover::before,
+.contact__link--xing:hover::before,
 .contact__link--github:hover::before {
   opacity: 1;
 }
@@ -168,6 +199,7 @@
    the same rule as motionBudget(): reduce, do not remove. */
 @media (prefers-reduced-motion: reduce) {
   .contact__link--linkedin::before,
+  .contact__link--xing::before,
   .contact__link--github::before {
     animation-duration: 7.5s;
   }
@@ -351,10 +383,6 @@ textarea.field__control {
 
 .contact__grid {
     grid-template-columns: 1fr;
-  }
-
-  .contact__intro {
-    position: static;
   }
 
   /* The pair still fits side by side on a phone, but not at 12rem each. */
