@@ -196,6 +196,12 @@
   --rb-pad: 0.4rem;
   --rb-badge: 2.25rem;
   --rb-gap: 0.85rem;
+  /* How far right the label sits from the pill's middle. The badge occupies
+     the left `--rb-pad + --rb-badge` of the pill, so half of that column is
+     what it takes to put the label in the middle of the room that is left.
+     Carried as a variable because the hover nudge has to add to it rather
+     than replace it, and the phone rule has to cancel it. */
+  --rb-shift: calc((var(--rb-pad) + var(--rb-badge)) / 2);
   --rb-ease: cubic-bezier(0.44, 0, 0.56, 1);
   /* 80% speed: the flood and the icon's travel read better a shade slower. */
   --rb-dur: 575ms;
@@ -206,21 +212,13 @@
   justify-content: center;
   min-height: 3.05rem;
   padding-block: var(--rb-pad);
-  /* The label is centred in the room the badge leaves, not in the pill.
-
-     Centring it in the pill is what the eye reads as off-centre: the disc
-     eats the left side, so a label sitting dead-centre had 13.6px of air
-     between it and the disc and 57px on the other side. Balanced on paper,
-     visibly shoved left.
-
-     The left reserve still has to clear the badge, so it stays; the right one
-     is now just the same gap, which puts the label's middle at the middle of
-     what is actually empty. The difference between the two reserves works out
-     to the badge's own column — exactly the shift needed — and the pill loses
-     the dead space it was carrying to stay symmetric. Same formula on a
-     phone: the custom properties shrink, the relationship holds. */
-  padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap))
-    var(--rb-gap);
+  /* Symmetric, and the same reserve on both sides. The left one has to clear
+     the badge; the right one is dead space that exists only to balance it.
+     This is what sizes the pill, so it stays symmetric — the label is moved
+     off the middle by a transform below, which costs no width. Doing it with
+     asymmetric padding instead would centre the label just as well but pull
+     the button ~42px narrower. */
+  padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap));
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   background: var(--surface-solid);
@@ -234,9 +232,17 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Centred in the room the badge leaves, not in the pill. Dead-centre in the
+   pill is what reads as off-centre: the disc eats the left side, so the label
+   sat with 13.6px of air between it and the disc and 57px on the other side.
+
+   A transform and not a margin or a padding: those three all move the label,
+   but only a transform is outside layout, so the pill keeps the width it
+   sizes itself to from its longest label. */
 .reveal-btn__label {
   position: relative;
   z-index: 1;
+  transform: translateX(var(--rb-shift));
   transition: transform var(--rb-dur) var(--rb-ease);
 }
 
@@ -287,9 +293,11 @@
   left: 50%;
 }
 
+/* The nudge is on top of the resting shift, not instead of it — a bare
+   translateX here would snap the label back to the pill's middle first. */
 .reveal-btn:hover .reveal-btn__label,
 .reveal-btn:focus-visible .reveal-btn__label {
-  transform: translateX(0.5rem);
+  transform: translateX(calc(var(--rb-shift) + 0.5rem));
 }
 
 .reveal-btn:active {
@@ -320,6 +328,16 @@
   .reveal-btn {
     --rb-badge: 1.9rem;
     --rb-gap: 0.55rem;
+    /* Back to a narrow reserve on the right, unlike the wide screen. Balancing
+       the badge here costs 45px of a 169px button, which is enough to break
+       "Download CV" and "Descargar CV" onto two lines — a worse read than a
+       label sitting slightly right of centre. So the label is centred in the
+       room it has rather than in the pill. */
+    padding-inline: calc(var(--rb-pad) + var(--rb-badge) + var(--rb-gap)) 0.7rem;
+    /* The asymmetric padding above already puts the label in the middle of
+       the free room here (measured 1.7px off), so the transform would only
+       overshoot. `0px` and not `0`: it is fed to a calc() on hover. */
+    --rb-shift: 0px;
     font-size: var(--text-xs);
     white-space: normal;
     /* justify-content centres the block; this centres the lines within it once
