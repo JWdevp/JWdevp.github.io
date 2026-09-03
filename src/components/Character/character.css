@@ -58,6 +58,20 @@
   opacity: 1;
 }
 
+/* The tap target for replaying the greeting: the frame itself, no more and no
+   less. Invisible by design — the picture is the affordance — but a real button,
+   so it takes a focus ring and can be reached without a pointer. */
+.character__replay {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* The wave has taken over; the still underneath would otherwise show around it. */
 .character__sheet[data-covered] {
   opacity: 0;
