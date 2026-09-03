@@ -91,10 +91,16 @@ p {
   color: var(--accent-contrast);
 }
 
+/* The outline only. It used to set `border-radius: var(--radius-sm)` as well,
+   to round itself off — but that reshapes the ELEMENT, not just the ring, for
+   anything that is focusable and has a radius of its own. It went unnoticed
+   while the form's fields were 14px and this was 8px; now that they are pills
+   it turned into a visible snap the moment you clicked into one. No radius is
+   needed anyway: an outline follows the border-radius of the box it is drawn
+   around, so it now takes the shape of whatever it is highlighting. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: var(--radius-sm);
 }
 
 :focus:not(:focus-visible) {

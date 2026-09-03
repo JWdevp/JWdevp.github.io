@@ -258,6 +258,24 @@
   .hero {
     padding-block-end: calc(var(--space-8) + 4.5rem);
   }
+
+  /* Justified here and only here: the column is narrow enough that the ragged
+     edge reads as untidy rather than as breathing room.
+
+     `text-wrap` goes back to normal with it. `balance` evens the lines out by
+     making them all shorter than they need to be, which is the opposite of
+     what justification wants — it would stretch those short lines to the full
+     measure and open rivers between the words. */
+  .hero__tagline {
+    text-align: justify;
+    text-wrap: wrap;
+    /* Justification needs somewhere to put the slack. In a column this narrow,
+       with German compounds in it, there is nowhere: the spaces stretch instead
+       and open rivers down the paragraph. Hyphenation gives the lines a place
+       to break, and `documentElement.lang` is kept in step with the chosen
+       language, so each one is hyphenated by its own rules. */
+    hyphens: auto;
+  }
 }
 
 /* Placeholder box held while the 3D chunk loads — same footprint as the scene,

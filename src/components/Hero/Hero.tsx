@@ -13,6 +13,10 @@ const CharacterStage = lazy(() =>
 )
 import './hero.css'
 
+/** Where the hero stacks and the two lines start arriving on their own
+ *  schedule. Matches the breakpoint in hero.css. */
+const PHONE = 720
+
 export function Hero() {
   const { t, language } = useLanguage()
   const root = useRef<HTMLElement>(null)
@@ -31,31 +35,43 @@ export function Hero() {
       const targets = gsap.utils.toArray<HTMLElement>('[data-hero-item]')
       const stage = root.current?.querySelector('.hero__stage')
 
+      // On a phone the two lines are staged rather than arriving together: the
+      // greeting half a second in, the line under it at two. They are the only
+      // thing on that first screen, so they can afford to take their time, and
+      // the wave is playing beside them in the meantime.
+      //
+      // Both still animate FROM an offset, so where they finish is where the
+      // layout puts them — nothing here decides their position.
+      const phone = window.matchMedia(`(max-width: ${PHONE}px)`).matches
       const tl = gsap.timeline({
         defaults: { ease: 'power3.out' },
-        delay: 0.08,
+        delay: phone ? 0 : 0.08,
       })
 
       // The greeting arrives on its own, and quickly — it is the first thing
       // read, so it should be there almost at once rather than easing in over
       // most of a second like the copy that follows it.
       if (greeting) {
-        tl.from(greeting, {
-          opacity: 0,
-          y: budget.travel(14),
-          duration: budget.duration(0.3),
-        })
+        tl.from(
+          greeting,
+          {
+            opacity: 0,
+            y: budget.travel(phone ? 22 : 14),
+            duration: budget.duration(phone ? 0.6 : 0.3),
+          },
+          phone ? 0.5 : 0,
+        )
       }
 
       tl.from(
         targets,
         {
           opacity: 0,
-          y: budget.travel(18),
-          duration: budget.duration(0.72),
+          y: budget.travel(phone ? 22 : 18),
+          duration: budget.duration(phone ? 0.6 : 0.72),
           stagger: budget.stagger(0.075),
         },
-        budget.duration(0.16),
+        phone ? 2 : budget.duration(0.16),
       )
 
       if (stage) {
