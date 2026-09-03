@@ -257,28 +257,17 @@
   border-color: var(--border-strong);
 }
 
-/* The frame of the field you are in: the accent, and 2px to match the lit ring
-   on the social buttons — their plain border is 1px, but the ring you actually
-   see on them is the 2px one. The stroke is the whole signal; there is no soft
-   halo outside it.
+/* The frame of the field you are in: the accent, and nothing else — no halo
+   outside it, and the same 1px the field already had at rest. Only the colour
+   changes, so the border box is identical focused and unfocused and there is
+   no padding to compensate with.
 
-   The padding gives back what the extra border takes. `box-sizing` is
-   border-box, so a border growing from 1px to 2px eats a pixel off the content
-   box on each side and shunts the text as you click in; trimming the padding by
-   the same pixel holds it still.
-
-   `padding-inline`/`padding-block` and not the shorthand: the shorthand also
-   outweighs `textarea.field__control`'s own `padding-block` (two classes to a
-   class and an element), so it reset the textarea from 0.7rem to 0.6rem and the
-   message text jumped 1.6px up on focus. Split, the textarea keeps its own
-   block padding and only trims it below. */
+   `outline: none` is load-bearing: the global `:focus-visible` rule paints a
+   2px accent outline 3px out from every focusable thing, which is exactly the
+   second frame this is meant not to have. The border is the indicator here. */
 .field__control:focus {
   outline: none;
-  border-width: 2px;
   border-color: var(--accent);
-  padding-inline: calc(0.95rem - 1px);
-  padding-block: calc(0.6rem - 1px);
-  box-shadow: none;
 }
 
 .field__control:disabled {
@@ -290,12 +279,6 @@ textarea.field__control {
   resize: vertical;
   min-height: 6.5rem;
   padding-block: 0.7rem;
-}
-
-/* The same pixel back that the focus rule trims from the inputs, off the
-   textarea's own larger block padding. */
-textarea.field__control:focus {
-  padding-block: calc(0.7rem - 1px);
 }
 
 .field[data-invalid] .field__control {
