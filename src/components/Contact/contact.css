@@ -184,7 +184,7 @@
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   mask-composite: exclude;
-  animation: contact-link-spin 2s linear infinite;
+  animation: contact-link-spin 1.6s linear infinite;
 }
 
 .contact__link--linkedin:hover::before,
@@ -193,17 +193,16 @@
   opacity: 1;
 }
 
-/* Slowed right down rather than stopped. Turning it off left the ring frozen
-   at one angle, which is not what the button is for; a quarter of the speed
-   keeps it alive without anything that could be called motion. This follows
-   the same rule as motionBudget(): reduce, do not remove. */
-@media (prefers-reduced-motion: reduce) {
-  .contact__link--linkedin::before,
-  .contact__link--xing::before,
-  .contact__link--github::before {
-    animation-duration: 7.5s;
-  }
-}
+/* No reduced-motion slowdown on this one, deliberately, and it is the
+   exception rather than the rule — the spinner below still reduces itself.
+
+   The ring used to stretch to 3.75x under the preference. In practice that
+   split the button in two: a desktop with the OS setting on crawled at 7.5s
+   a turn while the same page on a phone turned in 2s, which read as the
+   desktop being broken rather than as a considered accommodation. It is also
+   the quietest motion on the page — a faint arc inside a 1px band, no
+   travel, no flashing, nothing that moves the layout — so one speed for
+   everyone is the honest call here. */
 
 /* --- Form ---------------------------------------------------------------- */
 
