@@ -23,7 +23,7 @@ const es = {
   meta: {
     title: 'Jason Wiersum — Anwendungsentwickler',
     description:
-      'Jason Wiersum — Anwendungsentwickler certificado por la IHK en Nürnberg. Software, diseño y creatividad en un mismo perfil.',
+      'Jason Wiersum — Desarrolador de aplicaciones certificado por la IHK en Nürnberg. Software, diseño y creatividad en un mismo perfil.',
   },
   a11y: {
     skipToContent: 'Saltar al contenido',
@@ -51,7 +51,7 @@ const es = {
       'Escribo código. Resuelvo problemas. Creo problemas nuevos sin querer. Resuelvo esos también.',
       'Programo. Debuggeo. Me pregunto quién escribió ese código. Era yo.',
       'Escribo código. Funciona. No lo toco. No preguntes.',
-      'Creo productos. Persigo bugs. Pierdo discusiones contra un ;.',
+      'Escribo código que funciona a la primera. Nadie me cree. Yo tampoco.',
       'Programo cosas. Busco errores. Encuentro otros que no estaba buscando.',
       'Escribo código. Hago que funcione. Después intento entender por qué funciona.',
       'Transformo ideas en código. Código en bugs. Bugs en experiencia.',
@@ -63,7 +63,7 @@ const es = {
     eyebrow: 'Sobre mí',
     title: 'Más que solo código',
     paragraphs: [
-      'Soy Fachinformatiker für Anwendungsentwicklung y vivo en Nuremberg. Mi camino profesional, sin embargo, no empezó en la informática: estudié en Málaga, dirigí una empresa y trabajé varios años en el ámbito comercial y en la hostelería. Ahí aprendí a asumir responsabilidades, a trabajar con personas, a tratar los datos con cuidado y a asegurarme de que los procesos funcionen de forma fiable.',
+      'Soy desarrollador de aplicaciones y vivo en Nuremberg. Mi camino profesional, sin embargo, no empezó en la informática: estudié en Málaga, dirigí una empresa y trabajé varios años en el ámbito comercial y en la hostelería. Ahí aprendí a asumir responsabilidades, a trabajar con personas, a tratar los datos con cuidado y a asegurarme de que los procesos funcionen de forma fiable.',
       'Con la decisión de dedicarme al desarrollo de software me reorienté profesionalmente. No me interesa solo programar, sino sobre todo entender problemas concretos y crear soluciones que de verdad faciliten el trabajo de las personas. Por eso empecé la formación de Fachinformatiker für Anwendungsentwicklung y la terminé en 2026 aprobando el examen de la IHK.',
       'Hoy combino mi experiencia anterior con mi nueva dirección profesional. Me gusta meterme en sistemas y procesos ya existentes, escuchar a quienes trabajan con ellos e intentar entender primero cuál es el problema real. El código viene después.',
     ],
@@ -184,7 +184,7 @@ const en: Translation = {
       'I write code. I solve problems. I create new ones without meaning to. I solve those too.',
       'I code. I debug. I wonder who wrote this. Ups, It was me.',
       'I write code. It works. I do not touch it. Do not ask.',
-      'I build products. I chase bugs. I lose arguments with a semicolon.',
+      'I write code that works on the first try. Nobody believes me. Neither do I.',
       'I build things. I look for errors. I find others I was not looking for.',
       'I write code. I make it work. Then I try to understand why it works.',
       'I turn ideas into code. Code into bugs. Bugs into experience.',
@@ -196,7 +196,7 @@ const en: Translation = {
     eyebrow: 'About',
     title: 'More than just code',
     paragraphs: [
-      'I am a Fachinformatiker für Anwendungsentwicklung based in Nürnberg. My path did not begin in IT, though: I studied in Málaga, ran a business and spent several years working in commercial roles and in hospitality. That taught me to take responsibility, to work with people, to handle data carefully and to make sure processes run reliably.',
+      'I am a Software Developer based in Nürnberg. My path did not begin in IT, though: I studied in Málaga, ran a business and spent several years working in commercial roles and in hospitality. That taught me to take responsibility, to work with people, to handle data carefully and to make sure processes run reliably.',
       'Choosing software development meant changing direction. What interests me is not only the programming, but above all understanding concrete problems and building solutions that genuinely make people’s work easier. That is why I began retraining as a Fachinformatiker für Anwendungsentwicklung and completed it in 2026 by passing the IHK examination.',
       'Today I combine what I did before with my new direction. I like getting to grips with existing systems and processes, listening to the people who work with them, and trying to understand the actual problem first. The code comes afterwards.',
     ],
@@ -309,7 +309,7 @@ const de: Translation = {
       'Ich schreibe Code. Ich löse Probleme. Und schaffe versehentlich neue. Ich löse die auch.',
       'Ich programmiere. Ich debugge. Ich frage mich, wer das geschrieben hat. Ich war es.',
       'Ich schreibe Code. Er läuft. Ich fasse ihn nicht an. Frag nicht.',
-      'Ich baue Produkte. Ich jage Bugs. Ich verliere Diskussionen gegen ein Semikolon.',
+      'Ich schreibe Code, der beim ersten Mal funktioniert. Niemand glaubt mir. Ich auch nicht.',
       'Ich baue Dinge. Ich suche Fehler. Ich finde andere, die ich nicht gesucht habe.',
       'Ich schreibe Code. Ich bringe ihn zum Laufen. Danach versuche ich zu verstehen, warum.',
       'Ich mache aus Ideen Code. Aus Code Bugs. Aus Bugs Erfahrung.',
