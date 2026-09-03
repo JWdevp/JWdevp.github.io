@@ -68,7 +68,7 @@
   border: 0;
   border-radius: var(--radius-lg);
   background: transparent;
-  cursor: pointer;
+  cursor: var(--cursor-arrow), pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
