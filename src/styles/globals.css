@@ -20,6 +20,7 @@ html {
   /* The page still scrolls; only the bar is gone. The floating navigation is
      the position indicator here, the same choice the project dialog makes. */
   scrollbar-width: none;
+  cursor: var(--cursor-arrow), auto;
 }
 
 html::-webkit-scrollbar,
@@ -63,12 +64,21 @@ select {
 button {
   background: none;
   border: none;
-  cursor: pointer;
+  /* The same arrow as the page: the cursor no longer changes shape over a
+     control, so what marks something clickable is its hover state — every
+     button and link here already has one. `pointer` closes the list rather
+     than `auto`, so a browser that cannot use the SVG still gets the hand. */
+  cursor: var(--cursor-arrow), pointer;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  /* Links need saying explicitly. The UA stylesheet carries its own
+     `a:any-link { cursor: pointer }`, which outranks the value inherited from
+     `html` — so without this every link on the page, the three social pills
+     included, kept the system hand while everything around it had the arrow. */
+  cursor: var(--cursor-arrow), pointer;
 }
 
 h1,
