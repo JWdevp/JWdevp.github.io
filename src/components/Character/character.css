@@ -22,6 +22,11 @@
 .character[data-wave] {
   -webkit-mask-image: none;
   mask-image: none;
+  /* The ground the clips sit on, held here rather than on each of them so it
+     cannot come between two of them mid-swap. Only while a clip is actually
+     showing: with the video gone the still keeps the page behind it. */
+  background: #f2f2f0;
+  border-radius: var(--radius-lg);
 }
 
 .character[data-ready] {
@@ -45,7 +50,13 @@
   width: 100%;
   height: 100%;
   border-radius: var(--radius-lg);
-  background: #f2f2f0;
+  /* No ground of its own. A video element paints its background wherever it has
+     no picture, and on the first compositor frame of a reveal it has none yet —
+     even at readyState 4, already playing. #f2f2f0 is brighter than anything in
+     the shot, so that one frame flashed: measured, the face jumped +24.2 and the
+     backdrop +5.4, which is exactly a 242 slab at the reveal's opening opacity
+     of 0.23. The ground moved to the container, so a frame that has not arrived
+     shows the clip underneath instead of a pale slab. */
   object-fit: cover;
   /* 46%, not 50%: it puts the crop's centre on the head at x=630 rather than on
      the frame's at 640, so the head is the thing that is centred. */
