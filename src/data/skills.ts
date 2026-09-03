@@ -40,7 +40,7 @@ export const skillGroups: SkillGroup[] = [
   {
     category: 'design',
     items: [
-      { name: 'Photoshop' },
+      { name: 'Photoshop' }, { name: 'Illustrator' },{ name: 'Lightroom' },
     ],
   },
 ]
