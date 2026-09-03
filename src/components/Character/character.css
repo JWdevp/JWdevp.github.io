@@ -29,7 +29,7 @@
 }
 
 /* Touch devices: the wave, played once, in the character's place.
-   
+
    It keeps its own pale backdrop — see CharacterStage for why it is not cut
    out — so it is given a frame and made to look deliberate: the page's own
    corner radius, and a crop that fills it so no letterboxing shows. The video
@@ -51,7 +51,20 @@
      the frame's at 640, so the head is the thing that is centred. */
   object-position: 46% center;
   opacity: 0;
-  transition: opacity 300ms var(--ease-out);
+  /* The delay is what stops the swap flashing.
+
+     Two clips fading in opposite directions do not add up to one in the middle:
+     at the halfway point both sit near 0.5, and measured, 24.6% of the page
+     showed through between them — a dark dip in the dark theme, where the page
+     is near-black behind a near-white shot.
+
+     So only the arriving clip animates on sight. The one leaving holds at full
+     opacity for the length of that fade and only then goes, by which time it is
+     underneath something opaque and nobody sees it move. The delay lives here,
+     in the hidden state, and is cancelled in the visible one below — a
+     transition takes its timing from the state being entered, so this reads as
+     "fade in at once, fade out later" without either direction being named. */
+  transition: opacity 300ms var(--ease-out) 300ms;
   pointer-events: none;
 }
 
@@ -67,6 +80,7 @@
 .character__wave[data-playing],
 .character__idle[data-playing] {
   opacity: 1;
+  transition-delay: 0ms;
 }
 
 /* The tap target for replaying the greeting: the frame itself, no more and no
@@ -86,9 +100,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* The wave has taken over; the still underneath would otherwise show around it. */
+/* The wave has taken over; the still underneath would otherwise show around it.
+   Held for the length of the clip's fade-in for the same reason as above: on
+   the way out it must not thin at the same moment the thing covering it is
+   still arriving. */
 .character__sheet[data-covered] {
   opacity: 0;
+  transition-delay: 300ms;
 }
 
 /* Standing in for a wave that never arrived, inside the wave's wider box. */
