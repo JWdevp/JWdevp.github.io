@@ -77,11 +77,11 @@
      "fade in at once, fade out later" without either direction being named.
 
      The length is one custom property used for both the duration and the
-     delay, set by CharacterStage from CLIP_FADE. They have to be the same
-     number: the moment the delay is shorter than the fade, the clip leaving
-     starts to thin while the one arriving is still on its way, and the gap
-     between them is the flash. Holding them in one place is what stops that
-     being possible to get wrong later. */
+     delay, set by CharacterStage from CLIP_FADE, and the same for every swap.
+     They have to be the same number: the moment the delay is shorter than the
+     fade, the clip leaving starts to thin while the one arriving is still on
+     its way, and the gap between them is the flash. Holding them in one place
+     is what stops that being possible to get wrong later. */
   transition: opacity var(--clip-fade, 300ms) var(--ease-out) var(--clip-fade, 300ms);
   pointer-events: none;
 }
