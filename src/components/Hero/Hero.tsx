@@ -36,9 +36,9 @@ export function Hero() {
       const stage = root.current?.querySelector('.hero__stage')
 
       // On a phone the two lines are staged rather than arriving together: the
-      // greeting half a second in, the line under it at two. They are the only
-      // thing on that first screen, so they can afford to take their time, and
-      // the wave is playing beside them in the meantime.
+      // greeting a second in, the line under it at two and a half. They are the
+      // only thing on that first screen, so they can afford to take their time,
+      // and the wave is playing beside them in the meantime.
       //
       // Both still animate FROM an offset, so where they finish is where the
       // layout puts them — nothing here decides their position.
@@ -59,7 +59,7 @@ export function Hero() {
             y: budget.travel(phone ? 22 : 14),
             duration: budget.duration(phone ? 0.6 : 0.3),
           },
-          phone ? 0.5 : 0,
+          phone ? 1 : 0,
         )
       }
 
@@ -71,7 +71,7 @@ export function Hero() {
           duration: budget.duration(phone ? 0.6 : 0.72),
           stagger: budget.stagger(0.075),
         },
-        phone ? 2 : budget.duration(0.16),
+        phone ? 2.5 : budget.duration(0.16),
       )
 
       if (stage) {
