@@ -184,7 +184,7 @@
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   mask-composite: exclude;
-  animation: contact-link-spin 1.6s linear infinite;
+  animation: contact-link-spin 2s linear infinite;
 }
 
 .contact__link--linkedin:hover::before,
@@ -200,7 +200,7 @@
    split the button in two: a desktop with the OS setting on crawled at 7.5s
    a turn while the same page on a phone turned in 2s, which read as the
    desktop being broken rather than as a considered accommodation. It is also
-   the quietest motion on the page — a faint arc inside a 1px band, no
+   the quietest motion on the page — a faint arc inside a 2px band, no
    travel, no flashing, nothing that moves the layout — so one speed for
    everyone is the honest call here. */
 
