@@ -145,21 +145,33 @@
   }
 }
 
-/* The pointer. A black arrow with rounded corners, carrying its own 1px white
-   outline — which is what lets one cursor serve both themes and survive the
-   blue flood a CV button turns into on hover.
+/* The pointer. A rounded arrow with a glassy, see-through body and a solid
+   1px white rim — the rim being what lets one cursor serve both themes and
+   survive the blue flood a CV button turns into on hover.
 
-   The hotspot, `3 2`, is the arrow's apex measured off the rendered shape
-   rather than guessed: the rounded joins push the outline past the path's own
-   coordinates, and a hotspot at the wrong place makes every click land where
-   the reader did not aim.
+   The rim has to be punched out rather than simply stroked. A 5.9-unit stroke
+   reaches 2.95 either side of every edge, and the arrow's shaft is narrower
+   than that, so the two sides met in the middle and filled the body opaque
+   white — the glass read as flat grey. The mask removes the body silhouette
+   from the halo, leaving a true ring, and the translucent fill then goes
+   inside it.
+
+   Glass here means transparency and a specular gradient, not a blur: a CSS
+   cursor is a static image and cannot sample what is behind it. Frosting the
+   backdrop would mean `cursor: none` plus a DOM element chasing the pointer,
+   which always trails it.
+
+   The hotspot, `2 2`, is the arrow's apex measured off the rendered bitmap
+   rather than read from the path: the rounded joins push the outline past the
+   path's own coordinates, and a hotspot in the wrong place makes every click
+   land where the reader did not aim.
 
    Held as the url and hotspot alone, no trailing keyword, so each use can end
    the list with the fallback that suits it — `auto` for the page, `pointer`
    for a control. That fallback is what a browser without SVG cursor support
-   gets, and it is exactly today's behaviour. */
+   gets, and it is exactly the behaviour from before this existed. */
 :root {
-  --cursor-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='30'%20viewBox='0%200%2026%2030'%3E%3Cg%20transform='translate(1.4%202.4)'%3E%3Cpath%20d='M3%202.6%20L3%2020.2%20L7.9%2015.7%20L11.1%2022.6%20L14.6%2021%20L11.4%2014.3%20L18.2%2014.1%20Z'%20fill='%23ffffff'%20stroke='%23ffffff'%20stroke-width='5.4'%20stroke-linejoin='round'%20stroke-linecap='round'/%3E%3Cpath%20d='M3%202.6%20L3%2020.2%20L7.9%2015.7%20L11.1%2022.6%20L14.6%2021%20L11.4%2014.3%20L18.2%2014.1%20Z'%20fill='%230f1424'%20stroke='%230f1424'%20stroke-width='3.4'%20stroke-linejoin='round'%20stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") 3 2;
+  --cursor-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='21'%20height='24'%20viewBox='0%200%2021%2024'%3E%3Cdefs%3E%3ClinearGradient%20id='s'%20x1='0'%20y1='0'%20x2='0.6'%20y2='1'%3E%3Cstop%20offset='0'%20stop-color='%23ffffff'%20stop-opacity='0.55'/%3E%3Cstop%20offset='0.42'%20stop-color='%23ffffff'%20stop-opacity='0.06'/%3E%3Cstop%20offset='0.78'%20stop-color='%23ffffff'%20stop-opacity='0'/%3E%3Cstop%20offset='1'%20stop-color='%23ffffff'%20stop-opacity='0.30'/%3E%3C/linearGradient%3E%3Cmask%20id='ring'%20maskUnits='userSpaceOnUse'%20x='-6'%20y='-6'%20width='40'%20height='44'%3E%3Crect%20x='-6'%20y='-6'%20width='40'%20height='44'%20fill='%23ffffff'/%3E%3Cpath%20d='M3%202.6%20L3%2020.2%20L7.9%2015.7%20L11.1%2022.6%20L14.6%2021%20L11.4%2014.3%20L18.2%2014.1%20Z'%20fill='%23000000'%20stroke='%23000000'%20stroke-width='3.4'%20stroke-linejoin='round'%20stroke-linecap='round'/%3E%3C/mask%3E%3C/defs%3E%3Cg%20transform='scale(0.8)%20translate(1.4%202.4)'%3E%3Cpath%20d='M3%202.6%20L3%2020.2%20L7.9%2015.7%20L11.1%2022.6%20L14.6%2021%20L11.4%2014.3%20L18.2%2014.1%20Z'%20fill='none'%20stroke='%23ffffff'%20stroke-width='5.9'%20stroke-linejoin='round'%20stroke-linecap='round'%20mask='url(%23ring)'/%3E%3Cpath%20d='M3%202.6%20L3%2020.2%20L7.9%2015.7%20L11.1%2022.6%20L14.6%2021%20L11.4%2014.3%20L18.2%2014.1%20Z'%20fill='%230f1424'%20fill-opacity='0.4'%20stroke='%230f1424'%20stroke-opacity='0.4'%20stroke-width='3.4'%20stroke-linejoin='round'%20stroke-linecap='round'/%3E%3Cpath%20d='M3%202.6%20L3%2020.2%20L7.9%2015.7%20L11.1%2022.6%20L14.6%2021%20L11.4%2014.3%20L18.2%2014.1%20Z'%20fill='url(%23s)'%20stroke='url(%23s)'%20stroke-width='3.4'%20stroke-linejoin='round'%20stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") 2 2;
 }
 
 [data-theme='dark'] {
