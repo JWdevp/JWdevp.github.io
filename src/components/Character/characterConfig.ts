@@ -77,3 +77,24 @@ export const LAYOUT = {
   /** Shrink on small screens, where the hero stacks. */
   mobileMaxWidth: '17rem',
 }
+
+/**
+ * How long the character rests between takes of the idle clip, in seconds.
+ *
+ * The idle is 5.9s and its last frame is not its first: measured, the wrap is
+ * about twenty times a normal frame-to-frame step — a small settle of the head
+ * rather than a change of pose. Played back to back that settle would repeat
+ * every six seconds and become the thing you notice, so the rest between takes
+ * is what the loop is really made of, and it is randomised so the rhythm never
+ * becomes predictable.
+ *
+ * The reduced-motion pair is longer rather than absent, the same rule the rest
+ * of the project follows: an idle character that never moves at all reads as a
+ * broken video, not as a considerate one.
+ */
+export const IDLE_REST = {
+  min: 10,
+  max: 15,
+  reducedMin: 30,
+  reducedMax: 45,
+}

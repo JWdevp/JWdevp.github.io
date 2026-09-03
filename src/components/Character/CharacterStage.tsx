@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { announceGreetingDone } from '../../hooks/useGreeting'
 import { useLanguage } from '../../hooks/useLanguage'
-import { FOLLOW, LAYOUT, MAX_TRAVEL } from './characterConfig'
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
+import { FOLLOW, IDLE_REST, LAYOUT, MAX_TRAVEL } from './characterConfig'
 import manifest from './manifest.json'
 import { useGazeTracking, type Gaze } from './useGazeTracking'
 import './character.css'
@@ -11,6 +12,10 @@ const STILL = `${import.meta.env.BASE_URL}character/${manifest.still}`
 /** Touch devices get a wave instead of tracking. Not built by the pipeline —
  *  drop the file in and it is used; if it is not there, the still is. */
 const WAVE = `${import.meta.env.BASE_URL}character/wave.mp4`
+/** The resting loop the character falls into once the greeting is over. Same
+ *  framing as the wave — measured, the head sits at 49.2% of the width against
+ *  the wave's 49.1% — so the two share a box and a crop. */
+const IDLE = `${import.meta.env.BASE_URL}character/idle.mp4`
 
 /** Gaze of every frame, flattened — read once per animation frame, so the pair
  *  of numbers should be adjacent in memory rather than behind two lookups. */
@@ -39,8 +44,10 @@ function hasFinePointer() {
  * about 1.6/255; poses picked that way differ by about 10, and that difference
  * is exactly what read as a slideshow.
  *
- * Nothing here crossfades. Two frames are never mixed, so there is no ghosting
- * — the smoothness comes from the steps being small, not from blending.
+ * The sheet never crossfades. Two of its frames are never mixed, so there is no
+ * ghosting — the smoothness comes from the steps being small, not from
+ * blending. (The two video clips a touch device gets do dissolve into each
+ * other; that is a different problem, and the note is on them.)
  *
  * The character itself never moves, scales or rotates; only the frame changes,
  * as a `translate3d` the compositor handles without repainting. React does not
@@ -58,9 +65,30 @@ export function CharacterStage() {
   const [wavePlaying, setWavePlaying] = useState(false)
   const [waveBroken, setWaveBroken] = useState(false)
   const [waveSettled, setWaveSettled] = useState(false)
-  /** The wave has played through. Only then is there anything to replay. */
-  const [waveEnded, setWaveEnded] = useState(false)
   const waveNode = useRef<HTMLVideoElement | null>(null)
+
+  /**
+   * What the character is doing.
+   *
+   * `greeting` is the wave on arrival, `wave` the same clip played again on a
+   * tap; both show the wave element, which is why they are not one state — the
+   * greeting announces itself to the rest of the page and a replay does not.
+   * `idle` covers the resting clip both while it runs and while it holds on its
+   * last frame between takes, because those look identical and differ only in
+   * whether a timer is pending.
+   */
+  const [phase, setPhase] = useState<'greeting' | 'idle' | 'wave'>('greeting')
+  /** The greeting is over, so a tap on the character means something. */
+  const [greetingOver, setGreetingOver] = useState(false)
+  const [idleBroken, setIdleBroken] = useState(false)
+  const idleNode = useRef<HTMLVideoElement | null>(null)
+  /** A tap arrived mid-take. The wave waits for the idle to finish. */
+  const waveQueued = useRef(false)
+  const restTimer = useRef<number | undefined>(undefined)
+  /** Whether the idle clip is actually running, as opposed to holding its last
+   *  frame. A tap during the hold has nothing to wait for. */
+  const idleRunning = useRef(false)
+  const reduced = usePrefersReducedMotion()
 
   /**
    * Reveal the wave once it has a frame to show.
@@ -94,23 +122,103 @@ export function CharacterStage() {
     node.addEventListener('error', onFail, { once: true })
   }, [])
 
+  /** Watch the idle for a file that is missing or cannot be decoded, the same
+   *  way the wave is watched and for the same reason: the failure is often
+   *  settled before React attaches `onError`. */
+  const attachIdle = useCallback((node: HTMLVideoElement | null) => {
+    idleNode.current = node
+    if (!node) return
+    if (node.error || node.networkState === node.NETWORK_NO_SOURCE) {
+      setIdleBroken(true)
+      return
+    }
+    node.addEventListener('error', () => setIdleBroken(true), { once: true })
+  }, [])
+
+  /**
+   * The rest between takes, and the take after it.
+   *
+   * These two call each other, so one of them has to be reachable through a ref
+   * — a plain pair of `useCallback`s cannot close over each other. The timer
+   * reads the latest `startIdle` at the moment it fires rather than the one that
+   * existed when it was set, which also means a change of motion preference
+   * takes effect on the next rest rather than being baked in at mount.
+   */
+  const startIdleRef = useRef<() => void>(() => {})
+
+  const rest = useCallback(() => {
+    const min = reduced ? IDLE_REST.reducedMin : IDLE_REST.min
+    const max = reduced ? IDLE_REST.reducedMax : IDLE_REST.max
+    const wait = (min + Math.random() * (max - min)) * 1000
+    window.clearTimeout(restTimer.current)
+    restTimer.current = window.setTimeout(() => startIdleRef.current(), wait)
+  }, [reduced])
+
+  const startIdle = useCallback(() => {
+    const node = idleNode.current
+    if (!node) return
+    setPhase('idle')
+    node.currentTime = 0
+    idleRunning.current = true
+    const started = node.play()
+    // A refusal is not fatal here: the character simply keeps holding its last
+    // frame and the next rest tries again.
+    if (started) {
+      started.catch(() => {
+        idleRunning.current = false
+        rest()
+      })
+    }
+  }, [rest])
+
+  useEffect(() => {
+    startIdleRef.current = startIdle
+  }, [startIdle])
+
   /**
    * Wave again, on a tap inside the frame.
    *
-   * The button only exists once the clip has finished, so there is nothing to
-   * interrupt and no way to restart it half way through. `play()` can be
-   * refused — a phone that has decided this page may not start media, say — and
-   * a refusal puts the button back rather than leaving a control that has
-   * quietly stopped working.
+   * `play()` can be refused — a phone that has decided this page may not start
+   * media, say — and rather than leave the character stranded on the wave's last
+   * frame, a refusal drops straight back into the idle cycle.
    */
-  const replayWave = useCallback(() => {
+  const playWave = useCallback(() => {
     const node = waveNode.current
-    if (!node) return
-    setWaveEnded(false)
+    if (!node) {
+      rest()
+      return
+    }
+    waveQueued.current = false
+    setPhase('wave')
     node.currentTime = 0
     const started = node.play()
-    if (started) started.catch(() => setWaveEnded(true))
-  }, [])
+    if (started) started.catch(() => startIdleRef.current())
+  }, [rest])
+
+  /**
+   * A tap on the character.
+   *
+   * Mid-take the wave is queued rather than cut in, which is the point: the idle
+   * is allowed to finish first. Between takes there is nothing to finish, so the
+   * pending rest is cancelled and the wave goes now — waiting out a timer the
+   * reader cannot see would just read as the tap having been ignored.
+   */
+  const onTap = useCallback(() => {
+    if (phase === 'wave') return
+    if (idleBroken) {
+      playWave()
+      return
+    }
+    if (idleRunning.current) {
+      waveQueued.current = true
+      return
+    }
+    window.clearTimeout(restTimer.current)
+    playWave()
+  }, [phase, idleBroken, playWave])
+
+  /** The rest is the one thing here that outlives the component if left. */
+  useEffect(() => () => window.clearTimeout(restTimer.current), [])
 
   // On a touch device nothing is shown until the wave has had its say, so the
   // cut-out still does not flash up behind it for a moment first. The timeout
@@ -138,13 +246,29 @@ export function CharacterStage() {
    * when something has genuinely gone wrong.
    */
   useEffect(() => {
-    if (tracks || waveBroken) {
+    if (tracks) {
       announceGreetingDone()
       return
     }
-    const timer = setTimeout(announceGreetingDone, 8000)
+    // The wave got there under its own steam and has already handed over to the
+    // idle. Re-running clears the backstop below, which is the point: left
+    // pending it would fire mid-take and restart the idle from the top.
+    if (greetingOver) return
+
+    const settle = () => {
+      announceGreetingDone()
+      setGreetingOver(true)
+      // A missing or stalled wave must not take the idle down with it. The
+      // greeting is what failed; the character can still rest and be tapped.
+      if (!idleBroken) startIdleRef.current()
+    }
+    if (waveBroken) {
+      settle()
+      return
+    }
+    const timer = setTimeout(settle, 8000)
     return () => clearTimeout(timer)
-  }, [tracks, waveBroken])
+  }, [tracks, waveBroken, idleBroken, greetingOver])
 
   const render = useCallback(
     (gaze: Gaze, delta: number) => {
@@ -215,6 +339,10 @@ export function CharacterStage() {
   // The still is contained inside the same box if the video never arrives.
   const aspect = tracks ? `${manifest.frameWidth} / ${manifest.frameHeight}` : '1.46'
   const visible = tracks || waveSettled
+  /** Either clip showing means the framed shot rather than the cut-out sheet,
+   *  so the bust fade comes off and the still underneath goes. */
+  const filmShowing = wavePlaying || phase === 'idle'
+  const idle = !tracks && !idleBroken
 
   return (
     <div
@@ -231,14 +359,14 @@ export function CharacterStage() {
         ['--character-mobile-max' as string]: LAYOUT.mobileMaxWidth,
       }}
       data-ready={(ready && visible) || undefined}
-      data-wave={wavePlaying || undefined}
+      data-wave={filmShowing || undefined}
       data-still={!tracks || undefined}
     >
       <img
         className="character__sheet"
         // Hidden, not unmounted: it still carries the size, and it comes back
         // if the video turns out to be unplayable.
-        data-covered={wavePlaying || undefined}
+        data-covered={filmShowing || undefined}
         ref={sheet}
         src={src}
         alt=""
@@ -271,23 +399,51 @@ export function CharacterStage() {
           // raise `error` on a media element, and an empty <video> paints as a
           // black box in some browsers — this way it simply never appears.
           ref={attachWave}
-          data-playing={wavePlaying || undefined}
+          data-playing={(wavePlaying && phase !== 'idle') || undefined}
           onEnded={() => {
-            setWaveEnded(true)
             announceGreetingDone()
+            setGreetingOver(true)
+            // With no idle to fall into, the character holds the wave's last
+            // frame exactly as it did before this existed.
+            if (!idleBroken) startIdleRef.current()
           }}
           onError={() => setWaveBroken(true)}
         />
       ) : null}
-      {/* Sits over the frame, and only after the wave has run: the greeting is
-          worth a second look and there is nothing else to do with the picture.
+      {/* The resting clip. Same box and crop as the wave, stacked over it, so
+          the swap between the two is a crossfade of two shots that already line
+          up rather than a cut. Measured, all three seams — the idle's own wrap,
+          greeting to idle, and idle to replay — are about twenty times a normal
+          frame-to-frame step, so one fade covers all of them.
+
+          No `loop`: the pause between takes is the whole design, so each take
+          is started deliberately. */}
+      {idle ? (
+        <video
+          className="character__idle"
+          src={IDLE}
+          muted
+          playsInline
+          preload="auto"
+          ref={attachIdle}
+          data-playing={(phase === 'idle') || undefined}
+          onEnded={() => {
+            idleRunning.current = false
+            if (waveQueued.current) playWave()
+            else rest()
+          }}
+          onError={() => setIdleBroken(true)}
+        />
+      ) : null}
+      {/* Sits over the frame from the moment the greeting is done, so a tap
+          lands whether the character is mid-take or resting between them.
           A button rather than a click handler on the video, so it can be
           reached by keyboard and says what it does. */}
-      {wave && waveEnded ? (
+      {wave && greetingOver ? (
         <button
           type="button"
           className="character__replay"
-          onClick={replayWave}
+          onClick={onTap}
           aria-label={t.a11y.replayGreeting}
         />
       ) : null}
