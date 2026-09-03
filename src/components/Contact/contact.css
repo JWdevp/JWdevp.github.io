@@ -259,18 +259,26 @@
 
 /* The frame of the field you are in: the accent, and 2px to match the lit ring
    on the social buttons — their plain border is 1px, but the ring you actually
-   see on them is the 2px one.
+   see on them is the 2px one. The stroke is the whole signal; there is no soft
+   halo outside it.
 
    The padding gives back what the extra border takes. `box-sizing` is
    border-box, so a border growing from 1px to 2px eats a pixel off the content
    box on each side and shunts the text as you click in; trimming the padding by
-   the same pixel holds it still. */
+   the same pixel holds it still.
+
+   `padding-inline`/`padding-block` and not the shorthand: the shorthand also
+   outweighs `textarea.field__control`'s own `padding-block` (two classes to a
+   class and an element), so it reset the textarea from 0.7rem to 0.6rem and the
+   message text jumped 1.6px up on focus. Split, the textarea keeps its own
+   block padding and only trims it below. */
 .field__control:focus {
   outline: none;
   border-width: 2px;
   border-color: var(--accent);
-  padding: calc(0.6rem - 1px) calc(0.95rem - 1px);
-  box-shadow: 0 0 0 3px var(--accent-ring);
+  padding-inline: calc(0.95rem - 1px);
+  padding-block: calc(0.6rem - 1px);
+  box-shadow: none;
 }
 
 .field__control:disabled {
@@ -284,12 +292,20 @@ textarea.field__control {
   padding-block: 0.7rem;
 }
 
+/* The same pixel back that the focus rule trims from the inputs, off the
+   textarea's own larger block padding. */
+textarea.field__control:focus {
+  padding-block: calc(0.7rem - 1px);
+}
+
 .field[data-invalid] .field__control {
   border-color: var(--danger);
 }
 
+/* No halo here either — the field you are in shows one stroke, and on an
+   invalid field that stroke is red rather than accent. */
 .field[data-invalid] .field__control:focus {
-  box-shadow: 0 0 0 3px var(--danger-soft);
+  border-color: var(--danger);
 }
 
 .field__error {
