@@ -184,7 +184,7 @@
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   mask-composite: exclude;
-  animation: contact-link-spin 2s linear infinite;
+  animation: contact-link-spin 1.6s linear infinite;
 }
 
 .contact__link--linkedin:hover::before,
@@ -194,14 +194,18 @@
 }
 
 /* Slowed right down rather than stopped. Turning it off left the ring frozen
-   at one angle, which is not what the button is for; a quarter of the speed
-   keeps it alive without anything that could be called motion. This follows
-   the same rule as motionBudget(): reduce, do not remove. */
+   at one angle, which is not what the button is for; a turn stretched to
+   3.75x keeps it alive without anything that could be called motion. This
+   follows the same rule as motionBudget(): reduce, do not remove.
+
+   That multiple is held constant, so speeding the ring up speeds up what a
+   reader with the preference set sees too — otherwise the change lands only
+   for everyone else. */
 @media (prefers-reduced-motion: reduce) {
   .contact__link--linkedin::before,
   .contact__link--xing::before,
   .contact__link--github::before {
-    animation-duration: 7.5s;
+    animation-duration: 6s;
   }
 }
 
