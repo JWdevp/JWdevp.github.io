@@ -145,37 +145,42 @@
   }
 }
 
-/* The pointer. A rounded dart with a glassy, see-through body and a solid 1px
-   white rim — the rim being what lets one cursor serve both themes and survive
-   the blue flood a CV button turns into on hover.
+/* The pointer, and the pointer while a mouse button is down.
 
-   The shape is its own outline with a radius at each corner, not a skeleton
-   fattened by a stroke. That distinction is the whole reason it works: the
-   earlier arrow got its rounding from `stroke-linejoin: round` on a thick
-   stroke, and a stroke that thick simply fills a concave corner in. Tried that
-   way first, the notch between the wing and the tail disappeared and the dart
-   came out a plain triangle. Drawing the outline puts the radius under control
-   at every corner, the reflex one included, where the arc sweeps the other way.
+   Both are the shapes as supplied, filled rather than outlined: the path is
+   given its own 2-wide round stroke as well as a fill, so the silhouette is
+   the outer edge of the outline it arrived as. The press state keeps its five
+   open subpaths as strokes — they are lines, and a line fills to nothing.
 
-   The rim is a stroke on that same outline, twice the width it should read at,
-   masked by the filled shape so only the half outside survives. Measured, it
-   comes back at 1.05.
+   The body carries `opacity` on a group rather than fill-opacity and
+   stroke-opacity separately. Set on both, the band where the stroke covers the
+   fill composites twice and comes out darker than the 90% asked for.
 
-   Both scales are solved against the rendered bitmap rather than worked out on
-   paper — the rim adds a constant the geometry cannot account for — and land
-   the ink on 14.50 x 19.00.
+   The white rim is an opaque stroke on the same paths, twice the width it
+   should read at, masked by the glyph so only the half outside survives. It is
+   1px at any scale because the width is derived from the scale — which is also
+   why shrinking the glyph to 90% takes the whole cursor from 19.00 to 17.25
+   rather than 17.10: the rim does not shrink with it, and should not.
 
-   The hotspot, `3 1`, is the dart's tip measured off that same bitmap: the
-   rounding pulls the tip away from the corner the path names, so a hotspot
-   taken from the coordinates would put every click somewhere the reader did
-   not aim.
+   Each hotspot sits on its own arrow's tip, measured off the rendered bitmap.
+   The press glyph draws its arrow further down and right, with the sparks
+   above and left, so a shared hotspot would jump the pointer on mousedown;
+   separate ones keep the tip still and let the sparks appear around it.
 
-   Held as the url and hotspot alone, no trailing keyword, so each use can end
-   the list with the fallback that suits it — `auto` for the page, `pointer`
-   for a control. That fallback is what a browser without SVG cursor support
-   gets, and it is exactly the behaviour from before this existed. */
+   `--cursor-now` is the indirection the swap runs through. `cursor` cannot be
+   animated — tested: a transition on it produces no running transition and the
+   value jumps — so this is a change of state, not a tween. */
 :root {
-  --cursor-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='17'%20height='22'%20viewBox='0%200%2017%2022'%3E%3Cdefs%3E%3ClinearGradient%20id='s'%20x1='0'%20y1='0'%20x2='0.6'%20y2='1'%3E%3Cstop%20offset='0'%20stop-color='%23ffffff'%20stop-opacity='0.44'/%3E%3Cstop%20offset='0.42'%20stop-color='%23ffffff'%20stop-opacity='0.06'/%3E%3Cstop%20offset='0.78'%20stop-color='%23ffffff'%20stop-opacity='0'/%3E%3Cstop%20offset='1'%20stop-color='%23ffffff'%20stop-opacity='0.30'/%3E%3C/linearGradient%3E%3Cmask%20id='ring'%20maskUnits='userSpaceOnUse'%20x='-10'%20y='-10'%20width='80'%20height='80'%3E%3Crect%20x='-10'%20y='-10'%20width='80'%20height='80'%20fill='%23ffffff'/%3E%3Cpath%20d='M4.911%204.481%20L16.59%2015.14%20A2.836%202.836%200%200%201%2015.79%2019.84%20L11.18%2021.81%20A2.239%202.239%200%200%200%2010.66%2022.12%20L5.211%2026.48%20A2.836%202.836%200%200%201%200.6043%2024.33%20L0.1651%206.647%20A2.836%202.836%200%200%201%204.911%204.481%20Z'%20fill='%23000000'/%3E%3C/mask%3E%3C/defs%3E%3Cg%20transform='scale(0.72)%20translate(2.54167%20-0.416667)'%3E%3Cpath%20d='M4.911%204.481%20L16.59%2015.14%20A2.836%202.836%200%200%201%2015.79%2019.84%20L11.18%2021.81%20A2.239%202.239%200%200%200%2010.66%2022.12%20L5.211%2026.48%20A2.836%202.836%200%200%201%200.6043%2024.33%20L0.1651%206.647%20A2.836%202.836%200%200%201%204.911%204.481%20Z'%20fill='none'%20stroke='%23ffffff'%20stroke-width='2.944'%20stroke-linejoin='round'%20mask='url(%23ring)'/%3E%3Cpath%20d='M4.911%204.481%20L16.59%2015.14%20A2.836%202.836%200%200%201%2015.79%2019.84%20L11.18%2021.81%20A2.239%202.239%200%200%200%2010.66%2022.12%20L5.211%2026.48%20A2.836%202.836%200%200%201%200.6043%2024.33%20L0.1651%206.647%20A2.836%202.836%200%200%201%204.911%204.481%20Z'%20fill='%230f1424'%20fill-opacity='0.4'/%3E%3Cpath%20d='M4.911%204.481%20L16.59%2015.14%20A2.836%202.836%200%200%201%2015.79%2019.84%20L11.18%2021.81%20A2.239%202.239%200%200%200%2010.66%2022.12%20L5.211%2026.48%20A2.836%202.836%200%200%201%200.6043%2024.33%20L0.1651%206.647%20A2.836%202.836%200%200%201%204.911%204.481%20Z'%20fill='url(%23s)'/%3E%3C/g%3E%3C/svg%3E") 3 1;
+  --cursor-arrow: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='20'%20height='20'%20viewBox='0%200%2020%2020'%3E%3Cdefs%3E%3Cmask%20id='r'%20maskUnits='userSpaceOnUse'%20x='-20'%20y='-20'%20width='120'%20height='120'%3E%3Crect%20x='-20'%20y='-20'%20width='120'%20height='120'%20fill='%23ffffff'/%3E%3Cpath%20d='M20.5056%2010.7754C21.1225%2010.5355%2021.431%2010.4155%2021.5176%2010.2459C21.5926%2010.099%2021.5903%209.92446%2021.5115%209.77954C21.4205%209.61226%2021.109%209.50044%2020.486%209.2768L4.59629%203.5728C4.0866%203.38983%203.83175%203.29835%203.66514%203.35605C3.52029%203.40621%203.40645%203.52004%203.35629%203.6649C3.29859%203.8315%203.39008%204.08635%203.57304%204.59605L9.277%2020.4858C9.50064%2021.1088%209.61246%2021.4203%209.77973%2021.5113C9.92465%2021.5901%2010.0991%2021.5924%2010.2461%2021.5174C10.4157%2021.4308%2010.5356%2021.1223%2010.7756%2020.5054L13.3724%2013.8278C13.4194%2013.707%2013.4429%2013.6466%2013.4792%2013.5957C13.5114%2013.5506%2013.5508%2013.5112%2013.5959%2013.479C13.6468%2013.4427%2013.7072%2013.4192%2013.828%2013.3722L20.5056%2010.7754Z'%20fill='%23000000'%20stroke='%23000000'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/mask%3E%3C/defs%3E%3Cg%20transform='scale(0.759757)%20translate(0.292949%200.292949)'%3E%3Cg%20mask='url(%23r)'%3E%3Cpath%20d='M20.5056%2010.7754C21.1225%2010.5355%2021.431%2010.4155%2021.5176%2010.2459C21.5926%2010.099%2021.5903%209.92446%2021.5115%209.77954C21.4205%209.61226%2021.109%209.50044%2020.486%209.2768L4.59629%203.5728C4.0866%203.38983%203.83175%203.29835%203.66514%203.35605C3.52029%203.40621%203.40645%203.52004%203.35629%203.6649C3.29859%203.8315%203.39008%204.08635%203.57304%204.59605L9.277%2020.4858C9.50064%2021.1088%209.61246%2021.4203%209.77973%2021.5113C9.92465%2021.5901%2010.0991%2021.5924%2010.2461%2021.5174C10.4157%2021.4308%2010.5356%2021.1223%2010.7756%2020.5054L13.3724%2013.8278C13.4194%2013.707%2013.4429%2013.6466%2013.4792%2013.5957C13.5114%2013.5506%2013.5508%2013.5112%2013.5959%2013.479C13.6468%2013.4427%2013.7072%2013.4192%2013.828%2013.3722L20.5056%2010.7754Z'%20fill='%23ffffff'%20stroke='%23ffffff'%20stroke-width='4.632'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/g%3E%3Cg%20opacity='0.9'%3E%3Cpath%20d='M20.5056%2010.7754C21.1225%2010.5355%2021.431%2010.4155%2021.5176%2010.2459C21.5926%2010.099%2021.5903%209.92446%2021.5115%209.77954C21.4205%209.61226%2021.109%209.50044%2020.486%209.2768L4.59629%203.5728C4.0866%203.38983%203.83175%203.29835%203.66514%203.35605C3.52029%203.40621%203.40645%203.52004%203.35629%203.6649C3.29859%203.8315%203.39008%204.08635%203.57304%204.59605L9.277%2020.4858C9.50064%2021.1088%209.61246%2021.4203%209.77973%2021.5113C9.92465%2021.5901%2010.0991%2021.5924%2010.2461%2021.5174C10.4157%2021.4308%2010.5356%2021.1223%2010.7756%2020.5054L13.3724%2013.8278C13.4194%2013.707%2013.4429%2013.6466%2013.4792%2013.5957C13.5114%2013.5506%2013.5508%2013.5112%2013.5959%2013.479C13.6468%2013.4427%2013.7072%2013.4192%2013.828%2013.3722L20.5056%2010.7754Z'%20fill='%230f1424'%20stroke='%230f1424'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 2 1;
+  --cursor-press: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='21'%20height='21'%20viewBox='0%200%2021%2021'%3E%3Cdefs%3E%3Cmask%20id='r'%20maskUnits='userSpaceOnUse'%20x='-20'%20y='-20'%20width='120'%20height='120'%3E%3Crect%20x='-20'%20y='-20'%20width='120'%20height='120'%20fill='%23ffffff'/%3E%3Cpath%20d='M9%203.5V2%20M5.06066%205.06066L4%204%20M5.06066%2013L4%2014.0607%20M13%205.06066L14.0607%204%20M3.5%209H2'%20fill='none'%20stroke='%23000000'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M15.8645%2016.1896L13.3727%2020.817C13.0881%2021.3457%2012.9457%2021.61%2012.7745%2021.6769C12.6259%2021.7349%2012.4585%2021.7185%2012.324%2021.6328C12.1689%2021.534%2012.0806%2021.2471%2011.9038%2020.6733L8.44519%209.44525C8.3008%208.97651%208.2286%208.74213%208.28669%208.58383C8.33729%208.44595%208.44595%208.33729%208.58383%208.2867C8.74213%208.22861%208.9765%208.3008%209.44525%208.44519L20.6732%2011.9038C21.247%2012.0806%2021.5339%2012.169%2021.6327%2012.324C21.7185%2012.4586%2021.7348%2012.6259%2021.6768%2012.7745C21.61%2012.9458%2021.3456%2013.0881%2020.817%2013.3728L16.1896%2015.8645C16.111%2015.9068%2016.0717%2015.9279%2016.0374%2015.9551C16.0068%2015.9792%2015.9792%2016.0068%2015.9551%2016.0374C15.9279%2016.0717%2015.9068%2016.111%2015.8645%2016.1896Z'%20fill='%23000000'%20stroke='%23000000'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/mask%3E%3C/defs%3E%3Cg%20transform='scale(0.759757)%20translate(1.77369%201.77369)'%3E%3Cg%20mask='url(%23r)'%3E%3Cpath%20d='M9%203.5V2%20M5.06066%205.06066L4%204%20M5.06066%2013L4%2014.0607%20M13%205.06066L14.0607%204%20M3.5%209H2'%20fill='none'%20stroke='%23ffffff'%20stroke-width='4.632'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M15.8645%2016.1896L13.3727%2020.817C13.0881%2021.3457%2012.9457%2021.61%2012.7745%2021.6769C12.6259%2021.7349%2012.4585%2021.7185%2012.324%2021.6328C12.1689%2021.534%2012.0806%2021.2471%2011.9038%2020.6733L8.44519%209.44525C8.3008%208.97651%208.2286%208.74213%208.28669%208.58383C8.33729%208.44595%208.44595%208.33729%208.58383%208.2867C8.74213%208.22861%208.9765%208.3008%209.44525%208.44519L20.6732%2011.9038C21.247%2012.0806%2021.5339%2012.169%2021.6327%2012.324C21.7185%2012.4586%2021.7348%2012.6259%2021.6768%2012.7745C21.61%2012.9458%2021.3456%2013.0881%2020.817%2013.3728L16.1896%2015.8645C16.111%2015.9068%2016.0717%2015.9279%2016.0374%2015.9551C16.0068%2015.9792%2015.9792%2016.0068%2015.9551%2016.0374C15.9279%2016.0717%2015.9068%2016.111%2015.8645%2016.1896Z'%20fill='%23ffffff'%20stroke='%23ffffff'%20stroke-width='4.632'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/g%3E%3Cg%20opacity='0.9'%3E%3Cpath%20d='M9%203.5V2%20M5.06066%205.06066L4%204%20M5.06066%2013L4%2014.0607%20M13%205.06066L14.0607%204%20M3.5%209H2'%20fill='none'%20stroke='%230f1424'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3Cpath%20d='M15.8645%2016.1896L13.3727%2020.817C13.0881%2021.3457%2012.9457%2021.61%2012.7745%2021.6769C12.6259%2021.7349%2012.4585%2021.7185%2012.324%2021.6328C12.1689%2021.534%2012.0806%2021.2471%2011.9038%2020.6733L8.44519%209.44525C8.3008%208.97651%208.2286%208.74213%208.28669%208.58383C8.33729%208.44595%208.44595%208.33729%208.58383%208.2867C8.74213%208.22861%208.9765%208.3008%209.44525%208.44519L20.6732%2011.9038C21.247%2012.0806%2021.5339%2012.169%2021.6327%2012.324C21.7185%2012.4586%2021.7348%2012.6259%2021.6768%2012.7745C21.61%2012.9458%2021.3456%2013.0881%2020.817%2013.3728L16.1896%2015.8645C16.111%2015.9068%2016.0717%2015.9279%2016.0374%2015.9551C16.0068%2015.9792%2015.9792%2016.0068%2015.9551%2016.0374C15.9279%2016.0717%2015.9068%2016.111%2015.8645%2016.1896Z'%20fill='%230f1424'%20stroke='%230f1424'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 7 6;
+  --cursor-now: var(--cursor-arrow);
+}
+
+/* Any mousedown puts `:active` on the element and every ancestor, so this one
+   rule reaches the whole page through inheritance rather than needing an
+   `:active` twin beside each cursor rule. */
+:root:active {
+  --cursor-now: var(--cursor-press);
 }
 
 [data-theme='dark'] {

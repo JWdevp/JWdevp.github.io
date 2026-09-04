@@ -227,7 +227,7 @@
   font-weight: 520;
   white-space: nowrap;
   overflow: hidden;
-  cursor: var(--cursor-arrow), pointer;
+  cursor: var(--cursor-now), pointer;
   box-shadow: var(--shadow-sm);
 }
 
