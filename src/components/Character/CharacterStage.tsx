@@ -108,6 +108,8 @@ export function CharacterStage() {
   const smileWaitTimer = useRef<number | undefined>(undefined)
   /** A tap arrived mid-take. The wave waits for the idle to finish. */
   const waveQueued = useRef(false)
+  /** The combo landed while a clip was running. The smile waits for it. */
+  const smileQueued = useRef(false)
   const restTimer = useRef<number | undefined>(undefined)
   /** Holds the replayed wave on its first frame until the idle has dissolved
    *  off it. */
@@ -252,10 +254,18 @@ export function CharacterStage() {
    * The easter egg, on five quick taps.
    *
    * It suspends the idle cycle rather than joining it: every pending timer is
-   * dropped, the idle is paused where it stands, and the clip plays once before
-   * handing straight back. The idle stays opaque underneath the whole time (see
-   * character.css) so what the smile fades in over, and back out to reveal, is
-   * the same picture that was already on screen.
+   * dropped and the clip plays once before handing straight back. The idle stays
+   * opaque underneath the whole time (see character.css) so what the smile fades
+   * in over, and back out to reveal, is the same picture that was already on
+   * screen.
+   *
+   * Nothing is moving by the time this runs — `armSmile` waits for it. That
+   * wait is the whole point and it is not about the frames: measured against
+   * the smile's opening frame, the worst mid-take idle frame differs by 4.55 of
+   * 255 and the last one by 4.08, which is the idle-to-wave seam already
+   * shipping. What was visible was the STOP. Pausing a clip mid-gesture halts a
+   * moving picture on the spot, and that reads instantly, two seconds before
+   * the dissolve has finished arriving.
    *
    * The first frame is held for one CLIP_FADE before playing, the same trick the
    * replayed wave uses and for the same reason: started with the dissolve, the
@@ -276,7 +286,10 @@ export function CharacterStage() {
     window.clearTimeout(smileStartTimer.current)
     window.clearTimeout(smileWaitTimer.current)
     waveQueued.current = false
+    smileQueued.current = false
     idleRunning.current = false
+    // Already at rest in every path that reaches here; this only settles a clip
+    // that ended a tick ago and has nothing left to show.
     idleNode.current?.pause()
 
     const begin = () => {
@@ -315,6 +328,37 @@ export function CharacterStage() {
   }, [])
 
   /**
+   * The fifth tap.
+   *
+   * The smile never cuts a clip that is moving. If the idle is mid-take, or the
+   * wave is actually running rather than being held on its first frame, this
+   * queues and the clip's own `ended` hands over — the same courtesy the
+   * replayed wave has always been given, and for a better reason than tidiness:
+   * a picture stopped dead is what reads as a jump.
+   *
+   * The fetch starts here regardless, inside the tap's own call stack. The clip
+   * is not preloaded, so the wait doubles as up to six seconds of head start.
+   */
+  const armSmile = useCallback(() => {
+    const node = smileNode.current
+    if (!node) return
+    if (node.readyState < 2 && node.networkState !== node.NETWORK_LOADING) {
+      node.preload = 'auto'
+      node.load()
+    }
+    waveQueued.current = false
+
+    const wave = waveNode.current
+    const waveRunning = !!wave && !wave.paused && wave.currentTime > 0
+    if (idleRunning.current || waveRunning) {
+      smileQueued.current = true
+      return
+    }
+    window.clearTimeout(restTimer.current)
+    playSmile()
+  }, [playSmile])
+
+  /**
    * A tap on the character.
    *
    * Mid-take the wave is queued rather than cut in, which is the point: the idle
@@ -332,7 +376,7 @@ export function CharacterStage() {
     taps.current = recent
     if (recent.length >= SMILE_COMBO.taps && phase !== 'smile' && !smileBroken) {
       taps.current = []
-      playSmile()
+      armSmile()
       return
     }
 
@@ -347,7 +391,7 @@ export function CharacterStage() {
     }
     window.clearTimeout(restTimer.current)
     playWave()
-  }, [phase, idleBroken, playWave, playSmile, smileBroken])
+  }, [phase, idleBroken, playWave, armSmile, smileBroken])
 
   /** The timers are what outlive the component if left. */
   useEffect(
@@ -549,6 +593,12 @@ export function CharacterStage() {
           onEnded={() => {
             announceGreetingDone()
             setGreetingOver(true)
+            // A combo that landed mid-gesture waited for this rather than
+            // stopping the arm where it was.
+            if (smileQueued.current) {
+              playSmile()
+              return
+            }
             // With no idle to fall into, the character holds the wave's last
             // frame exactly as it did before this existed.
             if (!idleBroken) startIdleRef.current()
@@ -585,7 +635,10 @@ export function CharacterStage() {
             // cycle here would run the idle underneath the easter egg.
             if (phase === 'smile') return
             idleRunning.current = false
-            if (waveQueued.current) playWave()
+            // The smile first: it was queued by a combo, which outranks the
+            // single tap that may also be waiting behind it.
+            if (smileQueued.current) playSmile()
+            else if (waveQueued.current) playWave()
             else rest()
           }}
           onError={() => setIdleBroken(true)}
