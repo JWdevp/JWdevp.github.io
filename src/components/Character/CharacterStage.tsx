@@ -85,6 +85,9 @@ export function CharacterStage() {
   /** A tap arrived mid-take. The wave waits for the idle to finish. */
   const waveQueued = useRef(false)
   const restTimer = useRef<number | undefined>(undefined)
+  /** Holds the replayed wave on its first frame until the idle has dissolved
+   *  off it. */
+  const waveStartTimer = useRef<number | undefined>(undefined)
   /** Whether the idle clip is actually running, as opposed to holding its last
    *  frame. A tap during the hold has nothing to wait for. */
   const idleRunning = useRef(false)
@@ -189,10 +192,20 @@ export function CharacterStage() {
       return
     }
     waveQueued.current = false
-    setPhase('wave')
+    // Hold the neutral first frame while the idle dissolves off it, and only
+    // then wave. Started here instead, the clip ran underneath the dissolve and
+    // was 3.18s into a 4.01s gesture by the time anything could be seen of it —
+    // measured — so the character appeared mid-wave from nowhere. Waiting also
+    // makes the dissolve one between two still, near-identical neutral frames,
+    // which is why it does not read as a cut at all.
+    node.pause()
     node.currentTime = 0
-    const started = node.play()
-    if (started) started.catch(() => startIdleRef.current())
+    setPhase('wave')
+    window.clearTimeout(waveStartTimer.current)
+    waveStartTimer.current = window.setTimeout(() => {
+      const started = node.play()
+      if (started) started.catch(() => startIdleRef.current())
+    }, CLIP_FADE)
   }, [rest])
 
   /**
@@ -217,8 +230,14 @@ export function CharacterStage() {
     playWave()
   }, [phase, idleBroken, playWave])
 
-  /** The rest is the one thing here that outlives the component if left. */
-  useEffect(() => () => window.clearTimeout(restTimer.current), [])
+  /** The timers are what outlive the component if left. */
+  useEffect(
+    () => () => {
+      window.clearTimeout(restTimer.current)
+      window.clearTimeout(waveStartTimer.current)
+    },
+    [],
+  )
 
   // On a touch device nothing is shown until the wave has had its say, so the
   // cut-out still does not flash up behind it for a moment first. The timeout

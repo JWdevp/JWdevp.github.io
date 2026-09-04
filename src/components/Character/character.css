@@ -91,14 +91,37 @@
    cutting. The head is at 49.2% of the idle's width and 49.1% of the wave's —
    measured, not assumed — which is what makes one `object-position` correct for
    both. */
+/* The idle is the layer on top, so it is the one that moves: it fades in over
+   the wave and fades out to reveal it again. No delay in either direction —
+   what it uncovers is already opaque. */
 .character__idle {
   z-index: 1;
+  transition: opacity var(--clip-fade, 300ms) var(--ease-out);
 }
 
-.character__wave[data-playing],
 .character__idle[data-playing] {
   opacity: 1;
-  transition-delay: 0ms;
+}
+
+/* The wave is underneath, so it is never seen arriving and does not fade in at
+   all: it snaps to full opacity behind whatever is covering it — the still on
+   the first load, the idle on a replay.
+
+   Fading it in was what put the still on screen at reload. The still is the
+   character looking upward, and holding it under a wave that took two seconds
+   to arrive left it visible at 61% for the better part of a second.
+
+   Only its departure is timed, and that keeps the shared rule: held at full
+   opacity until the idle above has finished arriving, then gone underneath
+   it. */
+.character__wave {
+  transition: opacity var(--clip-fade, 300ms) var(--ease-out)
+    var(--clip-fade, 300ms);
+}
+
+.character__wave[data-playing] {
+  opacity: 1;
+  transition: none;
 }
 
 /* The tap target for replaying the greeting: the frame itself, no more and no
