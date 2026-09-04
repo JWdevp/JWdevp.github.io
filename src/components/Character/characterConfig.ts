@@ -121,3 +121,32 @@ export const IDLE_REST = {
  * before the moment worth seeing.
  */
 export const CLIP_FADE = 2000
+
+/**
+ * The tap combination that plays the smile clip.
+ *
+ * A single tap already replays the greeting, and that must not get slower to
+ * make room for this: the first tap starts the wave exactly as it always did,
+ * and the fifth inside the window takes over from it. Waiting to see whether
+ * more taps were coming would have put a delay on the common gesture to serve
+ * the rare one.
+ *
+ * Five taps in 1.5s is 3.3 a second — brisk enough that nobody arrives at it by
+ * tapping twice to replay the wave, slow enough to be doable with one thumb.
+ * The window rolls: what counts is five taps inside any 1.5s, not five from a
+ * standing start.
+ */
+export const SMILE_COMBO = {
+  taps: 5,
+  windowMs: 1500,
+}
+
+/**
+ * How long to wait for the smile clip to arrive before giving up on it.
+ *
+ * It is the one clip that is not preloaded — 2.3 MB for something almost nobody
+ * triggers — so the first play has to fetch it, and nothing is revealed until
+ * there is a frame to reveal. Ten seconds is long for a file this size and
+ * that is the point: it is a backstop for a fetch that died, not a deadline.
+ */
+export const SMILE_TIMEOUT = 10000

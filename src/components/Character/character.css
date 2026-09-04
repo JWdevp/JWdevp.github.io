@@ -44,7 +44,8 @@
    Invisible until it can play, so a missing file leaves the still showing
    rather than a black rectangle over it. */
 .character__wave,
-.character__idle {
+.character__idle,
+.character__smile {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -103,6 +104,23 @@
   opacity: 1;
 }
 
+/* The easter egg sits one layer above the idle and follows the idle's rule
+   exactly, for the same reason: it fades in over something opaque and fades
+   back out to reveal something opaque, so neither direction needs a delay.
+
+   What keeps that true is in CharacterStage — the idle is held at full opacity
+   for the whole of the smile rather than being allowed to fade out under it.
+   Without that, the layer this uncovers on the way out would be the wave's held
+   last frame, two seconds after the idle had quietly gone. */
+.character__smile {
+  z-index: 2;
+  transition: opacity var(--clip-fade, 300ms) var(--ease-out);
+}
+
+.character__smile[data-playing] {
+  opacity: 1;
+}
+
 /* The wave is underneath, so it is never seen arriving and does not fade in at
    all: it snaps to full opacity behind whatever is covering it — the still on
    the first load, the idle on a replay.
@@ -130,9 +148,10 @@
 .character__replay {
   position: absolute;
   inset: 0;
-  /* Over both clips: the idle raises itself above the wave, and a tap target
-     underneath the thing it covers catches nothing. */
-  z-index: 2;
+  /* Over all three clips: each raises itself above the last, and a tap target
+     underneath the thing it covers catches nothing. Five quick taps here are
+     what summon the smile, so this has to stay reachable while it plays. */
+  z-index: 3;
   padding: 0;
   border: 0;
   border-radius: var(--radius-lg);

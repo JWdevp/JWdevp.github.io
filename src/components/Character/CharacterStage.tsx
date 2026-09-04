@@ -2,7 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { announceGreetingDone } from '../../hooks/useGreeting'
 import { useLanguage } from '../../hooks/useLanguage'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
-import { CLIP_FADE, FOLLOW, IDLE_REST, LAYOUT, MAX_TRAVEL } from './characterConfig'
+import {
+  CLIP_FADE,
+  FOLLOW,
+  IDLE_REST,
+  LAYOUT,
+  MAX_TRAVEL,
+  SMILE_COMBO,
+  SMILE_TIMEOUT,
+} from './characterConfig'
 import manifest from './manifest.json'
 import { useGazeTracking, type Gaze } from './useGazeTracking'
 import './character.css'
@@ -16,6 +24,11 @@ const WAVE = `${import.meta.env.BASE_URL}character/wave.mp4`
  *  framing as the wave — measured, the head sits at 49.2% of the width against
  *  the wave's 49.1% — so the two share a box and a crop. */
 const IDLE = `${import.meta.env.BASE_URL}character/idle.mp4`
+/** The easter egg: five quick taps and the character smiles, once. Same shot as
+ *  the wave — 1280x720, and measured, the head sits at 48.97% of the width
+ *  against the wave's 48.97% and the idle's 49.0-49.2% — so it shares their box,
+ *  their crop and their dissolve without a value of its own. */
+const SMILE = `${import.meta.env.BASE_URL}character/smile.mp4`
 
 /** Gaze of every frame, flattened — read once per animation frame, so the pair
  *  of numbers should be adjacent in memory rather than behind two lookups. */
@@ -75,13 +88,24 @@ export function CharacterStage() {
    * greeting announces itself to the rest of the page and a replay does not.
    * `idle` covers the resting clip both while it runs and while it holds on its
    * last frame between takes, because those look identical and differ only in
-   * whether a timer is pending.
+   * whether a timer is pending. `smile` is the easter egg, which suspends the
+   * idle cycle for its one play and hands straight back to it.
    */
-  const [phase, setPhase] = useState<'greeting' | 'idle' | 'wave'>('greeting')
+  const [phase, setPhase] = useState<'greeting' | 'idle' | 'wave' | 'smile'>(
+    'greeting',
+  )
   /** The greeting is over, so a tap on the character means something. */
   const [greetingOver, setGreetingOver] = useState(false)
   const [idleBroken, setIdleBroken] = useState(false)
   const idleNode = useRef<HTMLVideoElement | null>(null)
+  const [smileBroken, setSmileBroken] = useState(false)
+  const smileNode = useRef<HTMLVideoElement | null>(null)
+  /** When each of the last few taps landed, oldest first. */
+  const taps = useRef<number[]>([])
+  /** Holds the smile on its first frame while the idle dissolves off it, and
+   *  the backstop on fetching a clip that is deliberately not preloaded. */
+  const smileStartTimer = useRef<number | undefined>(undefined)
+  const smileWaitTimer = useRef<number | undefined>(undefined)
   /** A tap arrived mid-take. The wave waits for the idle to finish. */
   const waveQueued = useRef(false)
   const restTimer = useRef<number | undefined>(undefined)
@@ -136,6 +160,22 @@ export function CharacterStage() {
       return
     }
     node.addEventListener('error', () => setIdleBroken(true), { once: true })
+  }, [])
+
+  /**
+   * The smile is watched differently from the other two, because it is the one
+   * clip that is not preloaded.
+   *
+   * `preload="none"` means the element sits at NETWORK_EMPTY with no source
+   * fetched, which is indistinguishable from a file that is missing — so unlike
+   * the wave and the idle there is nothing to read synchronously here, and the
+   * only honest signal is a fetch that has actually been attempted and failed.
+   * That check lives in `playSmile`.
+   */
+  const attachSmile = useCallback((node: HTMLVideoElement | null) => {
+    smileNode.current = node
+    if (!node) return
+    node.addEventListener('error', () => setSmileBroken(true), { once: true })
   }, [])
 
   /**
@@ -209,6 +249,72 @@ export function CharacterStage() {
   }, [rest])
 
   /**
+   * The easter egg, on five quick taps.
+   *
+   * It suspends the idle cycle rather than joining it: every pending timer is
+   * dropped, the idle is paused where it stands, and the clip plays once before
+   * handing straight back. The idle stays opaque underneath the whole time (see
+   * character.css) so what the smile fades in over, and back out to reveal, is
+   * the same picture that was already on screen.
+   *
+   * The first frame is held for one CLIP_FADE before playing, the same trick the
+   * replayed wave uses and for the same reason: started with the dissolve, the
+   * clip would be two seconds in by the time any of it could be seen. Measured,
+   * that is affordable here — the clip barely moves for its first second (1.25
+   * of 255 against its own opening frame) and the smile peaks at 5.0s, so the
+   * fade is long over before the moment worth seeing.
+   */
+  const playSmile = useCallback(() => {
+    const node = smileNode.current
+    if (!node) return
+
+    // Everything the idle cycle had pending, cancelled: a rest that fires
+    // mid-smile would restart the idle underneath it, and a queued wave would
+    // jump in the moment the smile ended.
+    window.clearTimeout(restTimer.current)
+    window.clearTimeout(waveStartTimer.current)
+    window.clearTimeout(smileStartTimer.current)
+    window.clearTimeout(smileWaitTimer.current)
+    waveQueued.current = false
+    idleRunning.current = false
+    idleNode.current?.pause()
+
+    const begin = () => {
+      node.pause()
+      node.currentTime = 0
+      setPhase('smile')
+      smileStartTimer.current = window.setTimeout(() => {
+        const started = node.play()
+        if (started) started.catch(() => startIdleRef.current())
+      }, CLIP_FADE)
+    }
+
+    if (node.readyState >= 2) {
+      begin()
+      return
+    }
+
+    // Not fetched yet. Nothing is revealed until there is a frame to reveal —
+    // dissolving to an element with no picture would show the page through it.
+    // `load()` runs inside the tap's own call stack, which is what lets a phone
+    // start the fetch at all.
+    const onReady = () => {
+      window.clearTimeout(smileWaitTimer.current)
+      begin()
+    }
+    node.addEventListener('loadeddata', onReady, { once: true })
+    node.preload = 'auto'
+    node.load()
+    smileWaitTimer.current = window.setTimeout(() => {
+      node.removeEventListener('loadeddata', onReady)
+      // Give up on it for the rest of the visit rather than make every later
+      // combo wait out the same ten seconds.
+      setSmileBroken(true)
+      startIdleRef.current()
+    }, SMILE_TIMEOUT)
+  }, [])
+
+  /**
    * A tap on the character.
    *
    * Mid-take the wave is queued rather than cut in, which is the point: the idle
@@ -217,7 +323,20 @@ export function CharacterStage() {
    * reader cannot see would just read as the tap having been ignored.
    */
   const onTap = useCallback(() => {
-    if (phase === 'wave') return
+    // Counted before anything else returns early, because the combo has to be
+    // reachable while the wave is playing — its own first tap is what started
+    // that wave.
+    const now = Date.now()
+    const recent = taps.current.filter((at) => now - at < SMILE_COMBO.windowMs)
+    recent.push(now)
+    taps.current = recent
+    if (recent.length >= SMILE_COMBO.taps && phase !== 'smile' && !smileBroken) {
+      taps.current = []
+      playSmile()
+      return
+    }
+
+    if (phase === 'wave' || phase === 'smile') return
     if (idleBroken) {
       playWave()
       return
@@ -228,13 +347,15 @@ export function CharacterStage() {
     }
     window.clearTimeout(restTimer.current)
     playWave()
-  }, [phase, idleBroken, playWave])
+  }, [phase, idleBroken, playWave, playSmile, smileBroken])
 
   /** The timers are what outlive the component if left. */
   useEffect(
     () => () => {
       window.clearTimeout(restTimer.current)
       window.clearTimeout(waveStartTimer.current)
+      window.clearTimeout(smileStartTimer.current)
+      window.clearTimeout(smileWaitTimer.current)
     },
     [],
   )
@@ -358,10 +479,11 @@ export function CharacterStage() {
   // The still is contained inside the same box if the video never arrives.
   const aspect = tracks ? `${manifest.frameWidth} / ${manifest.frameHeight}` : '1.46'
   const visible = tracks || waveSettled
-  /** Either clip showing means the framed shot rather than the cut-out sheet,
+  /** Any clip showing means the framed shot rather than the cut-out sheet,
    *  so the bust fade comes off and the still underneath goes. */
-  const filmShowing = wavePlaying || phase === 'idle'
+  const filmShowing = wavePlaying || phase === 'idle' || phase === 'smile'
   const idle = !tracks && !idleBroken
+  const smile = !tracks && !smileBroken
 
   return (
     <div
@@ -421,7 +543,9 @@ export function CharacterStage() {
           // raise `error` on a media element, and an empty <video> paints as a
           // black box in some browsers — this way it simply never appears.
           ref={attachWave}
-          data-playing={(wavePlaying && phase !== 'idle') || undefined}
+          data-playing={
+            (wavePlaying && phase !== 'idle' && phase !== 'smile') || undefined
+          }
           onEnded={() => {
             announceGreetingDone()
             setGreetingOver(true)
@@ -448,13 +572,43 @@ export function CharacterStage() {
           playsInline
           preload="auto"
           ref={attachIdle}
-          data-playing={(phase === 'idle') || undefined}
+          // Opaque under the smile as well as while it is the clip being
+          // watched. The smile fades in over it and, when it ends, fades back
+          // out to reveal it — both need something solid underneath, and the
+          // idle is the picture that was already on screen when the taps
+          // landed. Left to fade out on its own, what the smile uncovered
+          // would be the wave's held last frame instead.
+          data-playing={phase === 'idle' || phase === 'smile' || undefined}
           onEnded={() => {
+            // Paused mid-take by the smile, this cannot fire — but a take that
+            // ends on the same tick as the fifth tap can, and restarting the
+            // cycle here would run the idle underneath the easter egg.
+            if (phase === 'smile') return
             idleRunning.current = false
             if (waveQueued.current) playWave()
             else rest()
           }}
           onError={() => setIdleBroken(true)}
+        />
+      ) : null}
+      {/* The easter egg, stacked over the idle so it dissolves onto the picture
+          that is already showing. Same box, crop and fade as the other two.
+
+          `preload="none"` is the one departure, and it is the point: 2.3 MB
+          that almost nobody triggers has no business on every visit, so the
+          file is fetched inside the tap that asks for it. Nothing is revealed
+          until a frame has arrived — see playSmile. */}
+      {smile ? (
+        <video
+          className="character__smile"
+          src={SMILE}
+          muted
+          playsInline
+          preload="none"
+          ref={attachSmile}
+          data-playing={phase === 'smile' || undefined}
+          onEnded={() => startIdleRef.current()}
+          onError={() => setSmileBroken(true)}
         />
       ) : null}
       {/* Sits over the frame from the moment the greeting is done, so a tap
