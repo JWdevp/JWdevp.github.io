@@ -137,7 +137,7 @@
   border: 0;
   border-radius: var(--radius-lg);
   background: transparent;
-  cursor: var(--cursor-now), pointer;
+  cursor: var(--cursor-arrow), pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
