@@ -5,6 +5,19 @@ on:
     branches: [main]
   # Allows a manual run from the Actions tab.
   workflow_dispatch:
+  # Re-publishes the site once a day so the CV carries the current date. The
+  # PDF in the repository is never touched — see the stamping step below.
+  #
+  # 23:00 UTC and not 00:00, because this scheduler runs in UTC and the CV is
+  # dated in Germany. Berlin is an hour ahead in winter and two in summer, so
+  # 23:00 UTC is midnight there in winter and 01:00 in summer: in both, the
+  # German day being stamped has already started. Running at 00:00 UTC would,
+  # for half the year, date the document a day ahead of Germany.
+  #
+  # GitHub delays scheduled runs under load, sometimes by half an hour. That
+  # only ever pushes it further into the same German day, so it stays correct.
+  schedule:
+    - cron: '0 23 * * *'
 
 permissions:
   contents: read
@@ -53,6 +66,30 @@ jobs:
         env:
           BASE_PATH: ${{ steps.base.outputs.path }}
         run: npm run build
+
+      # Only the built copy is stamped. The PDF in the repository stays exactly
+      # as it came out of Word: rewriting it would swap a hand-made export for
+      # a tool's re-save, and the next export would then diff against
+      # something nobody wrote. Stamping the copy also means the ~37 kB that
+      # re-embedding the font costs is paid once per build rather than
+      # accumulating.
+      #
+      # A glob rather than the filename, so renaming the CV does not silently
+      # stop this. The script leaves anything it does not recognise alone and
+      # never fails the build — a date is not worth blocking a deploy over, so
+      # watch this step's log if the date ever looks stale.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Stamp today's date on the CV
+        run: |
+          python -m pip install --quiet pymupdf
+          shopt -s nullglob
+          for pdf in dist/cv/*.pdf; do
+            python scripts/stamp-cv-date.py "$pdf"
+          done
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
