@@ -61,7 +61,7 @@
   font: inherit;
   background: none;
   border: 0;
-  cursor: var(--cursor-arrow), pointer;
+  cursor: var(--cursor-now), pointer;
 }
 
 .project__cover {
