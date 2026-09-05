@@ -29,6 +29,13 @@ const IDLE = `${import.meta.env.BASE_URL}character/idle.mp4`
  *  against the wave's 48.97% and the idle's 49.0-49.2% — so it shares their box,
  *  their crop and their dissolve without a value of its own. */
 const SMILE = `${import.meta.env.BASE_URL}character/smile.mp4`
+/** The other half of the resting loop. Takes alternate between this and the
+ *  idle, so the character is never watched doing the same thing twice running.
+ *  Same shot as the rest — measured, the head sits at 49.62% of the width
+ *  against the idle's 49.64% — so it shares their box and crop. */
+const COFFEE = `${import.meta.env.BASE_URL}character/coffee.mp4`
+/** Slot 0 opens, slot 1 answers, and back. */
+const LOOP = [IDLE, COFFEE]
 
 /** Gaze of every frame, flattened — read once per animation frame, so the pair
  *  of numbers should be adjacent in memory rather than behind two lookups. */
@@ -98,13 +105,22 @@ export function CharacterStage() {
   const [greetingOver, setGreetingOver] = useState(false)
   const [idleBroken, setIdleBroken] = useState(false)
   /**
-   * Two idle layers, and everything that keeps the spare one from being able to
-   * break the character.
+   * The resting loop's two layers, and everything that keeps the second one
+   * from being able to break the character.
    *
-   * The clip does not loop — its last frame is 2.24 of 255 from its first,
-   * seventeen normal frame steps — and there is no clean loop point anywhere in
-   * it, so the wrap has to be dissolved rather than cut, which takes a second
-   * layer of the same video.
+   * They hold different clips — slot 0 the idle, slot 1 the coffee — and takes
+   * alternate between them, so every swap dissolves two shots that already line
+   * up rather than cutting. Measured on the composited crops, mean absolute
+   * difference of 255: the idle's last frame to the coffee's first is 3.99, the
+   * coffee's last to the idle's first is 3.13, and neither has a better opening
+   * frame to start from — searched frame by frame, the coffee's own frame 0
+   * wins both ways. The seams already shipping run 2.75 to 4.09.
+   *
+   * The pair predates the coffee: it was two copies of the idle, dissolving the
+   * idle's own wrap, because that clip does not loop into itself — last frame
+   * 2.24 from first, seventeen normal frame steps, no clean loop point anywhere
+   * in it. Alternating clips retires that problem instead of solving it, since
+   * the idle no longer follows itself. The count of video elements is unchanged.
    *
    * An <img> of the frame was tried first and measured worse than the problem:
    * painting a LOSSLESS image of a frame instead of the video's own differs by
@@ -128,11 +144,11 @@ export function CharacterStage() {
    * With both, the worst case is the wrap staying a cut, which is where this
    * started. It is never a blank frame.
    */
-  const idleNodes = useRef<Array<HTMLVideoElement | null>>([null, null])
+  const loopNodes = useRef<Array<HTMLVideoElement | null>>([null, null])
   /** Which layer is showing. The ref is what callbacks read, the state is what
    *  the render needs, and they are always set together. */
-  const [idleSlot, setIdleSlot] = useState(0)
-  const idleSlotRef = useRef(0)
+  const [loopSlot, setLoopSlot] = useState(0)
+  const loopSlotRef = useRef(0)
   const spareReady = useRef(false)
   const spareDead = useRef(false)
   const [smileBroken, setSmileBroken] = useState(false)
@@ -202,7 +218,7 @@ export function CharacterStage() {
    *  settled before React attaches `onError`. */
   const attachIdle = useCallback(
     (slot: number) => (node: HTMLVideoElement | null) => {
-      idleNodes.current[slot] = node
+      loopNodes.current[slot] = node
       if (!node) return
       // Only slot 0 can declare the idle broken. A spare that cannot load is a
       // wrap that stays a cut, not a character that disappears.
@@ -255,7 +271,7 @@ export function CharacterStage() {
   }, [reduced])
 
   const startIdle = useCallback(() => {
-    const node = idleNodes.current[idleSlotRef.current]
+    const node = loopNodes.current[loopSlotRef.current]
     if (!node) return
     setPhase('idle')
     // Usually a no-op: a hand-over at the end of the last take left this layer
@@ -264,6 +280,15 @@ export function CharacterStage() {
     // this is the old cut, which is the fallback rather than the design.
     if (node.currentTime !== 0) node.currentTime = 0
     idleRunning.current = true
+
+    // Start pulling the other half of the loop down now, with a take and a rest
+    // still to run before it is wanted. Nothing depends on it arriving: if it
+    // has not, the hand-over does not happen and the same clip plays again.
+    const other = loopNodes.current[loopSlotRef.current === 0 ? 1 : 0]
+    if (other && other.preload === 'none' && !other.error) {
+      other.preload = 'auto'
+      other.load()
+    }
     const started = node.play()
     // A refusal is not fatal here: the character simply keeps holding its last
     // frame and the next rest tries again.
@@ -289,10 +314,10 @@ export function CharacterStage() {
    * only if that round trip resolves. Every way this can fail ends in the same
    * place: no swap, and `startIdle` cuts back to frame 0 as it always did.
    */
-  const handOverIdle = useCallback(async () => {
+  const handOverLoop = useCallback(async () => {
     if (spareDead.current) return
-    const next = idleSlotRef.current === 0 ? 1 : 0
-    const node = idleNodes.current[next]
+    const next = loopSlotRef.current === 0 ? 1 : 0
+    const node = loopNodes.current[next]
     if (!node || node.error || node.readyState < 2) return
 
     if (!spareReady.current) {
@@ -311,8 +336,8 @@ export function CharacterStage() {
 
     node.pause()
     if (node.currentTime !== 0) node.currentTime = 0
-    idleSlotRef.current = next
-    setIdleSlot(next)
+    loopSlotRef.current = next
+    setLoopSlot(next)
   }, [])
 
   /**
@@ -339,7 +364,7 @@ export function CharacterStage() {
    * take.
    */
   const rewindIdle = useCallback(() => {
-    const node = idleNodes.current[idleSlotRef.current]
+    const node = loopNodes.current[loopSlotRef.current]
     if (!node) return
     node.pause()
     idleRunning.current = false
@@ -753,7 +778,7 @@ export function CharacterStage() {
           onError={() => setWaveBroken(true)}
         />
       ) : null}
-      {/* The resting clip, on two alternating layers — see idleNodes for why,
+      {/* The resting clip, on two alternating layers — see loopNodes for why,
           and for the two guards that keep the spare from being able to blank
           the frame. Same box and crop as the wave, stacked over it, so every
           swap here dissolves shots that already line up rather than cutting.
@@ -765,10 +790,15 @@ export function CharacterStage() {
             <video
               key={slot}
               className="character__idle"
-              src={IDLE}
+              src={LOOP[slot]}
               muted
               playsInline
-              preload="auto"
+              // The coffee is a megabyte and it is not needed for a good ten
+              // seconds — the greeting, the first idle take and a rest have to
+              // pass first. Preloading it would have it competing with the
+              // greeting for a phone's bandwidth at the worst moment, so its
+              // fetch is kicked off once the first take is running instead.
+              preload={slot === 0 ? 'auto' : 'none'}
               ref={attachIdle(slot)}
               // The showing layer is opaque under the smile as well as while it
               // is the clip being watched: the smile fades in over it and, when
@@ -776,14 +806,14 @@ export function CharacterStage() {
               // solid underneath. Left to fade out on its own, what the smile
               // uncovered would be the wave's held last frame instead.
               data-playing={
-                (slot === idleSlot &&
+                (slot === loopSlot &&
                   (phase === 'idle' ||
                     (phase === 'smile' && smileOver.current === 'idle'))) ||
                 undefined
               }
               onEnded={() => {
                 // Only the layer that was actually playing has anything to say.
-                if (slot !== idleSlotRef.current) return
+                if (slot !== loopSlotRef.current) return
                 // Paused mid-take by the smile, this cannot fire — but a take
                 // that ends on the same tick as the fifth tap can, and
                 // restarting the cycle here would run the idle underneath the
@@ -799,7 +829,7 @@ export function CharacterStage() {
                 else if (waveQueued.current) playWave()
                 else {
                   rest()
-                  void handOverIdle()
+                  void handOverLoop()
                 }
               }}
               onError={() => {
