@@ -130,6 +130,22 @@
   --shadow-island: 0 1px 1px rgba(255, 255, 255, 0.6) inset,
     0 8px 30px -10px rgba(15, 20, 36, 0.24), 0 2px 6px rgba(15, 20, 36, 0.07);
 
+  /* The character's window, and the only shadow here with no offset: it is
+     uniform on all four sides, so the frame reads as lifted off the page
+     rather than lit from anywhere.
+
+     20px of blur, down from the 24 first shown: the shadow was reaching about
+     30px out and this brings it to about 25, which reads as the window sitting
+     just off the page rather than hovering above it. Narrowing the blur while
+     keeping the alpha also makes it denser close to the edge, which is the same
+     illusion said the other way round.
+
+     The alpha is not the same in both themes and cannot be. On the light
+     page's #d6e3ff this reads at 14%; on the dark page's #0b0c10 black at 14%
+     is nothing at all, and it takes 55% before the surround darkens enough to
+     register as depth. */
+  --shadow-window: 0 0 20px rgba(15, 20, 36, 0.14);
+
   --grain-opacity: 0.035;
   --glow-a: rgba(0, 56, 255, 0.14);
   --glow-b: rgba(255, 138, 76, 0.1);
@@ -219,6 +235,8 @@
 }
 
 [data-theme='dark'] {
+  --shadow-window: 0 0 20px rgba(0, 0, 0, 0.55);
+
   --background: #0b0c10;
   --background-elevated: #111219;
   --foreground: #eceef3;
