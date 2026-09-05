@@ -221,6 +221,37 @@ export function CharacterStage() {
   }, [startIdle])
 
   /**
+   * Put the idle back on its opening frame before a dissolve leaves it.
+   *
+   * Both outgoing dissolves used to depart from wherever the take had ended,
+   * and that is what the small jump was. The head drifts through a take and is
+   * furthest from where the other two clips open at the moment the take
+   * finishes: measured on the composited crops, the idle's LAST frame sits 4.87
+   * of 255 from the wave's first and 4.08 from the smile's, while its FIRST
+   * frame sits at 4.00 and 3.19. The seams that read as perfect — the greeting
+   * handing over to the idle, and the smile handing back — are 3.24 and 3.12,
+   * so 3.19 is inside that band and 4.87 is plainly outside it.
+   *
+   * Nothing else was available. Searched frame by frame, neither clip has an
+   * opening frame that matches the idle's end better than its own frame 0
+   * (best gains: 0.40 and 0.23, and 0.00 and 0.05 against the idle's start),
+   * head size and position agree across all three to within 1.6%, and the
+   * global grade difference is 1.52 at worst. The departure frame is the whole
+   * of the lever.
+   *
+   * The step back to frame 0 is the idle's own wrap, 2.75 — the smallest seam
+   * in the set, and the same one the loop already makes at the start of every
+   * take.
+   */
+  const rewindIdle = useCallback(() => {
+    const node = idleNode.current
+    if (!node) return
+    node.pause()
+    idleRunning.current = false
+    if (node.currentTime !== 0) node.currentTime = 0
+  }, [])
+
+  /**
    * Wave again, on a tap inside the frame.
    *
    * `play()` can be refused — a phone that has decided this page may not start
@@ -234,6 +265,9 @@ export function CharacterStage() {
       return
     }
     waveQueued.current = false
+    // The still the idle leaves behind goes back to its opening frame first —
+    // see rewindIdle. This is the seam that was jumping.
+    rewindIdle()
     // Hold the neutral first frame while the idle dissolves off it, and only
     // then wave. Started here instead, the clip ran underneath the dissolve and
     // was 3.18s into a 4.01s gesture by the time anything could be seen of it —
@@ -248,7 +282,7 @@ export function CharacterStage() {
       const started = node.play()
       if (started) started.catch(() => startIdleRef.current())
     }, CLIP_FADE)
-  }, [rest])
+  }, [rest, rewindIdle])
 
   /**
    * The easter egg, on five quick taps.
@@ -287,10 +321,9 @@ export function CharacterStage() {
     window.clearTimeout(smileWaitTimer.current)
     waveQueued.current = false
     smileQueued.current = false
-    idleRunning.current = false
-    // Already at rest in every path that reaches here; this only settles a clip
-    // that ended a tick ago and has nothing left to show.
-    idleNode.current?.pause()
+    // Nothing is moving by the time this runs, and this puts the still it
+    // leaves behind on the idle's opening frame — see rewindIdle.
+    rewindIdle()
 
     const begin = () => {
       node.pause()
@@ -325,7 +358,7 @@ export function CharacterStage() {
       setSmileBroken(true)
       startIdleRef.current()
     }, SMILE_TIMEOUT)
-  }, [])
+  }, [rewindIdle])
 
   /**
    * The fifth tap.

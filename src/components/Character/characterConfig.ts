@@ -90,13 +90,18 @@ export const LAYOUT = {
  *
  * The reduced-motion pair is longer rather than absent, the same rule the rest
  * of the project follows: an idle character that never moves at all reads as a
- * broken video, not as a considerate one.
+ * broken video, not as a considerate one. It stays three times the base pair,
+ * so shortening one shortens the other.
+ *
+ * Was 10-15. At a 5.9s take that put the character in motion about a third of
+ * the time; at 7-11 it is closer to two fifths, which is the same rhythm with
+ * less waiting in it.
  */
 export const IDLE_REST = {
-  min: 10,
-  max: 15,
-  reducedMin: 30,
-  reducedMax: 45,
+  min: 7,
+  max: 11,
+  reducedMin: 21,
+  reducedMax: 33,
 }
 
 /**
