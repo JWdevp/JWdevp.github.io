@@ -97,34 +97,7 @@ export function CharacterStage() {
   /** The greeting is over, so a tap on the character means something. */
   const [greetingOver, setGreetingOver] = useState(false)
   const [idleBroken, setIdleBroken] = useState(false)
-  /**
-   * Two idle elements, not one, and the reason is the wrap.
-   *
-   * The clip does not loop: measured at 24fps on the composited crops, its last
-   * frame sits 2.24 of 255 from its first while a normal frame-to-frame step is
-   * 0.128 — seventeen steps in one frame, which is what read as a jump when a
-   * rest ended and the next take cut back to the start. There is no clean loop
-   * point to move it to either: searched over every pair of frames, the best
-   * loop anywhere in the clip cuts 2.11, barely under the 2.24 already there.
-   * The character simply ends a take in a different pose from the one it began
-   * in.
-   *
-   * So the wrap is dissolved rather than cut, and dissolving a clip into itself
-   * takes two layers. Takes alternate between them: the one that just finished
-   * holds its last frame while the other, parked on frame 0, fades up over it.
-   * Both share one file, so the second costs a decoder and no bytes.
-   *
-   * The swap happens when a take ENDS, not when the next one starts. That is
-   * what leaves the rest sitting on frame 0 — so the next take begins from the
-   * frame already on screen with nothing to cut, and so does every dissolve out
-   * to the wave or the smile, which is the frame those two want to leave from
-   * anyway.
-   */
-  const idleNodes = useRef<Array<HTMLVideoElement | null>>([null, null])
-  /** Which layer is showing. The ref is what callbacks and timers read; the
-   *  state is what the render needs, and they are set together. */
-  const [idleSlot, setIdleSlot] = useState(0)
-  const idleSlotRef = useRef(0)
+  const idleNode = useRef<HTMLVideoElement | null>(null)
   const [smileBroken, setSmileBroken] = useState(false)
   const smileNode = useRef<HTMLVideoElement | null>(null)
   /** When each of the last few taps landed, oldest first. */
@@ -181,8 +154,8 @@ export function CharacterStage() {
   /** Watch the idle for a file that is missing or cannot be decoded, the same
    *  way the wave is watched and for the same reason: the failure is often
    *  settled before React attaches `onError`. */
-  const attachIdle = useCallback((slot: number) => (node: HTMLVideoElement | null) => {
-    idleNodes.current[slot] = node
+  const attachIdle = useCallback((node: HTMLVideoElement | null) => {
+    idleNode.current = node
     if (!node) return
     if (node.error || node.networkState === node.NETWORK_NO_SOURCE) {
       setIdleBroken(true)
@@ -227,14 +200,10 @@ export function CharacterStage() {
   }, [reduced])
 
   const startIdle = useCallback(() => {
-    const node = idleNodes.current[idleSlotRef.current]
+    const node = idleNode.current
     if (!node) return
     setPhase('idle')
-    // Normally a no-op: the hand-over at the end of the last take left this
-    // layer parked here, which is the point — the take begins on the frame
-    // already showing. It still matters after a wave or a smile, where the
-    // layer was rewound rather than swapped.
-    if (node.currentTime !== 0) node.currentTime = 0
+    node.currentTime = 0
     idleRunning.current = true
     const started = node.play()
     // A refusal is not fatal here: the character simply keeps holding its last
@@ -250,24 +219,6 @@ export function CharacterStage() {
   useEffect(() => {
     startIdleRef.current = startIdle
   }, [startIdle])
-
-  /**
-   * A take has finished and nothing is waiting on it: dissolve the wrap.
-   *
-   * The layer that just played holds its last frame and the other one, parked
-   * on frame 0, fades up over it. Nothing is playing during the swap — both are
-   * stills a fifth of a normal frame step apart by the time it is over — and
-   * the rest that follows sits on frame 0, ready for whatever comes next.
-   */
-  const handOverIdle = useCallback(() => {
-    const next = idleSlotRef.current === 0 ? 1 : 0
-    const node = idleNodes.current[next]
-    if (!node) return
-    node.pause()
-    if (node.currentTime !== 0) node.currentTime = 0
-    idleSlotRef.current = next
-    setIdleSlot(next)
-  }, [])
 
   /**
    * Put the idle back on its opening frame before a dissolve leaves it.
@@ -293,7 +244,7 @@ export function CharacterStage() {
    * take.
    */
   const rewindIdle = useCallback(() => {
-    const node = idleNodes.current[idleSlotRef.current]
+    const node = idleNode.current
     if (!node) return
     node.pause()
     idleRunning.current = false
@@ -631,11 +582,6 @@ export function CharacterStage() {
       data-ready={(ready && visible) || undefined}
       data-wave={filmShowing || undefined}
       data-still={!tracks || undefined}
-      // The idle layers hold before they go, which is what keeps the wrap
-      // dissolve covered — the layer arriving is another idle, not something
-      // already opaque. Leaving for the wave is the one case where what they
-      // uncover IS opaque, so there the hold comes off and they go at once.
-      data-idle-leaving={phase === 'wave' || undefined}
     >
       <img
         className="character__sheet"
@@ -693,61 +639,44 @@ export function CharacterStage() {
           onError={() => setWaveBroken(true)}
         />
       ) : null}
-      {/* The resting clip, on two alternating layers. Same box and crop as the
-          wave, stacked over it, so the swap between them is a crossfade of two
-          shots that already line up rather than a cut.
-
-          Two layers because the clip does not loop — see idleNodes. Takes
-          alternate, the finished one holding its last frame while the next,
-          parked on frame 0, fades up over it, so the wrap is dissolved instead
-          of cut.
+      {/* The resting clip. Same box and crop as the wave, stacked over it, so
+          the swap between the two is a crossfade of two shots that already line
+          up rather than a cut. Measured, all three seams — the idle's own wrap,
+          greeting to idle, and idle to replay — are about twenty times a normal
+          frame-to-frame step, so one fade covers all of them.
 
           No `loop`: the pause between takes is the whole design, so each take
           is started deliberately. */}
-      {idle
-        ? [0, 1].map((slot) => (
-            <video
-              key={slot}
-              className="character__idle"
-              src={IDLE}
-              muted
-              playsInline
-              preload="auto"
-              ref={attachIdle(slot)}
-              // The showing layer is opaque under the smile as well as while it
-              // is the clip being watched: the smile fades in over it and, when
-              // it ends, fades back out to reveal it, and both need something
-              // solid underneath. Left to fade out on its own, what the smile
-              // uncovered would be the wave's held last frame instead.
-              data-playing={
-                (slot === idleSlot && (phase === 'idle' || phase === 'smile')) ||
-                undefined
-              }
-              onEnded={() => {
-                // Only the layer that was actually playing has anything to say.
-                if (slot !== idleSlotRef.current) return
-                // Paused mid-take by the smile, this cannot fire — but a take
-                // that ends on the same tick as the fifth tap can, and
-                // restarting the cycle here would run the idle underneath the
-                // easter egg.
-                if (phase === 'smile') return
-                idleRunning.current = false
-                // The smile first: it was queued by a combo, which outranks the
-                // single tap that may also be waiting behind it. Neither hands
-                // over to the other layer — both dissolve away from this one,
-                // rewound, and a swap underneath would be a second dissolve
-                // nobody asked for.
-                if (smileQueued.current) playSmile()
-                else if (waveQueued.current) playWave()
-                else {
-                  handOverIdle()
-                  rest()
-                }
-              }}
-              onError={() => setIdleBroken(true)}
-            />
-          ))
-        : null}
+      {idle ? (
+        <video
+          className="character__idle"
+          src={IDLE}
+          muted
+          playsInline
+          preload="auto"
+          ref={attachIdle}
+          // Opaque under the smile as well as while it is the clip being
+          // watched. The smile fades in over it and, when it ends, fades back
+          // out to reveal it — both need something solid underneath, and the
+          // idle is the picture that was already on screen when the taps
+          // landed. Left to fade out on its own, what the smile uncovered
+          // would be the wave's held last frame instead.
+          data-playing={phase === 'idle' || phase === 'smile' || undefined}
+          onEnded={() => {
+            // Paused mid-take by the smile, this cannot fire — but a take that
+            // ends on the same tick as the fifth tap can, and restarting the
+            // cycle here would run the idle underneath the easter egg.
+            if (phase === 'smile') return
+            idleRunning.current = false
+            // The smile first: it was queued by a combo, which outranks the
+            // single tap that may also be waiting behind it.
+            if (smileQueued.current) playSmile()
+            else if (waveQueued.current) playWave()
+            else rest()
+          }}
+          onError={() => setIdleBroken(true)}
+        />
+      ) : null}
       {/* The easter egg, stacked over the idle so it dissolves onto the picture
           that is already showing. Same box, crop and fade as the other two.
 
