@@ -1,7 +1,7 @@
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { Check, Loader2, Send, TriangleAlert } from 'lucide-react'
-import { useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   WEB3FORMS_ACCESS_KEY,
   WEB3FORMS_ENDPOINT,
@@ -245,6 +245,34 @@ function Field({
   disabled,
 }: FieldProps) {
   const errorId = `${id}-error`
+  const area = useRef<HTMLTextAreaElement>(null)
+
+  /**
+   * Grow the message box to fit what is being written.
+   *
+   * The drag handle is gone — `resize: none` in contact.css — because dragging
+   * it made the form taller and the GitHub button, pinned to the foot of the
+   * column beside it, slid away from the two above. Typing does the same thing
+   * to the form's height, so the button was unpinned in the same change; this
+   * only has to keep the box the right size.
+   *
+   * Height is cleared before it is read: `scrollHeight` is the content's full
+   * height only when the element is not already taller than its content, so
+   * measuring without this would ratchet the box up and never let it shrink
+   * again. The border is added back because the box sizes border-box and
+   * `scrollHeight` counts padding but not borders — set to `scrollHeight`
+   * alone the content comes out two pixels short and a scrollbar appears on
+   * every line. It stops growing at the max-height the stylesheet sets and
+   * scrolls from there.
+   */
+  useEffect(() => {
+    const el = area.current
+    if (!el) return
+    el.style.height = 'auto'
+    const border = el.offsetHeight - el.clientHeight
+    el.style.height = `${el.scrollHeight + border}px`
+  }, [value, multiline])
+
   // The label sits inside the field as its placeholder. The real <label> stays
   // in the markup, visually hidden, so screen readers and click-to-focus keep
   // working — a placeholder alone is not an accessible name.
@@ -265,7 +293,7 @@ function Field({
         {label}
       </label>
       {multiline ? (
-        <textarea {...shared} rows={4} />
+        <textarea {...shared} ref={area} rows={4} />
       ) : (
         <input {...shared} type={type} autoComplete={autoComplete} />
       )}
