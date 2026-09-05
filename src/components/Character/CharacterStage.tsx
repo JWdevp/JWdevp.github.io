@@ -147,6 +147,15 @@ export function CharacterStage() {
   const waveQueued = useRef(false)
   /** The combo landed while a clip was running. The smile waits for it. */
   const smileQueued = useRef(false)
+  /**
+   * Which layer the smile is sitting on, because it is not always the idle.
+   *
+   * A combo during the wave cuts straight to the smile rather than waiting, so
+   * whatever is showing has to stay opaque underneath it — the idle if it was
+   * resting, the wave if it was mid-gesture. Get this wrong and the smile fades
+   * in over a layer that is fading out beneath it.
+   */
+  const smileOver = useRef<'idle' | 'wave'>('idle')
   const restTimer = useRef<number | undefined>(undefined)
   /** Holds the replayed wave on its first frame until the idle has dissolved
    *  off it. */
@@ -407,8 +416,11 @@ export function CharacterStage() {
     window.clearTimeout(smileWaitTimer.current)
     waveQueued.current = false
     smileQueued.current = false
-    // Nothing is moving by the time this runs, and this puts the still it
-    // leaves behind on the idle's opening frame — see rewindIdle.
+    // What this is covering decides which layer has to hold underneath it.
+    smileOver.current = phase === 'wave' || phase === 'greeting' ? 'wave' : 'idle'
+    // The idle is put back on its opening frame either way: it is the still the
+    // smile leaves behind when it came from the idle, and it is where the idle
+    // restarts from afterwards when it came from the wave.
     rewindIdle()
 
     const begin = () => {
@@ -444,7 +456,7 @@ export function CharacterStage() {
       setSmileBroken(true)
       startIdleRef.current()
     }, SMILE_TIMEOUT)
-  }, [rewindIdle])
+  }, [phase, rewindIdle])
 
   /**
    * The fifth tap.
@@ -467,12 +479,18 @@ export function CharacterStage() {
     }
     waveQueued.current = false
 
-    const wave = waveNode.current
-    const waveRunning = !!wave && !wave.paused && wave.currentTime > 0
-    if (idleRunning.current || waveRunning) {
+    // The idle still gets to finish: cutting a take short stops a moving
+    // picture dead, which is what read as a jump.
+    if (idleRunning.current) {
       smileQueued.current = true
       return
     }
+    // The wave does not, by request. It is a worse seam and the numbers say so
+    // — measured against the smile's opening frame, a wave frame is 2.08 away
+    // at its quietest and 14.32 with the arm up, against 3.19 from the idle and
+    // about 3.2 for the seams that read as seamless. What keeps it as good as
+    // it can be is that the wave is left RUNNING underneath: the arm comes down
+    // through the dissolve instead of freezing where it was.
     window.clearTimeout(restTimer.current)
     playSmile()
   }, [playSmile])
@@ -712,13 +730,18 @@ export function CharacterStage() {
           // black box in some browsers — this way it simply never appears.
           ref={attachWave}
           data-playing={
-            (wavePlaying && phase !== 'idle' && phase !== 'smile') || undefined
+            (wavePlaying &&
+              (phase === 'greeting' ||
+                phase === 'wave' ||
+                (phase === 'smile' && smileOver.current === 'wave'))) ||
+            undefined
           }
           onEnded={() => {
             announceGreetingDone()
             setGreetingOver(true)
-            // A combo that landed mid-gesture waited for this rather than
-            // stopping the arm where it was.
+            // A combo cut in and this clip is now running unseen under the
+            // smile. Handing back to the idle here would end the smile early.
+            if (phase === 'smile') return
             if (smileQueued.current) {
               playSmile()
               return
@@ -753,7 +776,9 @@ export function CharacterStage() {
               // solid underneath. Left to fade out on its own, what the smile
               // uncovered would be the wave's held last frame instead.
               data-playing={
-                (slot === idleSlot && (phase === 'idle' || phase === 'smile')) ||
+                (slot === idleSlot &&
+                  (phase === 'idle' ||
+                    (phase === 'smile' && smileOver.current === 'idle'))) ||
                 undefined
               }
               onEnded={() => {

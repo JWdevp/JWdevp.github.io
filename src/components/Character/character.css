@@ -27,6 +27,10 @@
      showing: with the video gone the still keeps the page behind it. */
   background: #f2f2f0;
   border-radius: var(--radius-lg);
+  /* Only on the framed clips. The sheet a pointer device gets is a cut-out
+     with a mask, not a window, and a shadow there would trace the edges of its
+     box around a figure that has none. */
+  box-shadow: var(--shadow-window);
 }
 
 .character[data-ready] {
