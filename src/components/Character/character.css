@@ -92,27 +92,16 @@
    cutting. The head is at 49.2% of the idle's width and 49.1% of the wave's —
    measured, not assumed — which is what makes one `object-position` correct for
    both. */
-/* The idle is two alternating layers above the wave — see idleNodes for why.
-   Takes swap between them, so what one of them uncovers on the way out is
-   usually the OTHER one, still fading in. That is the case the shared
-   hold-then-go rule above exists for, and these keep it: the layer arriving
-   animates on sight, the one leaving holds at full opacity for the length of
-   that fade and only then goes.
-
-   Leaving for the wave is the exception. There what they uncover is opaque
-   already, so the hold would only stretch that dissolve to twice its length,
-   and the container drops it. */
+/* The idle is the layer on top, so it is the one that moves: it fades in over
+   the wave and fades out to reveal it again. No delay in either direction —
+   what it uncovers is already opaque. */
 .character__idle {
   z-index: 1;
+  transition: opacity var(--clip-fade, 300ms) var(--ease-out);
 }
 
 .character__idle[data-playing] {
   opacity: 1;
-  transition: opacity var(--clip-fade, 300ms) var(--ease-out);
-}
-
-.character[data-idle-leaving] .character__idle {
-  transition-delay: 0s;
 }
 
 /* The easter egg sits one layer above the idle and follows the idle's rule
