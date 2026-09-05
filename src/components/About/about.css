@@ -2,9 +2,16 @@
   margin-block-end: var(--space-4);
 }
 
+/* The aside was 0.65 of the two columns and the portrait inside it stretches to
+   the height of the text beside it, which is what made the photograph tall and
+   narrow. 0.78 is that 0.65 raised by a fifth, and since a fixed gap comes off
+   the top before the fractions are shared out, the ratio between the two is
+   exactly the ratio of the widths: the column, and the photograph in it, come
+   out 20% wider. The prose tops out at 40rem, so the width the main column
+   gives up is width it was not using. */
 .about__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+  grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
   gap: clamp(2rem, 5vw, 4rem);
   /* Stretch, not start: the aside has to run the full height of the text so the
      facts panel can sit flush with the bottom of it. */
